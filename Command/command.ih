@@ -1,0 +1,13 @@
+#include "command.hh"
+
+#include <optimization/Messages/messages.hh>
+#include <base/base.hh>
+#include "Application/application.hh"
+
+using namespace base;
+using namespace std;
+using namespace master;
+using namespace network;
+using namespace os;
+using namespace optimization;
+using namespace optimization::messages;

@@ -1,0 +1,17 @@
+#include "application.hh"
+#include "WorkerPool/workerpool.hh"
+
+#include <os/os.hh>
+#include <sstream>
+#include <network/network.hh>
+#include <os/os.hh>
+#include <libxml/xinclude.h>
+#include <vector>
+#include <gcrypt.h>
+
+using namespace std;
+using namespace master;
+using namespace base;
+using namespace os;
+using namespace network;
+using namespace db;

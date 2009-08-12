@@ -1,0 +1,36 @@
+AC_INIT(optimaster, 0.1)
+
+AM_INIT_AUTOMAKE([subdir-objects])
+
+AC_CONFIG_MACRO_DIR([m4])
+AC_PROG_LIBTOOL
+
+AC_ISC_POSIX
+AC_STDC_HEADERS
+AC_PROG_CXX
+AC_HEADER_STDC
+
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+
+AC_CONFIG_HEADERS(config.h)
+AM_MAINTAINER_MODE
+
+AC_CHECK_LIB([gcrypt],[gcry_check_version], [], [
+	echo "Could not find gcrypt"
+	exit -1
+	])
+
+PKG_CHECK_MODULES(PACKAGE_OPTIMASTER, [
+	libjessevdk-0.1
+	liboptimization-0.1
+	libxml++-2.6
+])
+
+AC_SUBST(PACKAGE_OPTIMASTER_CFLAGS)
+AC_SUBST(PACKAGE_OPTIMASTER_LIBS)
+
+AC_OUTPUT(
+Makefile
+
+)

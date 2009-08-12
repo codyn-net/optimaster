@@ -1,0 +1,8 @@
+#include "workerpool.hh"
+
+#include <algorithm>
+
+using namespace std;
+using namespace base;
+using namespace master;
+using namespace network;

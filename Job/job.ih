@@ -1,0 +1,7 @@
+#include "job.hh"
+
+#include <libxml++/libxml++.h>
+
+using namespace std;
+using namespace master;
+using namespace db;
