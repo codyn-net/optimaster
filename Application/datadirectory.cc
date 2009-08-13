@@ -2,12 +2,7 @@
 
 string Application::dataDirectory() const
 {
-	string path;
-	
-	if (!Environment::variable("OPTIMIZATION_DATA_PATH", path))
-	{
-		path = "data";
-	}
+	string path = optimaster::Config::instance().dataDirectory;
 	
 	if (!FileSystem::isAbsolute(path))
 	{
@@ -15,7 +10,7 @@ string Application::dataDirectory() const
 	}
 	
 	/* Try to make it all */
-	
 	FileSystem::mkdirs(path);
+
 	return path;
 }

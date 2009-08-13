@@ -35,6 +35,13 @@ void Application::parseArguments(int &argc, char **&argv)
 	group.add_entry(jobs, thejobs);
 
 
+	Glib::OptionEntry datadir;
+	datadir.set_long_name("data");
+	datadir.set_short_name('t');
+	datadir.set_description("Data files output directory");
+	
+	group.add_entry(datadir, config.dataDirectory);
+
 	Glib::OptionEntry exitt;
 	exitt.set_long_name("exit");
 	exitt.set_short_name('e');
@@ -80,6 +87,23 @@ void Application::parseArguments(int &argc, char **&argv)
 	d_discovery.setNs(config.discoveryNamespace);
 
 	d_command.set(config.commandPort);
+	
+	// Check for data output directory existence
+	if (!FileSystem::directoryExists(config.dataDirectory))
+	{
+		if (!FileSystem::mkdirs(config.dataDirectory))
+		{
+			cerr << "# Data directory does not exist!" << endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+	
+	// Check if data dir is writable
+	if (access(config.dataDirectory.c_str(), R_OK | W_OK | X_OK) != 0)
+	{
+		cerr << "# Incorrect permissions for data directory!" << endl;
+		exit(EXIT_FAILURE);
+	}
 	
 	parts = String(thejobs).split(",");
 	

@@ -14,6 +14,7 @@ namespace optimaster
 			bool acceptAnonymous;
 			Glib::ustring discoveryNamespace;
 			Glib::ustring discoveryAddress;
+			Glib::ustring dataDirectory;
 			int commandPort;			
 			int maxJobs;
 			
