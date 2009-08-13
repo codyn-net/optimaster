@@ -1,5 +1,5 @@
 #include "jobqueue.hh"
 
 using namespace std;
-using namespace master;
+using namespace optimaster;
 using namespace base;

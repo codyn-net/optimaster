@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace master
+namespace optimaster
 {
 namespace managers
 {

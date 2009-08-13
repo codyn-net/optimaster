@@ -6,7 +6,7 @@
 
 #include <queue>
 
-namespace master
+namespace optimaster
 {
 	class WorkerPool : public base::Object
 	{

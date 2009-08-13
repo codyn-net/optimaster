@@ -8,7 +8,7 @@
 
 #include <list>
 
-namespace master
+namespace optimaster
 {
 	class JobQueue : public base::Object
 	{

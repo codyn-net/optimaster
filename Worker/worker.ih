@@ -4,7 +4,7 @@
 #include <algorithm>
 
 using namespace std;
-using namespace master;
+using namespace optimaster;
 using namespace network;
 using namespace optimization;
 using namespace optimization::messages;

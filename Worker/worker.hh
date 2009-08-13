@@ -6,7 +6,7 @@
 
 #include "Job/job.hh"
 
-namespace master
+namespace optimaster
 {
 	class Worker : public network::Client
 	{

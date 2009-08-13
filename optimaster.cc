@@ -2,7 +2,7 @@
 
 #include <glibmm.h>
 
-using namespace master;
+using namespace optimaster;
 
 int 
 main(int argc, char *argv[])

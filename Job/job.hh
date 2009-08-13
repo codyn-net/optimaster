@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace master
+namespace optimaster
 {
 	class Job : public base::Object
 	{

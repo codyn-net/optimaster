@@ -1,4 +1,4 @@
 #include "dispatcher.hh"
 
 using namespace std;
-using namespace master;
+using namespace optimaster;

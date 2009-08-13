@@ -3,7 +3,7 @@
 
 #include <optimization/optimization.hh>
 
-namespace master
+namespace optimaster
 {
 	class Dispatcher : public optimization::Settings
 	{
