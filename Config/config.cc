@@ -19,6 +19,12 @@ Config::Config()
 	
 	dataDirectory = path;
 
+	string user;
+	if (Environment::variable("USER", user))
+	{
+		discoveryNamespace = user;
+	}
+
 	registerProperty("accept anonymous", acceptAnonymous);
 	registerProperty("discovery namespace", discoveryNamespace);
 	registerProperty("discovery address", discoveryAddress);
