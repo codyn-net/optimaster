@@ -2,6 +2,9 @@
 
 void Application::parseArguments(int &argc, char **&argv) 
 {
+	// Parse config file first
+	optimaster::Config &config = optimaster::Config::initialize(CONFDIR "/optimaster.conf");
+
 	Glib::OptionGroup group("Master", "Optimization Master");
 	Glib::OptionEntry discovery;
 	
@@ -20,11 +23,7 @@ void Application::parseArguments(int &argc, char **&argv)
 	command.set_short_name('c');
 	command.set_description("Command port");
 	
-	s.str("");
-	s << optimization::Constants::CommandPort;
-	
-	Glib::ustring commandport = s.str();
-	group.add_entry(command, commandport);
+	group.add_entry(command, config.commandPort);
 	
 	
 	Glib::OptionEntry jobs;
@@ -56,24 +55,31 @@ void Application::parseArguments(int &argc, char **&argv)
 	{
 		if (port != "")
 		{
-			d_discovery.set(host, port);
+			config.discoveryAddress = host + ":" + port;
 		}
 		else
 		{
-			d_discovery.set(host, optimization::Constants::DiscoveryPort);
+			s.str("");
+			s << host << ":" << optimization::Constants::DiscoveryPort;
+
+			config.discoveryAddress = s.str();
 		}
 	}
 	else
 	{
 		if (port != "")
 		{
-			d_discovery.set(optimization::Constants::DiscoveryGroup, port);
+			config.discoveryAddress = optimization::Constants::DiscoveryGroup + ":" + port;
 		}
 		
-		d_discovery.setNs(host);
+		config.discoveryNamespace = host;
 	}
+	
+	parts = String(config.discoveryAddress).split(":", 2);
+	d_discovery.set(parts[0], parts[1]);
+	d_discovery.setNs(config.discoveryNamespace);
 
-	d_command.set(commandport);
+	d_command.set(config.commandPort);
 	
 	parts = String(thejobs).split(",");
 	

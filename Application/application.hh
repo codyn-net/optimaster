@@ -14,7 +14,7 @@
 #include <libxml++/libxml++.h>
 #include <exception>
 
-namespace master
+namespace optimaster
 {
 	class Application
 	{

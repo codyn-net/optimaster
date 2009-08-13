@@ -1,5 +1,6 @@
 #include "application.hh"
 #include "WorkerPool/workerpool.hh"
+#include "Config/config.hh"
 
 #include <os/os.hh>
 #include <sstream>
@@ -10,7 +11,7 @@
 #include <gcrypt.h>
 
 using namespace std;
-using namespace master;
+using namespace optimaster;
 using namespace base;
 using namespace os;
 using namespace network;

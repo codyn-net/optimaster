@@ -6,7 +6,7 @@
 #include <optimization/Messages/messages.hh>
 #include "Job/job.hh"
 
-namespace master
+namespace optimaster
 {
 	class Application;
 

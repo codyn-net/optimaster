@@ -1,9 +1,23 @@
+
 #include "command.ih"
 
 void Command::Data::handleAddJob(Client &client, command::AddJobCommand const &cmd) 
 {
 	size_t priority;
 	string token;
+	optimaster::Config &config = Config::instance();
+	
+	if (!cmd.has_token() && !config.acceptAnonymous)
+	{
+		response(client, command::AddJob, false, "Tokenless jobs are not allowed");
+		return;
+	}
+	
+	if (config.maxJobs != 0 && application.jobs().size() >= config.maxJobs)
+	{
+		response(client, command::AddJob, false, "Too many jobs");
+		return;
+	}
 	
 	if (cmd.has_priority())
 	{
