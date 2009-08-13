@@ -4,9 +4,9 @@ include Makefile.am.inc
 optimaster_CFLAGS += $(GCRYPT_CFLAGS)
 optimaster_LDFLAGS += $(GCRYPT_LIBS)
 
-opticonfdir = $(sysconfdir)
+opticonfdir = $(datadir)/optimaster
 opticonf_DATA = \
-	optimaster.conf
+	optimaster.conf.ex
 
 EXTRA_DIST = \
 	$(opticonf_DATA)
