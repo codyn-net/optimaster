@@ -1,6 +1,6 @@
 #include "application.ih"
 
-void Application::addJobFromXmlFile(string const &filename, size_t priority, Job &job) 
+void Application::addJobFromXmlFile(string const &filename, size_t priority, Job &job, std::string const &user) 
 {
 	xmlpp::DomParser parser;
 	
@@ -15,5 +15,5 @@ void Application::addJobFromXmlFile(string const &filename, size_t priority, Job
 		throw InvalidJob("Could not read file `" + filename + "'");
 	}
 	
-	addJobFromXml(parser, priority, job);
+	addJobFromXml(parser, priority, job, user);
 }

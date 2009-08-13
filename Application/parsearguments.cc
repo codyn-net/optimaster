@@ -4,7 +4,7 @@ void Application::parseArguments(int &argc, char **&argv)
 {
 	// Parse config file first
 	optimaster::Config &config = optimaster::Config::initialize(CONFDIR "/optimaster.conf");
-
+	
 	Glib::OptionGroup group("Master", "Optimization Master");
 	Glib::OptionEntry discovery;
 	
@@ -93,7 +93,7 @@ void Application::parseArguments(int &argc, char **&argv)
 	{
 		if (!FileSystem::mkdirs(config.dataDirectory))
 		{
-			cerr << "# Data directory does not exist!" << endl;
+			cerr << "# Data directory `" << config.dataDirectory << "` does not exist!" << endl;
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -101,7 +101,7 @@ void Application::parseArguments(int &argc, char **&argv)
 	// Check if data dir is writable
 	if (access(config.dataDirectory.c_str(), R_OK | W_OK | X_OK) != 0)
 	{
-		cerr << "# Incorrect permissions for data directory!" << endl;
+		cerr << "# Incorrect permissions for data directory `" << config.dataDirectory << "`!" << endl;
 		exit(EXIT_FAILURE);
 	}
 	

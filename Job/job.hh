@@ -28,6 +28,7 @@ namespace optimaster
 		{
 			/* Instance data */
 			std::string name;
+			std::string user;
 
 			base::Cloneable<optimization::Optimizer> optimizer;
 			base::Cloneable<optimization::Fitness> fitness;
@@ -71,6 +72,9 @@ namespace optimaster
 			
 			double priority() const;
 			void setPriority(size_t priority);
+			
+			void setUser(std::string const &user);
+			std::string const &user() const;
 			
 			void initializeDatabase();
 		private:
@@ -140,6 +144,16 @@ namespace optimaster
 	inline void Job::setToken(std::string const &token)
 	{
 		d_data->token = token;
+	}
+	
+	inline std::string const &Job::user() const
+	{
+		return d_data->user;
+	}
+	
+	inline void Job::setUser(std::string const &user)
+	{
+		d_data->user = user;
 	}
 }
 

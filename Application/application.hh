@@ -51,15 +51,17 @@ namespace optimaster
 			/* Public functions */		
 			void run(Glib::RefPtr<Glib::MainLoop> loop);
 			
-			void addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &job);
-			void addJobFromXml(std::string const &filename, size_t priority, Job &job);
-			void addJobFromXmlFile(std::string const &filename, size_t priority, Job &job);
+			void addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &job, std::string const &user = "");
+			void addJobFromXml(std::string const &filename, size_t priority, Job &job, std::string const &user = "");
+			void addJobFromXmlFile(std::string const &filename, size_t priority, Job &job, std::string const &user = "");
 			
 			std::vector<Job> jobs() const;
 			bool job(std::string const &name, Job &job) const;
 			
 			bool removeJob(std::string const &name);
 			bool removeJob(Job &job);
+
+			std::string dataDirectory() const;
 		private:
 			/* Private functions */
 			void parseArguments(int &argc, char **&argv);
@@ -73,7 +75,6 @@ namespace optimaster
 			void parseBoundaries(optimization::Boundaries &boundaries, xmlpp::Element *child);
 			void parseParameters(optimization::Parameters &parameters, optimization::Boundaries &boundaries, xmlpp::Element *child);
 			
-			std::string dataDirectory() const;
 			void addJob(Job &job);
 			
 			bool jobByToken(std::string const &token, Job &job) const;

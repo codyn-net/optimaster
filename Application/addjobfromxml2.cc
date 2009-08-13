@@ -1,6 +1,6 @@
 #include "application.ih"
 
-void Application::addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &jobret)
+void Application::addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &jobret, std::string const &user)
 {	
 	if (!parser)
 	{
@@ -36,6 +36,11 @@ void Application::addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &
 	if (origJobName == "")
 	{
 		throw InvalidJob("Job name cannot be empty");
+	}
+	
+	if (user != "")
+	{
+		origJobName = user + ":" + origJobName;
 	}
 	
 	size_t i = 0;
@@ -122,11 +127,23 @@ void Application::addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &
 		parseParameters(parameters, boundaries, child);
 	}
 	
-	optimizer->setDataFilename(FileSystem::uniqueName(dataDirectory() + "/" + jobName + ".db"));
+	string datafile;
+	
+	if (user != "")
+	{
+		datafile = user + "/" + jobName.substr(user.size() + 1);
+	}
+	else
+	{
+		datafile = jobName;
+	}
+
+	optimizer->setDataFilename(FileSystem::uniqueName(dataDirectory() + "/" + datafile + ".db"));
 
 	Job j(jobName, optimizer, fitness, parameters, boundaries, dispatcher);
 	
 	j.setPriority(priority);
+	j.setUser(user);
 	
 	addJob(j);
 	jobret = j;

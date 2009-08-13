@@ -5,6 +5,8 @@ void Command::Data::handleAddJob(Client &client, command::AddJobCommand const &c
 {
 	size_t priority;
 	string token;
+	string user;
+
 	optimaster::Config &config = Config::instance();
 	
 	if (!cmd.has_token() && !config.acceptAnonymous)
@@ -32,12 +34,17 @@ void Command::Data::handleAddJob(Client &client, command::AddJobCommand const &c
 	{
 		token = cmd.token();
 	}
+	
+	if (cmd.has_user())
+	{
+		user = cmd.user();
+	}
 
 	Job job;
 	
 	try
 	{
-		application.addJobFromXml(cmd.description(), priority, job);
+		application.addJobFromXml(cmd.description(), priority, job, user);
 	}
 	catch (Application::InvalidJob &e)
 	{
@@ -45,6 +52,6 @@ void Command::Data::handleAddJob(Client &client, command::AddJobCommand const &c
 		return;
 	}
 	
-	job.setToken(token);
+	job.setToken(token);	
 	response(client, command::AddJob, true, string("Added new job: ") + job.name());
 }
