@@ -118,3 +118,31 @@ optimaster_SOURCES = \
 	Config/initialize.cc \
 	Config/config.cc \
 	Config/instance.cc
+noinst_HEADERS = \
+	Application/application.ih \
+	Application/application.hh \
+	WorkerPool/workerpool.hh \
+	WorkerPool/workerpool.ih \
+	Command/command.hh \
+	Command/command.ih \
+	Managers/Module/module.hh \
+	Managers/Module/Scanner/scanner.ih \
+	Managers/Module/Scanner/scanner.hh \
+	Managers/Optimizer/optimizer.ih \
+	Managers/Optimizer/optimizer.hh \
+	Managers/Optimizer/Extension/extension.ih \
+	Managers/Optimizer/Extension/extension.hh \
+	JobQueue/jobqueue.ih \
+	JobQueue/jobqueue.hh \
+	JobQueue/Item/item.hh \
+	JobQueue/Item/item.ih \
+	Worker/worker.ih \
+	Worker/worker.hh \
+	Dispatcher/dispatcher.hh \
+	Dispatcher/dispatcher.ih \
+	Job/job.ih \
+	Job/job.hh \
+	Config/config.ih \
+	Config/config.hh
+
+EXTRA_DIST = $(noinst_HEADERS)
