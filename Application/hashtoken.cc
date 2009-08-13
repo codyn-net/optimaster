@@ -31,7 +31,7 @@ string Application::hashToken(Job const &job, string const &challenge)
 	
 	for (size_t i = 0; i < gcry_md_get_algo_dlen(GCRY_MD_SHA1); ++i)
 	{
-		s << hex << ptr[i];
+		s << hex << setw(2) << setfill('0') << static_cast<unsigned>(ptr[i]);
 	}
 	
 	gcry_md_close(hd);

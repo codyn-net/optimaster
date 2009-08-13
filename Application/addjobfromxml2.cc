@@ -1,6 +1,6 @@
 #include "application.ih"
 
-void Application::addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &jobret, std::string const &user)
+void Application::addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &jobret, std::string const &user, std::string const &chain)
 {	
 	if (!parser)
 	{
@@ -138,12 +138,16 @@ void Application::addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &
 		datafile = jobName;
 	}
 
-	optimizer->setDataFilename(FileSystem::uniqueName(dataDirectory() + "/" + datafile + ".db"));
+	string filename = FileSystem::uniqueName(dataDirectory() + "/" + datafile + ".db");
+	FileSystem::mkdirs(FileSystem::dirname(filename));
+
+	optimizer->setDataFilename(filename);
 
 	Job j(jobName, optimizer, fitness, parameters, boundaries, dispatcher);
 	
 	j.setPriority(priority);
 	j.setUser(user);
+	j.setChain(chain);
 	
 	addJob(j);
 	jobret = j;

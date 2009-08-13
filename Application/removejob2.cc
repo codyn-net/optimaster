@@ -16,6 +16,29 @@ bool Application::removeJob(Job &job)
 	d_jobs.erase(iter);
 	
 	d_command.jobRemoved(job);
+	
+	// Check if there were jobs that depended on this guy
+	for (iter = d_jobs.begin(); iter != d_jobs.end(); ++iter)
+	{
+		Job &j = iter->second;
+		
+		if (j.chain() == "")
+		{
+			continue;
+		}
+		
+		string chain = j.chain();
+	
+		if (j.user() != "")
+		{
+			chain = j.user() + ":" + chain;
+		}
+	
+		if (d_jobs.find(chain) == d_jobs.end())
+		{
+			d_jobQueue.queue(j);
+		}
+	}
 
 	return true;
 }

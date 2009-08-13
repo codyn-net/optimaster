@@ -29,6 +29,7 @@ namespace optimaster
 			/* Instance data */
 			std::string name;
 			std::string user;
+			std::string chain;
 
 			base::Cloneable<optimization::Optimizer> optimizer;
 			base::Cloneable<optimization::Fitness> fitness;
@@ -75,6 +76,9 @@ namespace optimaster
 			
 			void setUser(std::string const &user);
 			std::string const &user() const;
+			
+			void setChain(std::string const &chain);
+			std::string const &chain() const;
 			
 			void initializeDatabase();
 		private:
@@ -154,6 +158,16 @@ namespace optimaster
 	inline void Job::setUser(std::string const &user)
 	{
 		d_data->user = user;
+	}
+	
+	inline std::string const &Job::chain() const
+	{
+		return d_data->chain;
+	}
+	
+	inline void Job::setChain(std::string const &chain)
+	{
+		d_data->chain = chain;
 	}
 }
 

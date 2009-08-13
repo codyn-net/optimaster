@@ -6,6 +6,7 @@ void Command::Data::handleAddJob(Client &client, command::AddJobCommand const &c
 	size_t priority;
 	string token;
 	string user;
+	string chain;
 
 	optimaster::Config &config = Config::instance();
 	
@@ -39,12 +40,17 @@ void Command::Data::handleAddJob(Client &client, command::AddJobCommand const &c
 	{
 		user = cmd.user();
 	}
-
+	
+	if (cmd.has_chain())
+	{
+		chain = cmd.chain();
+	}
+	
 	Job job;
 	
 	try
 	{
-		application.addJobFromXml(cmd.description(), priority, job, user);
+		application.addJobFromXml(cmd.description(), priority, job, user, chain);
 	}
 	catch (Application::InvalidJob &e)
 	{
@@ -52,6 +58,6 @@ void Command::Data::handleAddJob(Client &client, command::AddJobCommand const &c
 		return;
 	}
 	
-	job.setToken(token);	
+	job.setToken(token);
 	response(client, command::AddJob, true, string("Added new job: ") + job.name());
 }

@@ -51,9 +51,9 @@ namespace optimaster
 			/* Public functions */		
 			void run(Glib::RefPtr<Glib::MainLoop> loop);
 			
-			void addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &job, std::string const &user = "");
-			void addJobFromXml(std::string const &filename, size_t priority, Job &job, std::string const &user = "");
-			void addJobFromXmlFile(std::string const &filename, size_t priority, Job &job, std::string const &user = "");
+			void addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &job, std::string const &user = "", std::string const &chain = "");
+			void addJobFromXml(std::string const &filename, size_t priority, Job &job, std::string const &user = "", std::string const &chain = "");
+			void addJobFromXmlFile(std::string const &filename, size_t priority, Job &job, std::string const &user = "", std::string const &chain = "");
 			
 			std::vector<Job> jobs() const;
 			bool job(std::string const &name, Job &job) const;
