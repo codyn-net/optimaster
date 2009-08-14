@@ -3,7 +3,7 @@
 Config::Config()
 {
 	stringstream s;
-	s << ":" << optimization::Constants::DiscoveryPort;
+	s << optimization::Constants::DiscoveryGroup << ":" << optimization::Constants::DiscoveryPort;
 
 	acceptAnonymous = true;
 	maxJobs = 0;

@@ -10,10 +10,10 @@ void Application::parseArguments(int &argc, char **&argv)
 	
 	discovery.set_long_name("discovery");
 	discovery.set_short_name('d');
-	discovery.set_description("Discovery port");
+	discovery.set_description("Discovery address/namespace");
 
 	stringstream s;
-	s << ":" << optimization::Constants::DiscoveryPort;
+	s << optimization::Constants::DiscoveryGroup << ":" << optimization::Constants::DiscoveryPort;
 
 	Glib::ustring disc = s.str();
 	group.add_entry(discovery, disc);
@@ -83,6 +83,12 @@ void Application::parseArguments(int &argc, char **&argv)
 	}
 	
 	parts = String(config.discoveryAddress).split(":", 2);
+	
+	if (parts[0] == "")
+	{
+		parts[0] = optimization::Constants::DiscoveryGroup;
+	}
+
 	d_discovery.set(parts[0], parts[1]);
 	d_discovery.setNs(config.discoveryNamespace);
 
