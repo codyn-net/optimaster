@@ -83,7 +83,7 @@ namespace optimaster
 			bool onDispatch();
 			
 			void onWorkerRemoved(Worker &worker);
-			void onWorkerFailed(bool timeout, Worker worker);
+			void onWorkerFailed(optimization::messages::worker::Response::Failure &failure, Worker worker);
 			void onWorkerSuccess(Worker::SuccessArgs &args);
 			void onWorkerChallenge(std::string &challenge, Worker worker);
 			
@@ -97,6 +97,9 @@ namespace optimaster
 			bool getFirstChild(xmlpp::Node *node, std::string const &name, xmlpp::Element *&child);
 			
 			std::string hashToken(Job const &job, std::string const &challenge);
+			
+			std::string failureError(optimization::messages::worker::Response::Failure const &failure) const;
+			std::string failureMessage(optimization::messages::worker::Response::Failure const &failure) const;
 	};
 	
 	template <typename TParent, typename TManager>

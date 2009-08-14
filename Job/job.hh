@@ -42,6 +42,7 @@ namespace optimaster
 			double executionTime;
 			
 			std::string token;
+			size_t failures;
 			
 			~Data();
 		};
@@ -79,6 +80,10 @@ namespace optimaster
 			
 			void setChain(std::string const &chain);
 			std::string const &chain() const;
+			
+			void failed();
+			void failed(size_t reset);
+			size_t failures() const;
 			
 			void initializeDatabase();
 		private:
@@ -168,6 +173,21 @@ namespace optimaster
 	inline void Job::setChain(std::string const &chain)
 	{
 		d_data->chain = chain;
+	}
+	
+	inline void Job::failed()
+	{
+		++d_data->failures;
+	}
+	
+	inline void Job::failed(size_t reset)
+	{
+		d_data->failures = reset;
+	}
+	
+	inline size_t Job::failures() const
+	{
+		return d_data->failures;
 	}
 }
 

@@ -4,11 +4,6 @@ void Application::newIteration(Job &job)
 {
 	if (job.optimizer().iteration())
 	{
-		if (job.optimizer().currentIteration() == 1)
-		{
-			job.initializeDatabase();
-		}
-
 		debug_master << "New iteration for " << job.name() << endl;
 		d_jobQueue.queue(job);
 

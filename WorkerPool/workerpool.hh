@@ -24,7 +24,7 @@ namespace optimaster
 			void removeWorker(Worker &worker);
 
 			void onWorkerClosed(int fd, Worker worker);
-			void onWorkerFailed(bool timeout, Worker worker);
+			void onWorkerFailed(optimization::messages::worker::Response::Failure &failure, Worker worker);
 			void onWorkerSuccess(Worker::SuccessArgs &args, Worker worker);
 			
 			base::signals::Signal<> onWorkerIdle;

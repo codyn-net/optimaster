@@ -1,6 +1,6 @@
 #include "workerpool.ih"
 
-void WorkerPool::Data::onWorkerFailed(bool timeout, Worker worker) 
+void WorkerPool::Data::onWorkerFailed(optimization::messages::worker::Response::Failure &failure, Worker worker) 
 {
 	workerFinished(worker);
 }

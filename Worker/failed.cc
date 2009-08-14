@@ -1,7 +1,11 @@
 #include "worker.ih"
 
-void Worker::failed(bool timeout) 
+void Worker::failed(worker::Response::Failure::Type type, string const &message)
 {
-	++d_data->failures;
-	d_data->onFailed(timeout);
+	worker::Response::Failure failure;
+	
+	failure.set_type(type);
+	failure.set_message(message);
+	
+	d_data->onFailed(failure);
 }

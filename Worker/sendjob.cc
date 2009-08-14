@@ -76,6 +76,6 @@ void Worker::sendJob(Job &job, optimization::Solution &solution)
 	}
 	else
 	{
-		failed(false);
+		failed(optimization::messages::worker::Response::Failure::Unknown);
 	}
 }

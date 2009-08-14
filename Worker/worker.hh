@@ -26,14 +26,13 @@ namespace optimaster
 		
 			/* Public functions */
 			void sendJob(Job &job, optimization::Solution &solution);
-			void failed(bool timeout);
-			
-			size_t failures() const;
 			
 			Job &job();
 			optimization::Solution &solution();
 			
-			base::signals::Signal<bool> &onFailed();
+			void failed(optimization::messages::worker::Response::Failure::Type type, std::string const &message = "");
+			
+			base::signals::Signal<optimization::messages::worker::Response::Failure> &onFailed();
 			base::signals::Signal<SuccessArgs> &onSuccess();
 			base::signals::Signal<std::string> &onChallenge();
 		private:
@@ -41,14 +40,13 @@ namespace optimaster
 			struct Data : public base::Object::PrivateData
 			{
 				/* Instance data */
-				base::signals::Signal<bool> onFailed;
+				base::signals::Signal<optimization::messages::worker::Response::Failure> onFailed;
 				base::signals::Signal<SuccessArgs> onSuccess;
 				base::signals::Signal<std::string> onChallenge;
 
 				sigc::connection timeout;
 			
 				SuccessArgs args;
-				size_t failures;
 				
 				bool onData(os::FileDescriptor::DataArgs &args);
 				bool onTimeout();
@@ -67,7 +65,7 @@ namespace optimaster
 		return d_data->args.solution;
 	}
 	
-	inline base::signals::Signal<bool> &Worker::onFailed()
+	inline base::signals::Signal<optimization::messages::worker::Response::Failure> &Worker::onFailed()
 	{
 		return d_data->onFailed;
 	}

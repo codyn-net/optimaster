@@ -16,6 +16,7 @@ optimaster_CFLAGS = D_GNU_SOURCE -g $(PACKAGE_OPTIMASTER_CFLAGS)
 optimaster_LDFLAGS = $(PACKAGE_OPTIMASTER_LIBS)
 optimaster_SOURCES = \
 	optimaster.cc \
+	Application/failureerror.cc \
 	Application/addjobfromxml2.cc \
 	Application/removejob2.cc \
 	Application/run.cc \
@@ -27,6 +28,7 @@ optimaster_SOURCES = \
 	Application/application.cc \
 	Application/registerworker.cc \
 	Application/datadirectory.cc \
+	Application/failuremessage.cc \
 	Application/invalidjobwhat.cc \
 	Application/invalidjobinvalidjob.cc \
 	Application/parseboundaries.cc \
@@ -104,7 +106,6 @@ optimaster_SOURCES = \
 	JobQueue/Item/canovertake.cc \
 	Worker/failed.cc \
 	Worker/sendjob.cc \
-	Worker/failures.cc \
 	Worker/dataondata.cc \
 	Worker/worker1.cc \
 	Worker/dataontimeout.cc \
@@ -118,6 +119,7 @@ optimaster_SOURCES = \
 	Config/initialize.cc \
 	Config/config.cc \
 	Config/instance.cc
+
 noinst_HEADERS = \
 	Application/application.ih \
 	Application/application.hh \

@@ -7,7 +7,5 @@ Worker::Worker(AddressInfo &info)
 	d_data = new Data();
 	addPrivateData(d_data);
 	
-	d_data->failures = 0;
-
 	onData().add(*d_data, &Data::onData);
 }

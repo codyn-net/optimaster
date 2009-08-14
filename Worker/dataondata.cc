@@ -28,23 +28,27 @@ bool Worker::Data::onData(os::FileDescriptor::DataArgs &args)
 		timeout.disconnect();
 	}
 	
-	if (r.status() != worker::Response::Success || this->args.solution.id() != static_cast<size_t>(r.id()))
+	if (r.status() != worker::Response::Success)
 	{
-		bool timeout = r.has_failure() && r.failure().type() == worker::Response::Failure::Timeout;
+		debug_worker << "Got response, worker failed (" << r.id() << "), " << r.status() << "..." << endl;
+		this->args.job.failed();
 		
-		if (r.status() != worker::Response::Success)
+		if (!r.has_failure())
 		{
-			debug_worker << "Got response, worker failed (" << r.id() << "), " << r.status() << "..." << endl;
-		}
-		else
-		{
-			this->args.job.optimizer().log(optimization::Optimizer::LogType::Error) << "Worker responded with wrong id. Expected " << this->args.solution.id() << " but got " << static_cast<size_t>(r.id()) << optimization::Optimizer::Logger::End();
-
-			debug_worker << "Got response,  but for wrong request..." << endl;
+			r.mutable_failure()->set_type(worker::Response::Failure::Unknown);
 		}
 		
-		++failures;
-		onFailed(timeout);
+		onFailed(*r.mutable_failure());
+	}
+	else if (this->args.solution.id() != static_cast<size_t>(r.id()))
+	{
+		this->args.job.optimizer().log(optimization::Optimizer::LogType::Error) << "Worker responded with wrong id. Expected " << this->args.solution.id() << " but got " << static_cast<size_t>(r.id()) << optimization::Optimizer::Logger::End();
+		debug_worker << "Got response, but for wrong request..." << endl;
+		
+		worker::Response::Failure failure;
+		failure.set_type(worker::Response::Failure::WrongRequest);
+		
+		onFailed(failure);
 	}
 	else
 	{
@@ -56,7 +60,7 @@ bool Worker::Data::onData(os::FileDescriptor::DataArgs &args)
 		for (int i = 0; i < r.fitness_size(); ++i)
 			this->args.fitness[r.fitness(i).name()] = r.fitness(i).value();
 
-		failures = 0;
+		this->args.job.failed(0);
 		onSuccess(this->args);
 	}
 

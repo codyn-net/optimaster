@@ -12,6 +12,8 @@ void Application::addJob(Job &job)
 		chain = job.user() + ":" + chain;
 	}
 	
+	job.initializeDatabase();
+	
 	if (chain == "" || d_jobs.find(chain) == d_jobs.end())
 	{
 		job.setChain("");

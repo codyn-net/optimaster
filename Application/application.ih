@@ -17,3 +17,4 @@ using namespace base;
 using namespace os;
 using namespace network;
 using namespace db;
+using namespace optimization::messages;

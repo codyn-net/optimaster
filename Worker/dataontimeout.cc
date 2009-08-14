@@ -2,9 +2,12 @@
 
 bool Worker::Data::onTimeout() 
 {
-	bool timeout = true;
+	worker::Response::Failure failure;
 	
-	++failures;
-	onFailed(timeout);
+	failure.set_type(worker::Response::Failure::Timeout);
+
+	this->args.job.failed();
+	onFailed(failure);
+
 	return false;
 }

@@ -12,7 +12,7 @@ void WorkerPool::Data::onWorkerClosed(int fd, Worker worker)
 	if (iter != activeWorkers.end())
 	{
 		/* Worker was active when it was disconnected... */
-		worker.failed(false);
+		worker.failed(optimization::messages::worker::Response::Failure::Disconnected);
 	}
 	
 	removeWorker(worker);

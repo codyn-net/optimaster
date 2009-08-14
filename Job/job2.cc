@@ -14,6 +14,7 @@ Job::Job(string const &name, optimization::Optimizer &optimizer, optimization::F
 	
 	d_data->executionTime = 1;
 	d_data->priority = 1;
+	d_data->failures = 0;
 	
 	d_data->optimizer->setup(parameters, boundaries, fitness);
 	d_data->optimizer->reset();

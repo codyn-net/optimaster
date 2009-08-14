@@ -7,4 +7,5 @@ Job::Job()
 	
 	d_data->executionTime = 1;
 	d_data->priority = 1;
+	d_data->failures = 0;
 }
