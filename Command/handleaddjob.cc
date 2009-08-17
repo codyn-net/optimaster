@@ -16,7 +16,7 @@ void Command::Data::handleAddJob(Client &client, command::AddJobCommand const &c
 		return;
 	}
 	
-	if (config.maxJobs != 0 && application.jobs().size() >= config.maxJobs)
+	if (config.maxJobs != 0 && static_cast<int>(application.jobs().size()) >= config.maxJobs)
 	{
 		response(client, command::AddJob, false, "Too many jobs");
 		return;
