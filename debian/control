@@ -17,5 +17,6 @@ Package: optimaster
 Section: science
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: liboptimization-optimizers-pso0
 Description: liboptimization master application
  Master application for liboptimization
