@@ -141,13 +141,13 @@ void Application::addJobFromXml(xmlpp::DomParser &parser, size_t priority, Job &
 	string filename = FileSystem::uniqueName(dataDirectory() + "/" + datafile + ".db");
 	FileSystem::mkdirs(FileSystem::dirname(filename));
 
-	optimizer->setDataFilename(filename);
-
 	Job j(jobName, optimizer, fitness, parameters, boundaries, dispatcher);
-	
+
 	j.setPriority(priority);
 	j.setUser(user);
 	j.setChain(chain);
+
+	optimizer->setDataFilename(filename);
 	
 	addJob(j);
 	jobret = j;
