@@ -2,5 +2,5 @@
 
 string Optimizer::Extension::searchDirectory() const
 {
-	return LIBDIR "/liboptimization-optimizers-0.1/optimizers/extensions";
+	return LIBDIR "/liboptimization-optimizers-0.1/extensions";
 }
