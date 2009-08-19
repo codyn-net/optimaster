@@ -3,7 +3,12 @@
 *.Po
 autom4te.cache
 aclocal.m4
-config.*
+config.h
+config.h.in
+config.sub
+config.guess
+config.status
+config.log
 configure
 depcomp
 install-sh
