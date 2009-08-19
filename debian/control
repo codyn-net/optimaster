@@ -18,5 +18,7 @@ Section: science
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: liboptimization-optimizers-pso0
+Conflicts: liboptimization0-applications-optimaster
+Replaces: liboptimization0-applications-optimaster
 Description: liboptimization master application
  Master application for liboptimization
