@@ -8,7 +8,10 @@ Config::Config()
 	acceptAnonymous = true;
 	maxJobs = 0;
 	discoveryAddress = s.str();
-	commandPort = optimization::Constants::CommandPort;
+	
+	s.str("");
+	s << "127.0.0.1:" << optimization::Constants::CommandPort;
+	commandAddress = s.str();
 	
 	string path;
 	
@@ -28,7 +31,7 @@ Config::Config()
 	registerProperty("accept anonymous", acceptAnonymous);
 	registerProperty("discovery namespace", discoveryNamespace);
 	registerProperty("discovery address", discoveryAddress);
-	registerProperty("command port", commandPort);
+	registerProperty("command address", commandAddress);
 	registerProperty("data directory", dataDirectory);
 
 	registerProperty("maximum jobs", maxJobs);

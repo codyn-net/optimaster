@@ -15,7 +15,7 @@ namespace optimaster
 			Glib::ustring discoveryNamespace;
 			Glib::ustring discoveryAddress;
 			Glib::ustring dataDirectory;
-			int commandPort;			
+			Glib::ustring commandAddress;
 			int maxJobs;
 			
 			/* Constructor/destructor */

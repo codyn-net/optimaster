@@ -9,8 +9,8 @@
 ### The discovery address to use
 # discovery address = 
 
-### The command port
-# command port =
+### The command address to use
+# command address =
 
 ### Maximum number of simultaneous jobs (if 0, unlimited)
 # maximum jobs = 0
