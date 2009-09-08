@@ -1,4 +1,4 @@
-AC_INIT(optimaster, 0.2)
+AC_INIT(optimaster, 0.3)
 
 AM_INIT_AUTOMAKE([subdir-objects])
 

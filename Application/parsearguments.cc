@@ -21,10 +21,9 @@ void Application::parseArguments(int &argc, char **&argv)
 	Glib::OptionEntry command;
 	command.set_long_name("command");
 	command.set_short_name('c');
-	command.set_description("Command port");
+	command.set_description("Command listen address");
 	
-	group.add_entry(command, config.commandPort);
-	
+	group.add_entry(command, config.commandAddress);
 	
 	Glib::OptionEntry jobs;
 	jobs.set_long_name("jobs");
@@ -88,11 +87,26 @@ void Application::parseArguments(int &argc, char **&argv)
 	{
 		parts[0] = optimization::Constants::DiscoveryGroup;
 	}
-
+	
 	d_discovery.set(parts[0], parts[1]);
 	d_discovery.setNs(config.discoveryNamespace);
 
-	d_command.set(config.commandPort);
+	parts = String(config.commandAddress).split(":", 2);
+	
+	if (parts.size() == 1 || parts[1] == "")
+	{
+		if (parts.size() == 1)
+		{
+			parts.push_back("");
+		}
+
+		stringstream s;
+		s << optimization::Constants::CommandPort;
+		
+		parts[1] = s.str();
+	}
+
+	d_command.set(parts[0], parts[1]);
 	
 	// Check for data output directory existence
 	if (!FileSystem::directoryExists(config.dataDirectory))
