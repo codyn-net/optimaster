@@ -1,8 +1,14 @@
+optimaster (0.3-1) $DIST; urgency=low
+
+  * New upstream release 0.3 
+
+ -- Jesse van den Kieboom <jvanden@grijpc10.epfl.ch>  Tue, 08 Sep 2009 16:49:22 +0200
+
 optimaster (0.2-1) $DIST; urgency=low
 
   * New upstream release 0.2
 
- -- Jesse van den Kieboom <jesse.vandenkieboom@epfl.ch>  Tue, 18 Aug 2009 22:35:32 +0200
+ -- Jesse van den Kieboom <jvanden@grijpc10.epfl.ch>  Tue, 08 Sep 2009 16:48:58 +0200
 
 optimaster (0.1-1) $DIST; urgency=low
 
