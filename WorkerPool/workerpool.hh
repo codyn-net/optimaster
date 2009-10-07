@@ -4,7 +4,7 @@
 #include <base/base.hh>
 #include "Worker/worker.hh"
 
-#include <queue>
+#include <deque>
 
 namespace optimaster
 {
@@ -16,16 +16,12 @@ namespace optimaster
 			std::deque<Worker> idleWorkers;
 			std::deque<Worker> activeWorkers;
 			
-			std::map<std::string, size_t> activeWorkersPerJob;
-			
 			std::map<std::string, Worker> allWorkers;
 			
-			void workerFinished(Worker &worker);
 			void removeWorker(Worker &worker);
 
 			void onWorkerClosed(int fd, Worker worker);
-			void onWorkerFailed(optimization::messages::worker::Response::Failure &failure, Worker worker);
-			void onWorkerSuccess(Worker::SuccessArgs &args, Worker worker);
+			void onWorkerResponse(optimization::messages::task::Response &response, Worker worker);
 			
 			base::signals::Signal<> onWorkerIdle;
 			base::signals::Signal<Worker> onWorkerRemoved;
@@ -41,11 +37,10 @@ namespace optimaster
 			Worker add(std::string const &connection);
 			
 			bool hasIdleWorkers() const;
-			bool activateWorker(Job &job, optimization::Solution &solution, Worker &worker);
-			
-			size_t active(Job &job) const;
+			bool activate(taskqueue::Task &task);
 			
 			void close();
+
 			base::signals::Signal<> &onWorkerIdle();
 			base::signals::Signal<Worker> &onWorkerRemoved();
 		private:

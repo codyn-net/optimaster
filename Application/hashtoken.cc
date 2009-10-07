@@ -1,6 +1,6 @@
 #include "application.ih"
 
-string Application::hashToken(Job const &job, string const &challenge)
+/*string Application::hashToken(Job const &job, string const &challenge)
 {
 	string const &token = job.token();
 	
@@ -36,4 +36,4 @@ string Application::hashToken(Job const &job, string const &challenge)
 	
 	gcry_md_close(hd);
 	return s.str();
-}
+}*/

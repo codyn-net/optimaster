@@ -2,8 +2,8 @@
 
 void Application::onWorkerChallenge(string &challenge, Worker worker)
 {
-	// Do some calculation with the job token, and write the response
-	string response = hashToken(worker.job(), challenge);
+	// TODO: Do some calculation with the job token, and write the response
+	/*string response = hashToken(worker.job(), challenge);
 
 	optimization::messages::worker::Communication message;
 	optimization::messages::worker::Token &token = *message.mutable_token();
@@ -18,5 +18,5 @@ void Application::onWorkerChallenge(string &challenge, Worker worker)
 	if (optimization::Messages::create(message, serialized))
 	{
 		worker.write(serialized);
-	}
+	}*/
 }

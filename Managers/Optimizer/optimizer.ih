@@ -1,5 +1,0 @@
-#include "optimizer.hh"
-
-using namespace std;
-using namespace optimaster::managers;
-using namespace base;

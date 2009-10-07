@@ -2,15 +2,11 @@
 
 bool Application::onDispatch() 
 {
-	while (d_jobQueue.hasJobs() && d_workerPool.hasIdleWorkers())
+	taskqueue::Task task;
+	
+	while (d_workerPool.hasIdleWorkers() && d_taskQueue.pop(task))
 	{
-		Job job;
-		optimization::Solution solution;
-		
-		d_jobQueue.pop(job, solution);
-		
-		Worker worker;
-		d_workerPool.activateWorker(job, solution, worker);
+		d_workerPool.activate(task);
 	}
 	
 	return false;

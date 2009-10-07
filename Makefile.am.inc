@@ -16,105 +16,46 @@ optimaster_CFLAGS = D_GNU_SOURCE -g $(PACKAGE_OPTIMASTER_CFLAGS)
 optimaster_LDFLAGS = $(PACKAGE_OPTIMASTER_LIBS)
 optimaster_SOURCES = \
 	optimaster.cc \
-	Application/failureerror.cc \
-	Application/addjobfromxml2.cc \
-	Application/removejob2.cc \
 	Application/run.cc \
-	Application/onworkersuccess.cc \
-	Application/jobs.cc \
-	Application/addjobfromxml1.cc \
-	Application/addjob.cc \
-	Application/addjobfromxmlfile.cc \
+	Application/onworkerresponse.cc \
 	Application/application.cc \
 	Application/registerworker.cc \
-	Application/datadirectory.cc \
-	Application/failuremessage.cc \
-	Application/invalidjobwhat.cc \
-	Application/invalidjobinvalidjob.cc \
-	Application/parseboundaries.cc \
-	Application/onworkerfailed.cc \
 	Application/enableenvironment.cc \
-	Application/newiteration.cc \
-	Application/parseparameters.cc \
 	Application/ondispatch.cc \
 	Application/hashtoken.cc \
-	Application/getfirstchild.cc \
 	Application/oninterrupt.cc \
 	Application/ongreeting.cc \
-	Application/settingsfromxml.cc \
 	Application/sendwakeup.cc \
 	Application/onworkerchallenge.cc \
 	Application/onworkerremoved.cc \
+	Application/onidlework.cc \
 	Application/parsearguments.cc \
-	Application/onworkeridle.cc \
-	Application/job.cc \
-	Application/jobbytoken.cc \
-	Application/removejob1.cc \
+	TaskQueue/pop.cc \
+	TaskQueue/updateprioritysum.cc \
+	TaskQueue/insert.cc \
+	TaskQueue/empty.cc \
+	TaskQueue/taskqueue.cc \
+	TaskQueue/queue.cc \
+	TaskQueue/Task/overtake.cc \
+	TaskQueue/Task/sequencedecrease.cc \
+	TaskQueue/Task/sequence.cc \
+	TaskQueue/Task/task1.cc \
+	TaskQueue/Task/task2.cc \
+	TaskQueue/Task/clone.cc \
+	TaskQueue/Task/canovertake.cc \
 	WorkerPool/workerpool.cc \
 	WorkerPool/add.cc \
 	WorkerPool/dataremoveworker.cc \
 	WorkerPool/specifier.cc \
-	WorkerPool/activateworker.cc \
-	WorkerPool/dataonworkersuccess.cc \
+	WorkerPool/dataonworkerresponse.cc \
 	WorkerPool/close.cc \
-	WorkerPool/active.cc \
-	WorkerPool/dataonworkerfailed.cc \
+	WorkerPool/activate.cc \
 	WorkerPool/dataonworkerclosed.cc \
-	WorkerPool/dataworkerfinished.cc \
-	Command/handlelistjobs.cc \
-	Command/datahandlejobinfo.cc \
-	Command/handleaddjob.cc \
-	Command/jobadded.cc \
-	Command/command.cc \
-	Command/datasetiteration.cc \
-	Command/datacreateresponse.cc \
-	Command/jobremoved.cc \
-	Command/dataconstructor.cc \
-	Command/dataondata.cc \
-	Command/newiteration.cc \
-	Command/dataresponse.cc \
-	Command/dataonnewconnection.cc \
-	Command/datahandlejobprogress.cc \
-	Command/handleremovejob.cc \
-	Command/datasetjobinfo.cc \
-	Managers/Module/Scanner/scan1.cc \
-	Managers/Module/Scanner/scan2.cc \
-	Managers/Optimizer/optimizer.cc \
-	Managers/Optimizer/lookup.cc \
-	Managers/Optimizer/searchenvironmentpath.cc \
-	Managers/Optimizer/searchdirectory.cc \
-	Managers/Optimizer/Extension/lookup.cc \
-	Managers/Optimizer/Extension/extension.cc \
-	Managers/Optimizer/Extension/searchenvironmentpath.cc \
-	Managers/Optimizer/Extension/searchdirectory.cc \
-	JobQueue/pop.cc \
-	JobQueue/updateprioritysum.cc \
-	JobQueue/addsolutionsperjob.cc \
-	JobQueue/jobqueue.cc \
-	JobQueue/insert.cc \
-	JobQueue/queue2.cc \
-	JobQueue/inqueue.cc \
-	JobQueue/matchitem.cc \
-	JobQueue/jobdone.cc \
-	JobQueue/queue1.cc \
-	JobQueue/remove.cc \
-	JobQueue/Item/overtake.cc \
-	JobQueue/Item/item.cc \
-	JobQueue/Item/sequencedecrease.cc \
-	JobQueue/Item/sequence.cc \
-	JobQueue/Item/clone.cc \
-	JobQueue/Item/canovertake.cc \
-	Worker/failed.cc \
-	Worker/sendjob.cc \
+	Worker/datasetfailure.cc \
 	Worker/dataondata.cc \
 	Worker/worker1.cc \
-	Worker/dataontimeout.cc \
+	Worker/send.cc \
 	Worker/worker2.cc \
-	Dispatcher/dispatcher.cc \
-	Job/job1.cc \
-	Job/job2.cc \
-	Job/datadestructor.cc \
-	Job/initializedatabase.cc \
 	Config/statics.cc \
 	Config/initialize.cc \
 	Config/config.cc \
@@ -123,27 +64,14 @@ optimaster_SOURCES = \
 noinst_HEADERS = \
 	Application/application.ih \
 	Application/application.hh \
+	TaskQueue/taskqueue.ih \
+	TaskQueue/taskqueue.hh \
+	TaskQueue/Task/task.hh \
+	TaskQueue/Task/task.ih \
 	WorkerPool/workerpool.hh \
 	WorkerPool/workerpool.ih \
-	Command/command.hh \
-	Command/command.ih \
-	Managers/Module/module.hh \
-	Managers/Module/Scanner/scanner.ih \
-	Managers/Module/Scanner/scanner.hh \
-	Managers/Optimizer/optimizer.ih \
-	Managers/Optimizer/optimizer.hh \
-	Managers/Optimizer/Extension/extension.ih \
-	Managers/Optimizer/Extension/extension.hh \
-	JobQueue/jobqueue.ih \
-	JobQueue/jobqueue.hh \
-	JobQueue/Item/item.hh \
-	JobQueue/Item/item.ih \
 	Worker/worker.ih \
 	Worker/worker.hh \
-	Dispatcher/dispatcher.hh \
-	Dispatcher/dispatcher.ih \
-	Job/job.ih \
-	Job/job.hh \
 	Config/config.ih \
 	Config/config.hh
 

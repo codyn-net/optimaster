@@ -6,3 +6,4 @@ using namespace std;
 using namespace base;
 using namespace optimaster;
 using namespace network;
+using namespace optimization::messages;

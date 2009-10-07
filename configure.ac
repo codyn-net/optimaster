@@ -20,7 +20,7 @@ AC_CHECK_LIB([gcrypt],[gcry_check_version], [], [AC_MSG_ERROR([libgcrypt could n
 
 PKG_CHECK_MODULES(PACKAGE_OPTIMASTER, [
 	libjessevdk-0.1
-	liboptimization-0.1
+	liboptimization-1.0
 	libxml++-2.6
 ])
 

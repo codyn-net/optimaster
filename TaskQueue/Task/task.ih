@@ -1,0 +1,4 @@
+#include "task.hh"
+
+using namespace optimaster::taskqueue;
+using namespace optimization::messages;

@@ -4,80 +4,69 @@
 #include <network/network.hh>
 #include <optimization/optimization.hh>
 
-#include "Job/job.hh"
+#include "TaskQueue/taskqueue.hh"
 
 namespace optimaster
 {
 	class Worker : public network::Client
 	{
 		public:
-			struct SuccessArgs
-			{
-				Job job;
-				optimization::Solution solution;
-				optimization::messages::worker::Response response;
-
-				std::map<std::string, double> fitness;
-			};
-			
 			/* Constructor/destructor */
 			Worker();
 			Worker(network::AddressInfo &info);
 		
 			/* Public functions */
-			void sendJob(Job &job, optimization::Solution &solution);
+			void send(taskqueue::Task &task);
 			
-			Job &job();
-			optimization::Solution &solution();
+			taskqueue::Task const &task() const;
+			taskqueue::Task &task();
 			
-			void failed(optimization::messages::worker::Response::Failure::Type type, std::string const &message = "");
-			
-			base::signals::Signal<optimization::messages::worker::Response::Failure> &onFailed();
-			base::signals::Signal<SuccessArgs> &onSuccess();
+			bool working() const;
+
+			base::signals::Signal<optimization::messages::task::Response> &onResponse();
 			base::signals::Signal<std::string> &onChallenge();
 		private:
 			/* Private functions */
 			struct Data : public base::Object::PrivateData
 			{
 				/* Instance data */
-				base::signals::Signal<optimization::messages::worker::Response::Failure> onFailed;
-				base::signals::Signal<SuccessArgs> onSuccess;
+				base::signals::Signal<optimization::messages::task::Response> onResponse;
 				base::signals::Signal<std::string> onChallenge;
-
-				sigc::connection timeout;
 			
-				SuccessArgs args;
+				bool working;
+				optimization::messages::task::Response response;
+				taskqueue::Task task;
 				
 				bool onData(os::FileDescriptor::DataArgs &args);
-				bool onTimeout();
+				void setFailure(optimization::messages::task::Response::Failure::Type type, std::string const &message = "");
 			};
 
 			Data *d_data;		
 	};
 	
-	inline Job &Worker::job()
+	inline taskqueue::Task &Worker::task()
 	{
-		return d_data->args.job;
+		return d_data->task;
 	}
 	
-	inline optimization::Solution &Worker::solution()
+	inline taskqueue::Task const &Worker::task() const
 	{
-		return d_data->args.solution;
+		return d_data->task;
 	}
 	
-	inline base::signals::Signal<optimization::messages::worker::Response::Failure> &Worker::onFailed()
+	inline base::signals::Signal<optimization::messages::task::Response> &Worker::onResponse()
 	{
-		return d_data->onFailed;
-	}
-	
-	inline base::signals::Signal<Worker::SuccessArgs> &Worker::onSuccess()
-	{
-		return d_data->onSuccess;
+		return d_data->onResponse;
 	}
 	
 	inline base::signals::Signal<std::string> &Worker::onChallenge()
 	{
 		return d_data->onChallenge;
+	}
+	
+	inline bool Worker::working() const
+	{
+		return d_data->working;
 	}
 }
 

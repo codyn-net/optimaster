@@ -22,8 +22,7 @@ Worker WorkerPool::add(string const &connection)
 		d_data->idleWorkers.push_back(worker);
 		
 		worker.onClosed().addData(*d_data, &WorkerPool::Data::onWorkerClosed, worker);
-		worker.onFailed().addData(*d_data, &WorkerPool::Data::onWorkerFailed, worker);
-		worker.onSuccess().addData(*d_data, &WorkerPool::Data::onWorkerSuccess, worker);
+		worker.onResponse().addData(*d_data, &WorkerPool::Data::onWorkerResponse, worker);
 		
 		d_data->onWorkerIdle();
 	}

@@ -6,9 +6,7 @@ void Application::registerWorker(std::string const &connection)
 	
 	if (worker)
 	{
-		worker.onFailed().addData(*this, &Application::onWorkerFailed, worker);
-		
-		worker.onSuccess().addAfter(*this, &Application::onWorkerSuccess);
+		worker.onResponse().addData(*this, &Application::onWorkerResponse, worker);
 		worker.onChallenge().addData(*this, &Application::onWorkerChallenge, worker);
 	}
 }

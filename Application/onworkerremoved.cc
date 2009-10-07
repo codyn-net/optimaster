@@ -2,7 +2,11 @@
 
 void Application::onWorkerRemoved(Worker &worker)
 {
-	worker.onFailed().removeData(*this, &Application::onWorkerFailed, worker);
-	worker.onSuccess().remove(*this, &Application::onWorkerSuccess);
+	worker.onResponse().removeData(*this, &Application::onWorkerResponse, worker);
 	worker.onChallenge().removeData(*this, &Application::onWorkerChallenge, worker);
+	
+	if (worker.working())
+	{
+		// TODO: Make sure to reschedule the task
+	}
 }

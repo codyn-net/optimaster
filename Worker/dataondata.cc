@@ -2,67 +2,43 @@
 
 bool Worker::Data::onData(os::FileDescriptor::DataArgs &args) 
 {
-	vector<worker::Response> response;
-	vector<worker::Response>::iterator iter;
+	vector<task::Response> responses;
+	vector<task::Response>::iterator iter;
 	
-	Messages::extract(args, response);
+	Messages::extract(args, responses);
 	
-	if (response.begin() == response.end())
+	if (responses.begin() == responses.end())
 	{
 		return false;
 	}
 	
-	worker::Response &r = response[0];
+	// Take the last response
+	response = responses[responses.size() - 1];
 	
-	if  (r.status() == worker::Response::Challenge)
+	if  (response.status() == task::Response::Challenge)
 	{
-		// Send a token response
-		string challenge = r.challenge();
+		// We are being challenged
+		string challenge = response.challenge();
 		onChallenge(challenge);
-
 		return false;
 	}
 	
-	if (timeout)
+	// Check status
+	if (response.status() != task::Response::Success)
 	{
-		timeout.disconnect();
-	}
-	
-	if (r.status() != worker::Response::Success)
-	{
-		debug_worker << "Got response, worker failed (" << r.id() << "), " << r.status() << "..." << endl;
-		this->args.job.failed();
-		
-		if (!r.has_failure())
+		if (!response.has_failure())
 		{
-			r.mutable_failure()->set_type(worker::Response::Failure::Unknown);
+			setFailure(task::Response::Failure::Unknown);
 		}
-		
-		onFailed(*r.mutable_failure());
 	}
-	else if (this->args.solution.id() != static_cast<size_t>(r.id()))
+	else if (task.task().id() != response.id())
 	{
-		this->args.job.optimizer().log(optimization::Optimizer::LogType::Error) << "Worker responded with wrong id. Expected " << this->args.solution.id() << " but got " << static_cast<size_t>(r.id()) << optimization::Optimizer::Logger::End();
-		debug_worker << "Got response, but for wrong request..." << endl;
-		
-		worker::Response::Failure failure;
-		failure.set_type(worker::Response::Failure::WrongRequest);
-		
-		onFailed(failure);
+		// Response for the wrong task
+		setFailure(task::Response::Failure::WrongRequest);
 	}
-	else
-	{
-		debug_worker << "Got response, worker success " << "(" << r.id() << ")" << endl;
 
-		this->args.fitness.clear();
-		this->args.response = r;
-		
-		for (int i = 0; i < r.fitness_size(); ++i)
-			this->args.fitness[r.fitness(i).name()] = r.fitness(i).value();
-
-		this->args.job.failed(0);
-		onSuccess(this->args);
-	}
+	working = false;
+	onResponse(response);
 
 	return false;
 }

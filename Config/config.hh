@@ -14,9 +14,6 @@ namespace optimaster
 			bool acceptAnonymous;
 			Glib::ustring discoveryNamespace;
 			Glib::ustring discoveryAddress;
-			Glib::ustring dataDirectory;
-			Glib::ustring commandAddress;
-			int maxJobs;
 			
 			/* Constructor/destructor */
 			static Config &initialize(std::string const &filename);
