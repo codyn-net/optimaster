@@ -20,6 +20,7 @@ namespace optimaster
 
 			/* Constructor/destructor */
 			OptimizerManager();
+			~OptimizerManager();
 		
 			/* Public functions */
 			void set(std::string const &host, std::string const &port);

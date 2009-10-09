@@ -16,90 +16,93 @@ optimaster_CFLAGS = D_GNU_SOURCE -g $(PACKAGE_OPTIMASTER_CFLAGS)
 optimaster_LDFLAGS = $(PACKAGE_OPTIMASTER_LIBS)
 optimaster_SOURCES = \
 	optimaster.cc \
-	Application/run.cc \
-	Application/onworkerresponse.cc \
-	Application/application.cc \
+	Config/instance.cc \
+	Config/statics.cc \
+	Config/config.cc \
+	Config/initialize.cc \
+	Worker/worker1.cc \
+	Worker/datasetfailure.cc \
+	Worker/worker2.cc \
+	Worker/send.cc \
+	Worker/dataondata.cc \
+	Optimizer/response.cc \
+	Optimizer/optimizer1.cc \
+	Optimizer/id.cc \
+	Optimizer/onbatch.cc \
+	Optimizer/optimizer2.cc \
+	Optimizer/dataonclientdata.cc \
+	Optimizer/operatorequal.cc \
+	Optimizer/client.cc \
+	WorkerPool/activate.cc \
+	WorkerPool/dataremoveworker.cc \
+	WorkerPool/dataonworkerclosed.cc \
+	WorkerPool/add.cc \
+	WorkerPool/specifier.cc \
+	WorkerPool/close.cc \
+	WorkerPool/dataonworkerresponse.cc \
+	WorkerPool/workerpool.cc \
+	OptimizerManager/find.cc \
+	OptimizerManager/listen.cc \
+	OptimizerManager/fromdescriptor.cc \
+	OptimizerManager/onconnectionclosed.cc \
+	OptimizerManager/optimizermanager.cc \
+	OptimizerManager/set.cc \
+	OptimizerManager/onoptimizerbatch.cc \
+	OptimizerManager/onnewconnection.cc \
+	OptimizerManager/destructor.cc \
+	Application/parsearguments.cc \
+	Application/onworkerchallenge.cc \
+	Application/destructor.cc \
 	Application/registerworker.cc \
+	Application/ondispatch.cc \
+	Application/oninterrupt.cc \
+	Application/run.cc \
+	Application/onoptimizerclosed.cc \
+	Application/onworkerremoved.cc \
+	Application/hashtoken.cc \
+	Application/onworkerresponse.cc \
+	Application/ongreeting.cc \
+	Application/onidlework.cc \
+	Application/application.cc \
 	Application/enableenvironment.cc \
 	Application/onoptimizerbatch.cc \
-	Application/ondispatch.cc \
-	Application/hashtoken.cc \
-	Application/onoptimizerclosed.cc \
-	Application/oninterrupt.cc \
-	Application/ongreeting.cc \
 	Application/sendwakeup.cc \
-	Application/onworkerchallenge.cc \
-	Application/onworkerremoved.cc \
-	Application/onidlework.cc \
-	Application/parsearguments.cc \
-	TaskQueue/pop.cc \
-	TaskQueue/updateprioritysum.cc \
-	TaskQueue/insert.cc \
-	TaskQueue/queue2.cc \
 	TaskQueue/empty.cc \
-	TaskQueue/taskqueue.cc \
-	TaskQueue/queue1.cc \
+	TaskQueue/updateprioritysum.cc \
 	TaskQueue/remove.cc \
-	TaskQueue/Task/failed.cc \
+	TaskQueue/taskqueue.cc \
+	TaskQueue/insert.cc \
+	TaskQueue/queue1.cc \
+	TaskQueue/queue2.cc \
+	TaskQueue/pop.cc \
+	TaskQueue/Task/clone.cc \
+	TaskQueue/Task/task1.cc \
+	TaskQueue/Task/failures.cc \
 	TaskQueue/Task/overtake.cc \
 	TaskQueue/Task/sequencedecrease.cc \
-	TaskQueue/Task/sequence1.cc \
-	TaskQueue/Task/failures.cc \
-	TaskQueue/Task/task1.cc \
 	TaskQueue/Task/task2.cc \
-	TaskQueue/Task/clone.cc \
+	TaskQueue/Task/failed.cc \
 	TaskQueue/Task/canovertake.cc \
-	TaskQueue/Task/sequence2.cc \
+	TaskQueue/Task/sequence1.cc \
 	TaskQueue/Task/operatorequal.cc \
-	WorkerPool/workerpool.cc \
-	WorkerPool/add.cc \
-	WorkerPool/dataremoveworker.cc \
-	WorkerPool/specifier.cc \
-	WorkerPool/dataonworkerresponse.cc \
-	WorkerPool/close.cc \
-	WorkerPool/activate.cc \
-	WorkerPool/dataonworkerclosed.cc \
-	Optimizer/id.cc \
-	Optimizer/optimizer1.cc \
-	Optimizer/optimizer2.cc \
-	Optimizer/onbatch.cc \
-	Optimizer/operatorequal.cc \
-	Optimizer/dataonclientdata.cc \
-	Optimizer/response.cc \
-	Worker/datasetfailure.cc \
-	Worker/dataondata.cc \
-	Worker/worker1.cc \
-	Worker/send.cc \
-	Worker/worker2.cc \
-	OptimizerManager/optimizermanager.cc \
-	OptimizerManager/onnewconnection.cc \
-	OptimizerManager/find.cc \
-	OptimizerManager/onconnectionclosed.cc \
-	OptimizerManager/onoptimizerbatch.cc \
-	OptimizerManager/fromdescriptor.cc \
-	OptimizerManager/set.cc \
-	OptimizerManager/listen.cc \
-	Config/statics.cc \
-	Config/initialize.cc \
-	Config/config.cc \
-	Config/instance.cc
+	TaskQueue/Task/sequence2.cc
 
 noinst_HEADERS = \
-	Application/application.ih \
-	Application/application.hh \
-	TaskQueue/taskqueue.ih \
-	TaskQueue/taskqueue.hh \
-	TaskQueue/Task/task.hh \
-	TaskQueue/Task/task.ih \
-	WorkerPool/workerpool.hh \
-	WorkerPool/workerpool.ih \
-	Optimizer/optimizer.ih \
-	Optimizer/optimizer.hh \
+	Config/config.hh \
+	Config/config.ih \
 	Worker/worker.ih \
 	Worker/worker.hh \
-	OptimizerManager/optimizermanager.ih \
+	Optimizer/optimizer.hh \
+	Optimizer/optimizer.ih \
+	WorkerPool/workerpool.hh \
+	WorkerPool/workerpool.ih \
 	OptimizerManager/optimizermanager.hh \
-	Config/config.ih \
-	Config/config.hh
+	OptimizerManager/optimizermanager.ih \
+	Application/application.hh \
+	Application/application.ih \
+	TaskQueue/taskqueue.hh \
+	TaskQueue/taskqueue.ih \
+	TaskQueue/Task/task.ih \
+	TaskQueue/Task/task.hh
 
 EXTRA_DIST = $(noinst_HEADERS)

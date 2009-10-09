@@ -24,6 +24,8 @@ namespace optimaster
 			/* Constructor/destructor */
 			Optimizer();
 			Optimizer(network::Client &client);
+			
+			network::Client &client();
 		
 			/* Public functions */
 			size_t id();

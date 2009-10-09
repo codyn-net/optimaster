@@ -26,6 +26,7 @@ namespace optimaster
 		public:
 			/* Constructor/destructor */
 			Application(int &argc, char **&argv);
+			~Application();
 
 			/* Public functions */		
 			void run(Glib::RefPtr<Glib::MainLoop> loop);
