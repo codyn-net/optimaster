@@ -23,10 +23,14 @@ namespace optimaster
 			TaskQueue();
 		
 			/* Public functions */
-			void queue(optimization::messages::task::Batch &tasks);
+			void queue(size_t id, optimization::messages::task::Batch &tasks);
+			void queue(taskqueue::Task &task);
+
 			bool pop(taskqueue::Task &item);
 			
 			bool empty() const;
+			
+			void remove(size_t id);
 		private:
 			/* Private functions */
 			bool insert(taskqueue::Task &item);

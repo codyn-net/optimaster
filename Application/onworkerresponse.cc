@@ -2,21 +2,48 @@
 
 void Application::onWorkerResponse(task::Response &response, Worker worker)
 {
-	// TODO
-	// If the response is a success, relay it to the optimizer connection
+	taskqueue::Task &task = worker.task();
+	Optimizer optimizer;
 	
-	// Accept N number of failures before relaying the fail back to the optimizer
-	/*
-		if (worker.job().failures() >= 5)
+	if (!d_optimizerManager.find(task.id(), optimizer))
 	{
-		debug_worker << "Job " << worker.job().name() << " failed too many times, removing job" << endl;
-		worker.job().optimizer().log(optimization::Optimizer::LogType::Error) << "Job failed too many times" << optimization::Optimizer::Logger::End();
-		
-		removeJob(worker.job());
+		return;
+	}
+	
+	if (response.status() == task::Response::Success)
+	{
+		// Simply relay to optimizer
+		if (Debug::enabled(Debug::Domain::Worker))
+		{
+			debug_worker << "Worker success (" << worker.address().host(true) << ":" << worker.address().port(true) << ") for (" << worker.task().id() << ", " << worker.task().task().id() << ")" << endl;
+		}
+
+		optimizer.response(response);
 	}
 	else
 	{
-		d_jobQueue.queue(worker.job(), worker.solution());
+		// Check how many times this task failed
+		task.failed();
+		
+		if (task.failures() >= Config::instance().maxTaskFailures)
+		{
+			if (Debug::enabled(Debug::Domain::Worker))
+			{
+				debug_worker << "Task failed to many times (" << worker.address().host(true) << ":" << worker.address().port(true) << ") for (" << worker.task().id() << ", " << worker.task().task().id() << ")" << endl;
+			}
+
+			// Relay failure to optimizer
+			optimizer.response(response);
+		}
+		else
+		{
+			if (Debug::enabled(Debug::Domain::Worker))
+			{
+				debug_worker << "Task failed, rescheduling (" << worker.address().host(true) << ":" << worker.address().port(true) << ") for (" << worker.task().id() << ", " << worker.task().task().id() << ")" << endl;
+			}
+		
+			// Reschedule task
+			d_taskQueue.queue(task);
+		}
 	}
-	*/
 }

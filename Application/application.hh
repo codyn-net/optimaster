@@ -5,14 +5,17 @@
 
 #include "WorkerPool/workerpool.hh"
 #include "TaskQueue/taskqueue.hh"
+#include "OptimizerManager/optimizermanager.hh"
 
 #include <glibmm.h>
+#include <network/network.hh>
 
 namespace optimaster
 {
 	class Application
 	{
 		optimization::Discovery d_discovery;
+		OptimizerManager d_optimizerManager;
 
 		WorkerPool d_workerPool;
 		TaskQueue d_taskQueue;
@@ -45,6 +48,9 @@ namespace optimaster
 			void sendWakeup();
 			void enableEnvironment();
 			//std::string hashToken(Job const &job, std::string const &challenge);
+			
+			bool onOptimizerClosed(Optimizer &optimizer);
+			bool onOptimizerBatch(OptimizerManager::BatchArgs &args);
 	};
 }
 

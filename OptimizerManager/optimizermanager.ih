@@ -1,0 +1,9 @@
+#include "optimizermanager.hh"
+
+#include <optimization/Constants/constants.hh>
+
+using namespace std;
+using namespace optimaster;
+using namespace network;
+using namespace optimization;
+using namespace base;

@@ -10,4 +10,5 @@ Task::Task(size_t id, double priority, task::Task const &task)
 	d_data->task = task;
 
 	d_data->overtake = 0;
+	d_data->failures = 0;
 }

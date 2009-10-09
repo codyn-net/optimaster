@@ -12,8 +12,12 @@ namespace optimaster
 
 		public:
 			bool acceptAnonymous;
+
 			Glib::ustring discoveryNamespace;
 			Glib::ustring discoveryAddress;
+			Glib::ustring listenAddress;
+			
+			size_t maxTaskFailures;
 			
 			/* Constructor/destructor */
 			static Config &initialize(std::string const &filename);

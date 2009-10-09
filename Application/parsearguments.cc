@@ -18,6 +18,14 @@ void Application::parseArguments(int &argc, char **&argv)
 	Glib::ustring disc = s.str();
 	group.add_entry(discovery, disc);
 	
+	Glib::OptionEntry listen;
+	
+	listen.set_long_name("listen");
+	listen.set_short_name('l');
+	listen.set_description("Listen address");
+	
+	group.add_entry(listen, config.listenAddress);
+	
 	Glib::OptionContext context;
 	
 	context.set_main_group(group);
@@ -60,4 +68,21 @@ void Application::parseArguments(int &argc, char **&argv)
 	
 	d_discovery.set(parts[0], parts[1]);
 	d_discovery.setNs(config.discoveryNamespace);
+	
+	parts = String(config.listenAddress).split(":", 2);
+	
+	if (parts.size() == 1 || parts[1] == "")
+	{
+		if (parts.size() == 1)
+		{
+			parts.push_back("");
+		}
+		
+		stringstream s;
+		s << optimization::Constants::MasterPort;
+		
+		parts[1] = s.str();
+	}
+	
+	d_optimizerManager.set(parts[0], parts[1]);
 }

@@ -17,6 +17,8 @@ namespace taskqueue
 			size_t id;
 			double priority;
 			double overtake;
+			
+			size_t failures;
 		};
 		
 		Data *d_data;
@@ -34,6 +36,12 @@ namespace taskqueue
 			void setOvertake(double overtake);
 
 			void sequence(Task &other);
+			void sequence();
+			
+			void failed();
+			size_t failures();
+			
+			bool operator==(size_t id) const;
 			
 			optimization::messages::task::Task &task();
 			optimization::messages::task::Task const &task() const;
@@ -67,6 +75,11 @@ namespace taskqueue
 	inline size_t Task::id() const
 	{
 		return d_data->id;
+	}
+	
+	inline double Task::priority() const
+	{
+		return d_data->priority;
 	}
 }
 }

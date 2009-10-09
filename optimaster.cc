@@ -10,9 +10,9 @@ main(int argc, char *argv[])
 	Glib::init();
 	Glib::RefPtr<Glib::MainLoop> loop = Glib::MainLoop::create();
 
-	//Application app(argc, argv);
+	Application app(argc, argv);
 	
-	//app.run(loop);
+	app.run(loop);
 	
 	return 0;
 }
