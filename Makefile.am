@@ -1,4 +1,4 @@
-SUBDIRS = src
+SUBDIRS = src docs
 
 opticonfdir = $(datadir)/optimaster
 opticonf_DATA = \

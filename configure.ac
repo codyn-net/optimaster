@@ -13,6 +13,8 @@ AC_HEADER_STDC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
+AC_CHECK_PROG(DOXYGEN, doxygen, doxygen, no)
+
 AC_CONFIG_HEADERS(config.h)
 AM_MAINTAINER_MODE
 
@@ -28,4 +30,6 @@ AC_SUBST(PACKAGE_OPTIMASTER_LIBS)
 AC_OUTPUT(
 Makefile
 src/Makefile
+docs/Makefile
+docs/doxygen.cfg
 )
