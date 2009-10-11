@@ -30,6 +30,14 @@ using namespace network;
 using namespace optimization::messages;
 using namespace optimization;
 
+/** \brief Constructor with client.
+ * @param client the client
+ *
+ * Constructor.
+ *
+ * Construct an optimizer object for a certain clien.
+ *
+ */
 Optimizer::Optimizer(network::Client &client)
 {
 	d_data = new Data();
@@ -38,10 +46,24 @@ Optimizer::Optimizer(network::Client &client)
 	Set(d_data, client);
 }
 
+/** \brief Default constructor.
+ *
+ * Constructor.
+ *
+ * Default constructor. This does not result in a valid optimizer object.
+ *
+ */
 Optimizer::Optimizer()
 {
 }
 
+/** \brief Callback called when worker is deactivated.
+ * @param worker the worker
+ *
+ * Called when a worker that was executing a task for the optimizer was 
+ * deactivated.
+ *
+ */
 void
 Optimizer::Data::OnWorkerDeactivated(Worker &worker)
 {
@@ -54,6 +76,14 @@ Optimizer::Data::OnWorkerDeactivated(Worker &worker)
 	worker.OnDeactivated().remove(*this, &Optimizer::Data::OnWorkerDeactivated);
 }
 
+/** \brief Add worker activated for the optimizer.
+ * @param worker the worker
+ *
+ * This should be called when a worker is activated for a task of the 
+ * optimizer. The optimizer keeps track of which workers are executing tasks
+ * belonging to the optimizer.
+ *
+ */
 void
 Optimizer::Add(Worker &worker)
 {
@@ -61,6 +91,13 @@ Optimizer::Add(Worker &worker)
 	worker.OnDeactivated().add(*d_data, &Optimizer::Data::OnWorkerDeactivated);
 }
 
+/** \brief Get active workers.
+ *
+ * Get all the workers currently executing tasks for the optimizer.
+ *
+ * @return: the active workers
+ *
+ */
 vector<Worker> &
 Optimizer::ActiveWorkers()
 {

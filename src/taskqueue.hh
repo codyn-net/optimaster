@@ -47,6 +47,10 @@ namespace optimaster
 			bool Empty() const;
 			void Remove(size_t id);
 
+			/** \brief OnNotifyAvailable signal
+			 *
+			 * Signal emitted when new tasks are available on the queue
+			 */
 			base::signals::Signal<> OnNotifyAvailable;
 		private:
 			/* Private functions */

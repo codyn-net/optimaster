@@ -37,7 +37,7 @@ using namespace base::signals;
  * Constructor.
  *
  * Creates a new CommunicationArgs object for use in the onCommunication signal.
- *
+ * \fn Communicator::CommunicationArgs::CommunicationArgs(Communicator &source, optimization::messages::task::Communication &communication)
  */
 Communicator::CommunicationArgs::CommunicationArgs(Communicator        &source,
                                                    task::Communication &communication)
@@ -47,10 +47,25 @@ Communicator::CommunicationArgs::CommunicationArgs(Communicator        &source,
 {
 }
 
+/** \brief Default communicator constructor.
+ *
+ * Constructor.
+ *
+ * This creates an empty communicator object.
+ *
+ */
 Communicator::Communicator()
 {
 }
 
+/** \brief Communicator shell constructor.
+ * @param data the communicator data
+ *
+ * Constructor.
+ *
+ * Creates a communicator object shell around the communicator data.
+ *
+ */
 Communicator::Communicator(Data *data)
 :
 	d_data(data)
@@ -58,6 +73,13 @@ Communicator::Communicator(Data *data)
 	// Empty shell around data
 }
 
+/** \brief Set communicator data.
+ * @param data the communicator data
+ * @param client the communicator client
+ *
+ * Set the communicator data.
+ *
+ */
 void
 Communicator::Set(Data *data, network::Client const &client)
 {
@@ -70,18 +92,41 @@ Communicator::Set(Data *data, network::Client const &client)
 	d_data->client.onClosed().add(*d_data, &Data::OnClosed);
 }
 
+/** \brief Communicator id (const).
+ *
+ * Get the communicator id.
+ *
+ * @return: the communicator id
+ *
+ */
 size_t
 Communicator::Id() const
 {
 	return d_data->id;
 }
 
+/** \brief Operator equal.
+ * @param id the id to compare
+ *
+ * Operator equal comparing communicator ids.
+ *
+ * @return true if the id is the same, false otherwise
+ *
+ */
 bool
 Communicator::operator==(size_t id) const
 {
 	return d_data->id == id;
 }
 
+/** \brief Operator equal.
+ * @param other the communicator to compare with
+ *
+ * Operator equal comparing communicator ids.
+ *
+ * @return true if the two communicators are equal, false otherwise
+ *
+ */
 bool
 Communicator::operator==(Communicator const &other) const
 {

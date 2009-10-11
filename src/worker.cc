@@ -53,7 +53,7 @@ Worker::Worker()
  * Constructor.
  *
  * Creates a new worker on a specific network address.
- *
+ * \fn Worker::Worker(network::AddressInfo &info)
  */
 Worker::Worker(AddressInfo &info)
 {
@@ -89,12 +89,27 @@ Worker::ActiveTask() const
 	return d_data->task;
 }
 
+/** \brief Signal emitted when worker is activated.
+ *
+ * When the worker is activated with a certain task, this signal is emitted.
+ *
+ * @return: the signal object
+ *
+ */
 Signal<Worker> &
 Worker::OnActivated()
 {
 	return d_data->onActivated;
 }
 
+
+/** \brief Signal emitted when worker is deactivated.
+ *
+ * This signal is emitted when the worker is deactivated.
+ *
+ * @return: the signal object
+ *
+ */
 Signal<Worker> &
 Worker::OnDeactivated()
 {

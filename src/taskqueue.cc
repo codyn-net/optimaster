@@ -27,17 +27,39 @@ using namespace optimaster;
 using namespace base;
 using namespace optimization::messages;
 
+/** \brief Default task queue constructor.
+ *
+ * Constructor.
+ *
+ * Create a new task queue.
+ *
+ */
 TaskQueue::TaskQueue() 
 {
 	d_prioritySum = 1;
 }
 
+/** \brief Get whether the queue is empty (const).
+ *
+ * Get whether the queue is empty.
+ *
+ * @return: true if the queue is empty, false otherwise
+ *
+ */
 bool
 TaskQueue::Empty() const
 {
 	return d_queue.empty();
 }
 
+/** \brief Insert a task in the task queue.
+ * @param task a task
+ *
+ * Inserts a task in the queue.
+ *
+ * @return: true if the task was inserted at the beginning, false otherwise
+ *
+ */
 bool
 TaskQueue::Insert(Task &task) 
 {
@@ -65,6 +87,14 @@ TaskQueue::Insert(Task &task)
 	}
 }
 
+/** \brief Pop the next task of the queue.
+ * @param task the task return value
+ *
+ * Pop the next task of the queue.
+ *
+ * @return: true if a task was popped of the queue, false otherwise
+ *
+ */
 bool
 TaskQueue::Pop(Task &task)
 {
@@ -80,6 +110,13 @@ TaskQueue::Pop(Task &task)
 	return true;
 }
 
+/** \brief Queue batch of tasks.
+ * @param id the task group id
+ * @param batch a batch of tasks to add
+ *
+ * Adds a batch of tasks to the task queue.
+ * \fn TaskQueue::Queue(size_t id, optimization::messages::task::Batch const &batch)
+ */
 void
 TaskQueue::Queue(size_t             id,
                  task::Batch const &batch) 
@@ -117,6 +154,12 @@ TaskQueue::Queue(size_t             id,
 	}
 }
 
+/** \brief Queue a task.
+ * @param task a task
+ *
+ * Queue a task in the task queue.
+ *
+ */
 void
 TaskQueue::Queue(Task &task)
 {
@@ -145,6 +188,12 @@ TaskQueue::Queue(Task &task)
 	}
 }
 
+/** \brief Remove task group from the queue.
+ * @param id the task group id
+ *
+ * Removes all tasks in the task group from the queue.
+ *
+ */
 void
 TaskQueue::Remove(size_t id)
 {
@@ -160,6 +209,12 @@ TaskQueue::Remove(size_t id)
 	// TODO: update priority sum
 }
 
+/** \brief Update priority sum.
+ * @param num number with which to update the priority sum
+ *
+ * Updates the priority sum which is used to normalize the overtake credits.
+ *
+ */
 void
 TaskQueue::UpdatePrioritySum(double num) 
 {

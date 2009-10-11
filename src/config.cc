@@ -31,6 +31,13 @@ using namespace os;
 
 Config *Config::s_instance = 0;
 
+/** \brief Default constructor.
+ *
+ * Constructor.
+ *
+ * Default constructor.
+ *
+ */
 Config::Config()
 {
 	stringstream s;
@@ -55,6 +62,15 @@ Config::Config()
 	registerProperty("max task failures", MaxTaskFailures);
 }
 
+/**
+ * \brief Initialize config singleton.
+ * @param filename file to load configuration from
+ *
+ * Initialize the configuration singleton by loading configuration from a file.
+ *
+ * @return the configuration object
+ * \fn Config &Config::Initialize(std::string const &filename)
+ */
 Config &
 Config::Initialize(string const &filename)
 {
@@ -67,7 +83,15 @@ Config::Initialize(string const &filename)
 	return *s_instance;
 }
 
-Config &Config::Instance()
+/** \brief Get config object instance.
+ *
+ * Get the config object instance. Make sure the config object is initialized.
+ *
+ * @return: the configuration object
+ *
+ */
+Config &
+Config::Instance()
 {
 	return *s_instance;
 }

@@ -34,7 +34,10 @@ namespace optimaster
 		public:
 			struct CommunicationArgs
 			{
+				/** Communicator source object */
 				Communicator &Source;
+				
+				/** Communication message object */
 				optimization::messages::task::Communication &Communication;
 
 				CommunicationArgs(Communicator &source, optimization::messages::task::Communication &communication);
@@ -75,7 +78,14 @@ namespace optimaster
 			
 			Data *d_data;
 	};
-	
+
+	/** \brief Send message to the communicator end point
+	 * @param message the message to send
+	 *
+	 * Send message to the communicator end point
+	 *
+	 * @return true if the message was send successfully, false otherwise
+	 */
 	template <typename T>
 	bool Communicator::Send(T const &message)
 	{

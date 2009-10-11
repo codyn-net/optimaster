@@ -41,7 +41,6 @@ namespace optimaster
 		std::map<std::string, Worker> d_workersHash;
 
 		public:
-			/* Public functions */
 			bool Add(std::string const &connection, Worker &worker);
 			bool Add(std::string const &connection);
 
@@ -49,8 +48,22 @@ namespace optimaster
 
 			bool Idle(Worker &worker);
 
+			/** \brief OnAdded signal
+			  *
+			  * Signal emitted when a worker was added to the manager.
+			  */
 			base::signals::Signal<Worker> OnAdded;
+			
+			/** \brief OnRemoved signal
+			  *
+			  * Signal emitted when a worker was removed to the manager.
+			  */
 			base::signals::Signal<Worker> OnRemoved;
+			
+			/** \brief OnNotifyAvailable signal
+			  *
+			  * Signal emitted when a worker has become idle
+			  */
 			base::signals::Signal<> OnNotifyAvailable;
 		private:
 			/* Private functions */

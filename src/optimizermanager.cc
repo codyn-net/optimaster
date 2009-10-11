@@ -30,6 +30,15 @@ using namespace network;
 using namespace optimization;
 using namespace base;
 
+/** \brief Default constructor.
+ *
+ * Constructor.
+ *
+ * Create a new optimizer manager. After construction, make sure to call
+ * Set to set the host and port to listen on, and listen to start listening
+ * for new connections.
+ *
+ */
 OptimizerManager::OptimizerManager()
 :
 	d_server(Constants::MasterPort)
@@ -37,6 +46,11 @@ OptimizerManager::OptimizerManager()
 	d_server.onNewConnection().add(*this, &OptimizerManager::OnNewConnection);
 }
 
+/** \brief Destructor.
+ *
+ * Destructor.
+ *
+ */
 OptimizerManager::~OptimizerManager()
 {
 	d_server.onNewConnection().remove(*this, &OptimizerManager::OnNewConnection);
@@ -51,6 +65,15 @@ OptimizerManager::~OptimizerManager()
 	d_optimizers.clear();
 }
 
+/** \brief Find optimizer given an id.
+ * @param id optimizer id
+ * @param optimizer optimizer return value
+ *
+ * Find a connected optimizer by id.
+ *
+ * @return: true if optimizer could be found, false otherwise
+ *
+ */
 bool
 OptimizerManager::Find(size_t     id, 
                        Optimizer &optimizer)
@@ -70,6 +93,11 @@ OptimizerManager::Find(size_t     id,
 	}
 }
 
+/** \brief Start listening for optimizer connections.
+ *
+ * Start listening for new optimizer connections.
+ *
+ */
 void
 OptimizerManager::Listen()
 {
@@ -108,6 +136,13 @@ OptimizerManager::OnNewConnection(Client &client)
 	OnAdded(optimizer);
 }
 
+/** \brief Set host and port on which to listen for optimizer connections.
+ * @param host the host to listen on
+ * @param port the port to listen on
+ *
+ * Set the host and the port on which to listen for new optimizer connections.
+ * \fn OptimizerManager::Set(std::string const &host, std::string const &port)
+ */
 void
 OptimizerManager::Set(string const &host,
                       string const &port)

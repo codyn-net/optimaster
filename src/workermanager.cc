@@ -31,7 +31,9 @@ using namespace optimaster;
 using namespace optimization::messages;
 using namespace network;
 
-/** Add new worker to the manager.
+/** \brief Add new worker to the manager.
+ * @param connection the connection string describing the worker location
+ * @param worker worker return value
  *
  * Add a new worker to the manager. Usually the worker notifies itself through
  * automatic worker discovery to the master notifying a certain connection
@@ -40,14 +42,11 @@ using namespace network;
  * This function will immediately try to connect to the worker and will return
  * false if the connection could not be made.
  *
- * @param connection the connection string of the worker
- * @param worker a return value for the added worker
- *
  * @return true if the worker was registered, false otherwise
  *
  */
 bool
-WorkerManager::Add(string const &connection, Worker &worker) 
+WorkerManager::Add(std::string const &connection, Worker &worker) 
 {
 	// Check if the worker already exists
 	if (d_workersHash.find(connection) != d_workersHash.end())
@@ -87,19 +86,26 @@ WorkerManager::Add(string const &connection, Worker &worker)
 	}
 }
 
+/** \brief Add new worker to the manager.
+ * @param connection the connection describing the worker location
+ *
+ * Add a new worker to the manager.
+ *
+ * @return: true if the worker was added successfully, false otherwise
+ *
+ */
 bool
-WorkerManager::Add(string const &connection)
+WorkerManager::Add(std::string const &connection)
 {
 	Worker worker;
 
 	return Add(connection, worker);
 }
 
-/** Callback for closing worker connection.
+/** \brief Callback for closing worker connection.
+ * @param fd the worker id
  *
  * This callback is called when the connection with the worker has closed.
- *
- * @param fd the worker id
  */
 void
 WorkerManager::OnWorkerClosed(Communicator &communicator)
@@ -125,13 +131,14 @@ WorkerManager::OnWorkerClosed(Communicator &communicator)
 	RemoveWorker(worker);
 }
 
-/** Remove worker from the manager.
+/** \brief Remove worker from the manager.
+ * @param worker the worker to remove
  *
  * This function removes the worker from the manager, properly unregistering
  * any of the connected signals and removing it from all the managed queues and
  * maps.
  *
- * @param worker the worker to remove
+ *
  */
 void
 WorkerManager::RemoveWorker(Worker &worker)
@@ -171,14 +178,14 @@ WorkerManager::RemoveWorker(Worker &worker)
 	worker.Client().close();
 }
 
-/** Find a worker given a worker id.
- *
- * Find a worker with the specified id.
- *
+/** \brief Find a worker given a worker id.
  * @param id the worker id
  * @param worker a return value for the worker if found
  *
- * @return true if the worker with @id could be found, false otherwise
+ * Find a worker with the specified id.
+ *
+ *
+ * @return true if the worker with id could be found, false otherwise
  */
 bool
 WorkerManager::Find(size_t id, Worker &worker)
@@ -196,7 +203,7 @@ WorkerManager::Find(size_t id, Worker &worker)
 	}
 }
 
-/** Check whether there are idle workers.
+/** \brief Check whether there are idle workers.
  *
  * Check whether there are any workers that are currently idle.
  *
@@ -214,6 +221,12 @@ WorkerManager::Idle(Worker &worker)
 	return true;
 }
 
+/** \brief Callback called when worker is activated.
+ * @param worker the worker that is activated
+ *
+ * Called when worker is activated.
+ *
+ */
 void
 WorkerManager::OnWorkerActivated(Worker &worker)
 {
@@ -221,6 +234,12 @@ WorkerManager::OnWorkerActivated(Worker &worker)
 	d_activeWorkers[worker.Id()] = worker;
 }
 
+/** \brief Callback called when worker is deactivated.
+ * @param worker the worker that is deactivated
+ *
+ * Called when worker is deactivated.
+ *
+ */
 void
 WorkerManager::OnWorkerDeactivated(Worker &worker)
 {
