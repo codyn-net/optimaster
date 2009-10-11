@@ -16,8 +16,6 @@ AC_PROG_MAKE_SET
 AC_CONFIG_HEADERS(config.h)
 AM_MAINTAINER_MODE
 
-AC_CHECK_LIB([gcrypt],[gcry_check_version], [], [AC_MSG_ERROR([libgcrypt could not be found])])
-
 PKG_CHECK_MODULES(PACKAGE_OPTIMASTER, [
 	libjessevdk-0.1
 	liboptimization-1.0
@@ -29,5 +27,5 @@ AC_SUBST(PACKAGE_OPTIMASTER_LIBS)
 
 AC_OUTPUT(
 Makefile
-
+src/Makefile
 )

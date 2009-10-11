@@ -1,8 +1,5 @@
 ### Optimaster configuration file
 
-### Whether to accept anonymous jobs (e.g. jobs without tokens)
-# accept anonymous = yes
-
 ### The discovery namespace to use
 # discovery namespace =
 
