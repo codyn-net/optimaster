@@ -249,4 +249,6 @@ WorkerManager::OnWorkerDeactivated(Worker &worker)
 {
 	d_activeWorkers.erase(worker.Id());
 	d_idleWorkers[worker.Id()] = worker;
+	
+	OnNotifyAvailable();
 }
