@@ -60,7 +60,7 @@ Worker::Worker(AddressInfo &info)
 	d_data = new Data();
 	addPrivateData(d_data);
 
-	Set(d_data, network::Client(info));
+	Set(d_data, network::Client::resolve<network::Client>(info));
 }
 
 /** \brief Get the current worker task.
