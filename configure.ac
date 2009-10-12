@@ -13,7 +13,20 @@ AC_HEADER_STDC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
-AC_CHECK_PROG(DOXYGEN, doxygen, doxygen, no)
+AC_ARG_ENABLE([docs],
+	AS_HELP_STRING([--enable-docs],[Enable documentation building (default: disabled)]),
+	[enable_docs=$enableval],
+	[enable_docs=no])
+
+if test "x$enable_docs" != "xno"; then
+	AC_CHECK_PROG(DOXYGEN, doxygen, doxygen, no)
+	
+	if test x"$DOXYGEN" == "xno"; then
+		AC_MSG_ERROR([you need to have doxygen installed for generating documentation])
+	fi
+fi
+
+AM_CONDITIONAL(ENABLE_DOCS, test x"$enable_docs" = "xyes")
 
 AC_CONFIG_HEADERS(config.h)
 AM_MAINTAINER_MODE

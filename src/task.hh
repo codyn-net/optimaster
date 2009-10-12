@@ -23,7 +23,7 @@
 #ifndef __OPTIMASTER_TASK_H__
 #define __OPTIMASTER_TASK_H__
 
-#include <optimization/Messages/messages.hh>
+#include <optimization/messages.hh>
 
 namespace optimaster
 {

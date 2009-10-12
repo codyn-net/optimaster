@@ -22,7 +22,7 @@
 
 #include "optimizer.hh"
 
-#include <optimization/Messages/messages.hh>
+#include <optimization/messages.hh>
 
 using namespace std;
 using namespace optimaster;

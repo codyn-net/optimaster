@@ -22,7 +22,7 @@
 
 #include "optimizermanager.hh"
 
-#include <optimization/Constants/constants.hh>
+#include <optimization/constants.hh>
 
 using namespace std;
 using namespace optimaster;

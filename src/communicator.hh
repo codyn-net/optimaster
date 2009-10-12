@@ -24,7 +24,7 @@
 #define __OPTIMASTER_COMMUNICATOR_H__
 
 #include <base/base.hh>
-#include <optimization/Messages/messages.hh>
+#include <optimization/messages.hh>
 #include <network/network.hh>
 
 namespace optimaster
@@ -91,7 +91,7 @@ namespace optimaster
 	{
 		std::string serialized;
 		
-		if (optimization::Messages::create(message, serialized))
+		if (optimization::Messages::Create(message, serialized))
 		{
 			d_data->client.write(serialized);
 			return true;

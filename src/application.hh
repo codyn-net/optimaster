@@ -23,7 +23,7 @@
 #ifndef __OPTIMASTER_APPLICATION_H__
 #define __OPTIMASTER_APPLICATION_H__
 
-#include <optimization/Discovery/discovery.hh>
+#include <optimization/discovery.hh>
 
 #include "workermanager.hh"
 #include "taskqueue.hh"

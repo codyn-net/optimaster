@@ -173,7 +173,7 @@ Communicator::Data::OnData(os::FileDescriptor::DataArgs &args)
 	vector<task::Communication> communications;
 	vector<task::Communication>::iterator iter;
 
-	Messages::extract(args, communications);
+	Messages::Extract(args, communications);
 	Communicator shell(this);
 
 	for (iter = communications.begin(); iter != communications.end(); ++iter)

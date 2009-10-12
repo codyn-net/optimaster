@@ -50,7 +50,7 @@ Application::Application(int    &argc,
 {
 	EnableEnvironment();
 
-	d_discovery.onGreeting().add(*this, &Application::OnGreeting);
+	d_discovery.OnGreeting().add(*this, &Application::OnGreeting);
 
 	d_workerManager.OnAdded.add(*this, &Application::OnWorkerAdded);
 	d_workerManager.OnRemoved.add(*this, &Application::OnWorkerRemoved);
@@ -85,7 +85,7 @@ Application::~Application()
 
 	d_taskQueue.OnNotifyAvailable.remove(*this, &Application::OnNotifyAvailable);
 
-	d_discovery.onGreeting().remove(*this, &Application::OnGreeting);
+	d_discovery.OnGreeting().remove(*this, &Application::OnGreeting);
 }
 
 /** \brief Parse command line arguments.
@@ -164,7 +164,7 @@ Application::ParseArguments(int    &argc,
 	}
 
 	d_discovery.set(parts[0], parts[1]);
-	d_discovery.setNs(config.DiscoveryNamespace);
+	d_discovery.SetNamespace(config.DiscoveryNamespace);
 
 	parts = String(config.ListenAddress).split(":", 2);
 
@@ -229,14 +229,14 @@ void
 Application::OnGreeting(optimization::Discovery::Info &info) 
 {
 	string protocol;
-	string host = info.host;
+	string host = info.Host;
 	string port;
 
-	AddressInfo::Split(info.connection, protocol, host, port);
+	AddressInfo::Split(info.Connection, protocol, host, port);
 
 	if (host == "" || host == "0.0.0.0")
 	{
-		host = info.host;
+		host = info.Host;
 	}
 
 	d_workerManager.Add(protocol + "://" + host + ":" + port);
@@ -579,7 +579,7 @@ Application::SendWakeup()
 	optimization::messages::discovery::Discovery disc;
 
 	disc.set_type(optimization::messages::discovery::Discovery::TypeWakeup);
-	disc.set_namespace_(d_discovery.ns());
+	disc.set_namespace_(d_discovery.Namespace());
 
 	optimization::messages::discovery::Wakeup *wakeup = disc.mutable_wakeup();
 
@@ -587,7 +587,7 @@ Application::SendWakeup()
 	wakeup->set_connection(d_discovery.connection());
 	string serialized;
 
-	if (optimization::Messages::create(disc, serialized))
+	if (optimization::Messages::Create(disc, serialized))
 	{
 		client.write(serialized);
 	}

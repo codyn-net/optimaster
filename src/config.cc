@@ -22,7 +22,7 @@
 
 #include "config.hh"
 
-#include <optimization/Constants/constants.hh>
+#include <optimization/constants.hh>
 #include <os/os.hh>
 
 using namespace std;

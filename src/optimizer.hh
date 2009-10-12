@@ -24,7 +24,7 @@
 #define __OPTIMASTER_OPTIMIZER_H__
 
 #include <network/network.hh>
-#include <optimization/Messages/messages.hh>
+#include <optimization/messages.hh>
 #include <map>
 #include <vector>
 

@@ -21,7 +21,7 @@
  */
 
 #include "worker.hh"
-#include <optimization/Messages/messages.hh>
+#include <optimization/messages.hh>
 
 #include <algorithm>
 
