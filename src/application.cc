@@ -405,8 +405,9 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 {
 	Worker worker;
 
-	if (!d_workerManager.Find(worker.Id(), worker))
+	if (!d_workerManager.Find(args.Source.Id(), worker))
 	{
+		debug_worker << "Could not find worker: " << worker.Id() << endl;
 		return;
 	}
 
@@ -417,6 +418,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	// Check if the optimizer for this task is still present
 	if (!d_optimizerManager.Find(task.Id(), optimizer))
 	{
+		debug_worker << "Optimizer no longer connected..." << endl;
 		worker.Deactivate();
 		return;
 	}
