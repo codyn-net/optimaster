@@ -73,6 +73,10 @@ WorkerManager::Add(std::string const &connection, Worker &worker)
 		// Notification of worker closing
 		worker.OnClosed().add(*this, &WorkerManager::OnWorkerClosed);
 
+		// Activation notification
+		worker.OnActivated().add(*this, &WorkerManager::OnWorkerActivated);
+		worker.OnDeactivated().add(*this, &WorkerManager::OnWorkerDeactivated);
+
 		// Emit the Added signal
 		OnAdded(worker);
 		OnNotifyAvailable();
