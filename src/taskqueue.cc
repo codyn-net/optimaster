@@ -57,7 +57,7 @@ TaskQueue::Empty() const
  *
  * Inserts a task in the queue.
  *
- * @return: true if the task was inserted at the beginning, false otherwise
+ * @return: true if the task was inserted at the end, false otherwise
  *
  */
 bool
@@ -69,7 +69,9 @@ TaskQueue::Insert(Task &task)
 	for (iter = d_queue.rbegin(); iter != d_queue.rend(); ++iter)
 	{
 		if (!task.CanOvertake(*iter))
+		{
 			break;
+		}
 	}
 
 	if (iter == d_queue.rbegin())
