@@ -139,7 +139,17 @@ Worker::Activate(Task &task)
 
 	*communication.mutable_task() = task.Message();
 
-	return Send(communication);
+	if (Send(communication))
+	{
+		d_data->active = true;
+		d_data->onActivated(*this);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /** \brief Deactivate worker.
