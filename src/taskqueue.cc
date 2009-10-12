@@ -183,9 +183,9 @@ TaskQueue::Queue(Task &task)
 		{
 			iter->Sequence(task);
 		}
-
-		OnNotifyAvailable();
 	}
+
+	OnNotifyAvailable();
 }
 
 /** \brief Remove task group from the queue.
