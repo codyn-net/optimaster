@@ -41,6 +41,8 @@ namespace optimaster
 		std::map<std::string, Worker> d_workersHash;
 
 		public:
+			~WorkerManager();
+
 			bool Add(std::string const &connection, Worker &worker);
 			bool Add(std::string const &connection);
 

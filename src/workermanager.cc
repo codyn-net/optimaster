@@ -90,6 +90,17 @@ WorkerManager::Add(std::string const &connection, Worker &worker)
 	}
 }
 
+WorkerManager::~WorkerManager()
+{
+	map<size_t, Worker> workers = d_workers;
+	map<size_t, Worker>::iterator iter;
+	
+	for (iter = workers.begin(); iter != workers.end(); ++iter)
+	{
+		RemoveWorker(iter->second);
+	}
+}
+
 /** \brief Add new worker to the manager.
  * @param connection the connection describing the worker location
  *
