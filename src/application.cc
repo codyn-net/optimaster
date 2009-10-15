@@ -565,6 +565,14 @@ Application::OnDispatch()
 		{
 			break;
 		}
+
+		Optimizer optimizer;
+		if (d_optimizerManager.Find(task.Id(), optimizer))
+		{
+			optimizer.Add(worker);
+		}
+
+		debug_master << "Worker activated for: " << task.Id() << endl;
 	}
 
 	d_idleDispatch.disconnect();
