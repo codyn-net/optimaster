@@ -69,7 +69,7 @@ Application::Application(int    &argc,
 
 	d_taskQueue.OnNotifyAvailable.add(*this, &Application::OnNotifyAvailable);
 
-	d_discovery.listen();
+	d_discovery.Listen();
 	d_optimizerManager.Listen();
 }
 
@@ -324,6 +324,7 @@ Application::HandleOptimizerBatch(Optimizer                 &optimizer,
                                   task::Communication const &communication)
 {
 	// Add batch to the task queue
+	debug_master << "Received batch from optimizer (" << optimizer.Id() << "): " << communication.batch().tasks_size() << endl;
 	d_taskQueue.Queue(optimizer.Id(), communication.batch());
 }
 
