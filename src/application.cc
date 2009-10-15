@@ -324,7 +324,10 @@ Application::HandleOptimizerBatch(Optimizer                 &optimizer,
                                   task::Communication const &communication)
 {
 	// Add batch to the task queue
-	debug_master << "Received batch from optimizer (" << optimizer.Id() << "): " << communication.batch().tasks_size() << endl;
+	debug_master << "Received batch from optimizer ("
+	             << optimizer.Id() << "): "
+	             << communication.batch().tasks_size() << endl;
+
 	d_taskQueue.Queue(optimizer.Id(), communication.batch());
 }
 
@@ -343,7 +346,9 @@ Application::HandleOptimizerToken(Optimizer                 &optimizer,
 	// Relay the token response back to the worker
 	vector<Worker>::iterator iter;
 	
-	for (iter = optimizer.ActiveWorkers().begin(); iter != optimizer.ActiveWorkers().end(); ++iter)
+	for (iter = optimizer.ActiveWorkers().begin();
+	     iter != optimizer.ActiveWorkers().end();
+	     ++iter)
 	{
 		if (iter->ActiveTask().Id() == communication.token().id())
 		{
@@ -472,8 +477,9 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				{
 					debug_worker << "Task failed to many times ("
 					             << worker.Client().address().host(true)
-					             << ":" << worker.Client().address().port(true) <<
-					             ") for (" << task.Id() << ", "
+					             << ":"
+					             << worker.Client().address().port(true)
+					             << ") for (" << task.Id() << ", "
 					             << task.Message().id() << ")" << endl;
 				}
 
@@ -504,8 +510,10 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			if (Debug::enabled(Debug::Domain::Worker))
 			{
 				debug_worker << "Worker challenge ("
-				             << worker.Client().address().host(true) << ":"
-				             << worker.Client().address().port(true) << ") for ("
+				             << worker.Client().address().host(true)
+				             << ":"
+				             << worker.Client().address().port(true)
+				             << ") for ("
 				             << task.Id() << ", "
 				             << task.Message().id() << ")" << endl;
 			}
@@ -529,7 +537,8 @@ Application::IdleDispatch()
 {
 	if (!d_idleDispatch)
 	{
-		d_idleDispatch = Glib::signal_idle().connect(sigc::mem_fun(*this, &Application::OnDispatch));
+		d_idleDispatch = Glib::signal_idle().connect(sigc::mem_fun(*this,
+		                                             &Application::OnDispatch));
 	}
 }
 
