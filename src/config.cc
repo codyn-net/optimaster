@@ -31,7 +31,13 @@ using namespace os;
 
 Config *Config::s_instance = 0;
 
-/** \brief Default constructor.
+/**
+ * @class optimaster::Config
+ * @brief Config class
+ */
+
+/**
+ * @brief Default constructor.
  *
  * Constructor.
  *
@@ -63,7 +69,7 @@ Config::Config()
 }
 
 /**
- * \brief Initialize config singleton.
+ * @brief Initialize config singleton.
  * @param filename file to load configuration from
  *
  * Initialize the configuration singleton by loading configuration from a file.
@@ -83,7 +89,8 @@ Config::Initialize(string const &filename)
 	return *s_instance;
 }
 
-/** \brief Get config object instance.
+/**
+ * @brief Get config object instance.
  *
  * Get the config object instance. Make sure the config object is initialized.
  *

@@ -31,7 +31,13 @@ using namespace optimaster;
 using namespace optimization::messages;
 using namespace network;
 
-/** \brief Add new worker to the manager.
+/**
+ * @class optimaster::WorkerManager
+ * @brief Class managing worker connections.
+ */
+
+/**
+ * @brief Add new worker to the manager.
  * @param connection the connection string describing the worker location
  * @param worker worker return value
  *
@@ -101,7 +107,8 @@ WorkerManager::~WorkerManager()
 	}
 }
 
-/** \brief Add new worker to the manager.
+/**
+ * @brief Add new worker to the manager.
  * @param connection the connection describing the worker location
  *
  * Add a new worker to the manager.
@@ -117,7 +124,8 @@ WorkerManager::Add(std::string const &connection)
 	return Add(connection, worker);
 }
 
-/** \brief Callback for closing worker connection.
+/**
+ * @brief Callback for closing worker connection.
  * @param fd the worker id
  *
  * This callback is called when the connection with the worker has closed.
@@ -146,7 +154,8 @@ WorkerManager::OnWorkerClosed(Communicator &communicator)
 	RemoveWorker(worker);
 }
 
-/** \brief Remove worker from the manager.
+/**
+ * @brief Remove worker from the manager.
  * @param worker the worker to remove
  *
  * This function removes the worker from the manager, properly unregistering
@@ -193,7 +202,8 @@ WorkerManager::RemoveWorker(Worker &worker)
 	worker.Client().close();
 }
 
-/** \brief Find a worker given a worker id.
+/**
+ * @brief Find a worker given a worker id.
  * @param id the worker id
  * @param worker a return value for the worker if found
  *
@@ -218,7 +228,8 @@ WorkerManager::Find(size_t id, Worker &worker)
 	}
 }
 
-/** \brief Check whether there are idle workers.
+/**
+ * @brief Check whether there are idle workers.
  *
  * Check whether there are any workers that are currently idle.
  *
@@ -236,7 +247,8 @@ WorkerManager::Idle(Worker &worker)
 	return true;
 }
 
-/** \brief Callback called when worker is activated.
+/**
+ * @brief Callback called when worker is activated.
  * @param worker the worker that is activated
  *
  * Called when worker is activated.
@@ -249,7 +261,8 @@ WorkerManager::OnWorkerActivated(Worker &worker)
 	d_activeWorkers[worker.Id()] = worker;
 }
 
-/** \brief Callback called when worker is deactivated.
+/**
+ * @brief Callback called when worker is deactivated.
  * @param worker the worker that is deactivated
  *
  * Called when worker is deactivated.

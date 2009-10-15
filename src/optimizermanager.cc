@@ -30,7 +30,13 @@ using namespace network;
 using namespace optimization;
 using namespace base;
 
-/** \brief Default constructor.
+/**
+ * @class optimaster::OptimizerManager
+ * @brief Class managing optimizers.
+ */
+
+/**
+ * @brief Default constructor.
  *
  * Constructor.
  *
@@ -46,7 +52,8 @@ OptimizerManager::OptimizerManager()
 	d_server.onNewConnection().add(*this, &OptimizerManager::OnNewConnection);
 }
 
-/** \brief Destructor.
+/**
+ * @brief Destructor.
  *
  * Destructor.
  *
@@ -65,7 +72,8 @@ OptimizerManager::~OptimizerManager()
 	d_optimizers.clear();
 }
 
-/** \brief Find optimizer given an id.
+/**
+ * @brief Find optimizer given an id.
  * @param id optimizer id
  * @param optimizer optimizer return value
  *
@@ -93,7 +101,8 @@ OptimizerManager::Find(size_t     id,
 	}
 }
 
-/** \brief Start listening for optimizer connections.
+/**
+ * @brief Start listening for optimizer connections.
  *
  * Start listening for new optimizer connections.
  *
@@ -136,7 +145,8 @@ OptimizerManager::OnNewConnection(Client &client)
 	OnAdded(optimizer);
 }
 
-/** \brief Set host and port on which to listen for optimizer connections.
+/**
+ * @brief Set host and port on which to listen for optimizer connections.
  * @param host the host to listen on
  * @param port the port to listen on
  *

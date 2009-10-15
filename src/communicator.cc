@@ -30,7 +30,20 @@ using namespace optimization::messages;
 using namespace base;
 using namespace base::signals;
 
-/** \brief Create CommunicationArgs object.
+/**
+ * @class optimaster::Communicator
+ * @brief Abstract class used for communication to worker and optimizer.
+ * @see optimaster::Optimizer
+ * @see optimaster::Worker
+ */
+
+/**
+ * @class optimaster::Communicator::CommunicationArgs
+ * @brief Communication signal arguments.
+ */
+
+/**
+ * @brief Create CommunicationArgs object.
  * @param source the source object
  * @param communication the communication object
  *
@@ -47,7 +60,8 @@ Communicator::CommunicationArgs::CommunicationArgs(Communicator        &source,
 {
 }
 
-/** \brief Default communicator constructor.
+/**
+ * @brief Default communicator constructor.
  *
  * Constructor.
  *
@@ -58,7 +72,8 @@ Communicator::Communicator()
 {
 }
 
-/** \brief Communicator shell constructor.
+/**
+ * @brief Communicator shell constructor.
  * @param data the communicator data
  *
  * Constructor.
@@ -73,7 +88,8 @@ Communicator::Communicator(Data *data)
 	// Empty shell around data
 }
 
-/** \brief Set communicator data.
+/**
+ * @brief Set communicator data.
  * @param data the communicator data
  * @param client the communicator client
  *
@@ -92,7 +108,8 @@ Communicator::Set(Data *data, network::Client const &client)
 	d_data->client.onClosed().add(*d_data, &Data::OnClosed);
 }
 
-/** \brief Communicator id (const).
+/**
+ * @brief Communicator id (const).
  *
  * Get the communicator id.
  *
@@ -105,7 +122,8 @@ Communicator::Id() const
 	return d_data->id;
 }
 
-/** \brief Operator equal.
+/**
+ * @brief Operator equal.
  * @param id the id to compare
  *
  * Operator equal comparing communicator ids.
@@ -119,7 +137,8 @@ Communicator::operator==(size_t id) const
 	return d_data->id == id;
 }
 
-/** \brief Operator equal.
+/**
+ * @brief Operator equal.
  * @param other the communicator to compare with
  *
  * Operator equal comparing communicator ids.
@@ -133,7 +152,8 @@ Communicator::operator==(Communicator const &other) const
 	return d_data->id == other.d_data->id;
 }
 
-/** \brief Communication received signal.
+/**
+ * @brief Communication received signal.
  * 
  * Get the signal object which is fired when a communication message has been
  * received.
@@ -147,7 +167,8 @@ Communicator::OnCommunication()
 	return d_data->onCommunication;
 }
 
-/** \brief Connection closed signal.
+/**
+ * @brief Connection closed signal.
  * 
  * Get the signal object which is fired when the connection
  * is closed.
@@ -161,7 +182,8 @@ Communicator::OnClosed()
 	return d_data->onClosed;
 }
 
-/** \brief Data received callback.
+/**
+ * @brief Data received callback.
  * @param args The received data argument
  * 
  * Callback called when data has been received from the worker.
@@ -183,7 +205,8 @@ Communicator::Data::OnData(os::FileDescriptor::DataArgs &args)
 	}
 }
 
-/** \brief Connection closed callback.
+/**
+ * @brief Connection closed callback.
  * @param fd The connection file descriptor
  * 
  * Callback called when the connection with the worker is closed.
@@ -196,7 +219,8 @@ Communicator::Data::OnClosed(int fd)
 	onClosed(shell);
 }
 
-/** \brief Get the client connection.
+/**
+ * @brief Get the client connection.
  *
  * The client connection.
  *
@@ -209,7 +233,8 @@ Communicator::Client()
 	return d_data->client;
 }
 
-/** \brief Get the client connection (const).
+/**
+ * @brief Get the client connection (const).
  *
  * The client connection.
  *

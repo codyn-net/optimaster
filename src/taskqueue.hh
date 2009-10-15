@@ -47,7 +47,8 @@ namespace optimaster
 			bool Empty() const;
 			void Remove(size_t id);
 
-			/** \brief OnNotifyAvailable signal
+			/**
+ * @brief OnNotifyAvailable signal
 			 *
 			 * Signal emitted when new tasks are available on the queue
 			 */

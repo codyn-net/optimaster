@@ -25,7 +25,13 @@
 using namespace optimaster;
 using namespace optimization::messages;
 
-/** \brief Task constructor.
+/**
+ * @class optimaster::Task
+ * @brief Class containing a single task description.
+ */
+
+/**
+ * @brief Task constructor.
  * @param id The task group id
  * @param priority The task priority
  * @param task The task
@@ -48,7 +54,8 @@ Task::Task(size_t id, double priority, task::Task const &task)
 	d_data->failures = 0;
 }
 
-/** \brief Empty task constructor.
+/**
+ * @brief Empty task constructor.
  *
  * Constructor.
  *
@@ -59,7 +66,8 @@ Task::Task()
 {
 }
 
-/** \brief Checks whether the task can overtake some other task (const).
+/**
+ * @brief Checks whether the task can overtake some other task (const).
  * @param other the other task
  *
  * Checks whether the current task has enough 'overtake credits' to overtake
@@ -75,7 +83,8 @@ Task::CanOvertake(Task const &other) const
 	return Overtake() > other.Overtake();
 }
 
-/** \brief Cloneable clone implementation (const).
+/**
+ * @brief Cloneable clone implementation (const).
  *
  * Create clone of the object.
  *
@@ -88,7 +97,8 @@ Task::clone() const
 	return new Task(*this);
 }
 
-/** \brief Increase task failure.
+/**
+ * @brief Increase task failure.
  *
  * Indicates a task failure. The task keeps track of the number of failures.
  *
@@ -99,7 +109,8 @@ Task::Failed()
 	++d_data->failures;
 }
 
-/** \brief Number of failures.
+/**
+ * @brief Number of failures.
  *
  * The number of times tasks have failed.
  *
@@ -112,7 +123,8 @@ Task::Failures()
 	return d_data->failures;
 }
 
-/** \brief Task equality.
+/**
+ * @brief Task equality.
  *
  * Test for task id
  *
@@ -125,7 +137,8 @@ Task::operator==(size_t id) const
 	return d_data->id == id;	
 }
 
-/** \brief Overtake another task.
+/**
+ * @brief Overtake another task.
  * @param other the other task
  *
  * Overtake another task. This decreases the overtake credits of the other
@@ -144,7 +157,8 @@ Task::Overtake(Task &other)
 	}
 }
 
-/** \brief Sequence task after this task.
+/**
+ * @brief Sequence task after this task.
  * @param other the other task
  *
  * Sequence the other task after the task.
@@ -157,7 +171,8 @@ Task::Sequence(Task &other)
 	other.d_data->overtake += d_data->overtake;
 }
 
-/** \brief Reset sequence.
+/**
+ * @brief Reset sequence.
  *
  * Reset the task sequence.
  *
@@ -168,7 +183,8 @@ Task::Sequence()
 	d_data->nextInSequence.clear();
 }
 
-/** \brief Decrease the sequence.
+/**
+ * @brief Decrease the sequence.
  * @param overtake overtake to decrease
  *
  * Decreases by overtake, and propagates to next in sequence.
@@ -185,7 +201,8 @@ Task::SequenceDecrease(double overtake)
 	}
 }
 
-/** \brief Get task message associated to the task.
+/**
+ * @brief Get task message associated to the task.
  *
  * Get the task message associated to this task.
  *
@@ -198,7 +215,8 @@ Task::Message()
 	return d_data->task;
 }
 
-/** \brief Get task message associated to the task (const).
+/**
+ * @brief Get task message associated to the task (const).
  *
  * Get the task message associated to this task.
  *
@@ -211,7 +229,8 @@ Task::Message() const
 	return d_data->task;
 }
 
-/** \brief Get task overtak (const).
+/**
+ * @brief Get task overtak (const).
  *
  * Get the task overtak.
  *
@@ -224,7 +243,8 @@ Task::Overtake() const
 	return d_data->overtake;
 }
 
-/** \brief Set the task overtake.
+/**
+ * @brief Set the task overtake.
  * @param overtake the task overtake
  *
  * Set the task overtake.
@@ -236,7 +256,8 @@ Task::SetOvertake(double overtake)
 	d_data->overtake = overtake;
 }
 
-/** \brief Get the task id (const).
+/**
+ * @brief Get the task id (const).
  *
  * Get the task id.
  *
@@ -249,7 +270,8 @@ Task::Id() const
 	return d_data->id;
 }
 
-/** \brief Get the task priority (const).
+/**
+ * @brief Get the task priority (const).
  *
  * Get the task priority.
  *

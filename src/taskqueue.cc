@@ -27,7 +27,13 @@ using namespace optimaster;
 using namespace base;
 using namespace optimization::messages;
 
-/** \brief Default task queue constructor.
+/**
+ * @class optimaster::TaskQueue
+ * @brief Class to queue and schedule tasks.
+ */
+
+/**
+ * @brief Default task queue constructor.
  *
  * Constructor.
  *
@@ -39,7 +45,8 @@ TaskQueue::TaskQueue()
 	d_prioritySum = 1;
 }
 
-/** \brief Get whether the queue is empty (const).
+/**
+ * @brief Get whether the queue is empty (const).
  *
  * Get whether the queue is empty.
  *
@@ -52,7 +59,8 @@ TaskQueue::Empty() const
 	return d_queue.empty();
 }
 
-/** \brief Insert a task in the task queue.
+/**
+ * @brief Insert a task in the task queue.
  * @param task a task
  *
  * Inserts a task in the queue.
@@ -89,7 +97,8 @@ TaskQueue::Insert(Task &task)
 	}
 }
 
-/** \brief Pop the next task of the queue.
+/**
+ * @brief Pop the next task of the queue.
  * @param task the task return value
  *
  * Pop the next task of the queue.
@@ -112,7 +121,8 @@ TaskQueue::Pop(Task &task)
 	return true;
 }
 
-/** \brief Queue batch of tasks.
+/**
+ * @brief Queue batch of tasks.
  * @param id the task group id
  * @param batch a batch of tasks to add
  *
@@ -156,7 +166,8 @@ TaskQueue::Queue(size_t             id,
 	}
 }
 
-/** \brief Queue a task.
+/**
+ * @brief Queue a task.
  * @param task a task
  *
  * Queue a task in the task queue.
@@ -190,7 +201,8 @@ TaskQueue::Queue(Task &task)
 	OnNotifyAvailable();
 }
 
-/** \brief Remove task group from the queue.
+/**
+ * @brief Remove task group from the queue.
  * @param id the task group id
  *
  * Removes all tasks in the task group from the queue.
@@ -211,7 +223,8 @@ TaskQueue::Remove(size_t id)
 	// TODO: update priority sum
 }
 
-/** \brief Update priority sum.
+/**
+ * @brief Update priority sum.
  * @param num number with which to update the priority sum
  *
  * Updates the priority sum which is used to normalize the overtake credits.

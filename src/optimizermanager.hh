@@ -44,13 +44,15 @@ namespace optimaster
 			
 			bool Find(size_t id, Optimizer &optimizer);
 			
-			/** \brief OnAdded signal
+			/**
+ * @brief OnAdded signal
 			 *
 			 * Signal emitted when optimizer is added to the manager
 			 */
 			base::signals::Signal<Optimizer> OnAdded;
 			
-			/** \brief OnRemoved signal
+			/**
+ * @brief OnRemoved signal
 			 *
 			 * Signal emitted when optimizer is removed from the manager
 			 */

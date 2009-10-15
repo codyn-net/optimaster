@@ -1,0 +1,7 @@
+doxygen: doxygen.cfg
+	$(DOXYGEN) doxygen.cfg >/dev/null
+	@echo ""
+	@echo "Installing images..."
+	@cp $(srcdir)/images/folder.png $(srcdir)/html/ftv2folderclosed.png
+	@cp $(srcdir)/images/folder.png $(srcdir)/html/ftv2folderopen.png
+	@cp $(srcdir)/images/file.png $(srcdir)/html/ftv2doc.png

@@ -33,16 +33,16 @@ namespace optimaster
 		static Config *s_instance;
 
 		public:
-			/** Discovery namespace setting */
+			/** Discovery namespace setting. */
 			Glib::ustring DiscoveryNamespace;
 			
-			/** Discovery address setting */
+			/** Discovery address setting. */
 			Glib::ustring DiscoveryAddress;
 			
-			/** Address on which to listen */
+			/** Address on which to listen. */
 			Glib::ustring ListenAddress;
 			
-			/** Maximum number of allowed task failures */
+			/** Maximum number of allowed task failures. */
 			size_t MaxTaskFailures;
 			
 			/* Constructor/destructor */

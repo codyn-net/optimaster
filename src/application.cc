@@ -36,7 +36,13 @@ using namespace os;
 using namespace network;
 using namespace optimization::messages;
 
-/** \brief Create new application.
+/**
+ * @class optimaster::Application
+ * @brief Main application class
+ */
+
+/**
+ * @brief Create new application.
  * @param argc number of command line arguments
  * @param argv command line arguments
  *
@@ -67,7 +73,8 @@ Application::Application(int    &argc,
 	d_optimizerManager.Listen();
 }
 
-/** \brief Application destructor.
+/**
+ * @brief Application destructor.
  *
  * Destructor.
  *
@@ -88,7 +95,8 @@ Application::~Application()
 	d_discovery.OnGreeting().remove(*this, &Application::OnGreeting);
 }
 
-/** \brief Parse command line arguments.
+/**
+ * @brief Parse command line arguments.
  * @param argc number of command line arguments
  * @param argv command line arguments
  *
@@ -190,7 +198,8 @@ struct DebugInfo
 	int flag;
 };
 
-/** \brief Enable debug levels using environment variables.
+/**
+ * @brief Enable debug levels using environment variables.
  *
  * Sets debug levels based on environment variables.
  *
@@ -218,7 +227,8 @@ Application::EnableEnvironment()
 	}
 }
 
-/** \brief Greeting message callback.
+/**
+ * @brief Greeting message callback.
  * @param info discovery info
  *
  * Called when a discovery greeting has been received. The worker who send it
@@ -242,7 +252,8 @@ Application::OnGreeting(optimization::Discovery::Info &info)
 	d_workerManager.Add(protocol + "://" + host + ":" + port);
 }
 
-/** \brief Keyboard interrupt callback.
+/**
+ * @brief Keyboard interrupt callback.
  * @param loop the glib main loop
  *
  * Called on keyboard interrupt.
@@ -257,7 +268,8 @@ Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop)
 	return true;
 }
 
-/** \brief Optimizer added callback.
+/**
+ * @brief Optimizer added callback.
  * @param optimizer the optimizer
  *
  * Called when a new optimizer is connected.
@@ -269,7 +281,8 @@ Application::OnOptimizerAdded(Optimizer &optimizer)
 	optimizer.OnCommunication().add(*this, &Application::OnOptimizerCommunication);
 }
 
-/** \brief Optimizer removed callback.
+/**
+ * @brief Optimizer removed callback.
  * @param optimizer the optimizer
  *
  * Called when an optimizer is disconnected.
@@ -298,7 +311,8 @@ Application::OnOptimizerRemoved(Optimizer &optimizer)
 	}
 }
 
-/** \brief Handle optimizer batch.
+/**
+ * @brief Handle optimizer batch.
  * @param optimizer the optimizer
  * @param batch the batch
  *
@@ -313,7 +327,8 @@ Application::HandleOptimizerBatch(Optimizer                 &optimizer,
 	d_taskQueue.Queue(optimizer.Id(), communication.batch());
 }
 
-/** \brief Handle optimizer token.
+/**
+ * @brief Handle optimizer token.
  * @param optimizer the optimizer
  * @param token the token
  *
@@ -337,7 +352,8 @@ Application::HandleOptimizerToken(Optimizer                 &optimizer,
 	}
 }
 
-/** \brief Optmizer communication callback.
+/**
+ * @brief Optmizer communication callback.
  * @param args communication arguments
  *
  * Called when a communication message from an optimizer has been received.
@@ -364,7 +380,8 @@ Application::OnOptimizerCommunication(Optimizer::CommunicationArgs &args)
 	}
 }
 
-/** \brief Worker added callback.
+/**
+ * @brief Worker added callback.
  * @param worker the worker
  *
  * Called when a worker has been added.
@@ -376,7 +393,8 @@ Application::OnWorkerAdded(Worker &worker)
 	worker.OnCommunication().add(*this, &Application::OnWorkerCommunication);
 }
 
-/** \brief Worker removed callback.
+/**
+ * @brief Worker removed callback.
  * @param worker the worker
  *
  * Called when a worker has been removed.
@@ -394,7 +412,8 @@ Application::OnWorkerRemoved(Worker &worker)
 	}
 }
 
-/** \brief Worker communication message processing.
+/**
+ * @brief Worker communication message processing.
  * @param args the CommunicationArgs
  *
  * Process communication messages from the worker.
@@ -497,7 +516,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	}
 }
 
-/** \brief Dispatch tasks in an idle function.
+/**
+ * @brief Dispatch tasks in an idle function.
  *
  * Add a glib idle function for dispatching tasks. This is useful if you
  * want to collect multiple dispatches in one call.
@@ -512,7 +532,8 @@ Application::IdleDispatch()
 	}
 }
 
-/** \brief Dispatch available tasks to available workers.
+/**
+ * @brief Dispatch available tasks to available workers.
  *
  * Dispatches tasks to workers as long as there are idle workers and tasks
  * in the task queue.
@@ -540,7 +561,8 @@ Application::OnDispatch()
 	return false;
 }
 
-/** \brief Main application loop.
+/**
+ * @brief Main application loop.
  * @param loop the glib main loop to use
  *
  * Runs the main application loop.
@@ -562,7 +584,8 @@ Application::Run(Glib::RefPtr<Glib::MainLoop> loop)
 	loop->run();
 }
 
-/** \brief Send discovery wakeup message.
+/**
+ * @brief Send discovery wakeup message.
  *
  * Send a discovery wakeup message. The wakup message is used to ask any
  * workers to notify themselves to the master process. All workers receiving
@@ -593,7 +616,8 @@ Application::SendWakeup()
 	}
 }
 
-/** \brief Notfy available callback.
+/**
+ * @brief Notfy available callback.
  *
  * Called when there are idle workers available or when there are new tasks
  * to be processed.

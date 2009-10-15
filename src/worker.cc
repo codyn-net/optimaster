@@ -33,7 +33,13 @@ using namespace optimization::messages;
 using namespace base;
 using namespace base::signals;
 
-/** \brief Create stub worker.
+/**
+ * @class optimaster::Worker
+ * @brief Class representing a worker connection.
+ */
+
+/**
+ * @brief Create stub worker.
  * 
  * Constructor.
  *
@@ -47,13 +53,14 @@ Worker::Worker()
 {
 }
 
-/** \brief Create worker at address.
+/**
+ * @fn optimaster::Worker::Worker(network::AddressInfo &info)
+ * @brief Create worker at address.
  * @param info Address specification for the worker
- * 
+ *
  * Constructor.
  *
  * Creates a new worker on a specific network address.
- * \fn Worker::Worker(network::AddressInfo &info)
  */
 Worker::Worker(AddressInfo &info)
 {
@@ -63,7 +70,8 @@ Worker::Worker(AddressInfo &info)
 	Set(d_data, network::Client::resolve<network::Client>(info));
 }
 
-/** \brief Get the current worker task.
+/**
+ * @brief Get the current worker task.
  * 
  * Get the task currently being executed by the worker.
  *
@@ -76,7 +84,8 @@ Worker::ActiveTask()
 	return d_data->task;
 }
 
-/** \brief Get the current worker task (const).
+/**
+ * @brief Get the current worker task (const).
  * 
  * Get the task currently being executed by the worker.
  *
@@ -89,7 +98,8 @@ Worker::ActiveTask() const
 	return d_data->task;
 }
 
-/** \brief Signal emitted when worker is activated.
+/**
+ * @brief Signal emitted when worker is activated.
  *
  * When the worker is activated with a certain task, this signal is emitted.
  *
@@ -103,7 +113,8 @@ Worker::OnActivated()
 }
 
 
-/** \brief Signal emitted when worker is deactivated.
+/**
+ * @brief Signal emitted when worker is deactivated.
  *
  * This signal is emitted when the worker is deactivated.
  *
@@ -116,7 +127,8 @@ Worker::OnDeactivated()
 	return d_data->onDeactivated;
 }
 
-/** \brief Send task to the worker.
+/**
+ * @brief Send task to the worker.
  * @param task The task to send to the worker
  * 
  * Send a task to the worker to be executed.
@@ -152,7 +164,8 @@ Worker::Activate(Task &task)
 	}
 }
 
-/** \brief Deactivate worker.
+/**
+ * @brief Deactivate worker.
  *
  * Deactivate the worker. This makes the worker idle and ready for a new task.
  *
@@ -169,7 +182,8 @@ Worker::Deactivate()
 	d_data->onDeactivated(*this);
 }
 
-/** \brief Cancel active task.
+/**
+ * @brief Cancel active task.
  *
  * Cancel the task the worker is currently working on. This will send a
  * TaskCancelled message to the worker before deactivating it.
@@ -199,7 +213,8 @@ Worker::Cancel()
 	return true;
 }
 
-/** \brief Get whether worker is active (const).
+/**
+ * @brief Get whether worker is active (const).
  *
  * Returns whether the worker is currently working on a task.
  *

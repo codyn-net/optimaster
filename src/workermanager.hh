@@ -50,19 +50,22 @@ namespace optimaster
 
 			bool Idle(Worker &worker);
 
-			/** \brief OnAdded signal
+			/**
+ * @brief OnAdded signal
 			  *
 			  * Signal emitted when a worker was added to the manager.
 			  */
 			base::signals::Signal<Worker> OnAdded;
 			
-			/** \brief OnRemoved signal
+			/**
+ * @brief OnRemoved signal
 			  *
 			  * Signal emitted when a worker was removed to the manager.
 			  */
 			base::signals::Signal<Worker> OnRemoved;
 			
-			/** \brief OnNotifyAvailable signal
+			/**
+ * @brief OnNotifyAvailable signal
 			  *
 			  * Signal emitted when a worker has become idle
 			  */

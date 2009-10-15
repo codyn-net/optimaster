@@ -1,5 +1,6 @@
-all: doxygen.cfg
-	$(DOXYGEN) doxygen.cfg
+include Makefile.doxygen
+
+all: doxygen
 
 install-data-hook: all
 	cp -r html $(datadir)/doc/optimaster

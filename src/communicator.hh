@@ -79,7 +79,8 @@ namespace optimaster
 			Data *d_data;
 	};
 
-	/** \brief Send message to the communicator end point
+	/**
+ * @brief Send message to the communicator end point
 	 * @param message the message to send
 	 *
 	 * Send message to the communicator end point

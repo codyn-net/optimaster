@@ -30,7 +30,13 @@ using namespace network;
 using namespace optimization::messages;
 using namespace optimization;
 
-/** \brief Constructor with client.
+/**
+ * @class optimaster::Optimizer
+ * @brief Class representing a optimizer connection.
+ */
+
+/**
+ * @brief Constructor with client.
  * @param client the client
  *
  * Constructor.
@@ -46,7 +52,8 @@ Optimizer::Optimizer(network::Client &client)
 	Set(d_data, client);
 }
 
-/** \brief Default constructor.
+/**
+ * @brief Default constructor.
  *
  * Constructor.
  *
@@ -57,7 +64,8 @@ Optimizer::Optimizer()
 {
 }
 
-/** \brief Callback called when worker is deactivated.
+/**
+ * @brief Callback called when worker is deactivated.
  * @param worker the worker
  *
  * Called when a worker that was executing a task for the optimizer was 
@@ -76,7 +84,8 @@ Optimizer::Data::OnWorkerDeactivated(Worker &worker)
 	worker.OnDeactivated().remove(*this, &Optimizer::Data::OnWorkerDeactivated);
 }
 
-/** \brief Add worker activated for the optimizer.
+/**
+ * @brief Add worker activated for the optimizer.
  * @param worker the worker
  *
  * This should be called when a worker is activated for a task of the 
@@ -91,7 +100,8 @@ Optimizer::Add(Worker &worker)
 	worker.OnDeactivated().add(*d_data, &Optimizer::Data::OnWorkerDeactivated);
 }
 
-/** \brief Get active workers.
+/**
+ * @brief Get active workers.
  *
  * Get all the workers currently executing tasks for the optimizer.
  *
