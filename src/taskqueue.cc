@@ -214,11 +214,7 @@ TaskQueue::Remove(size_t id)
 	std::list<Task>::iterator iter;
 
 	iter = std::remove(d_queue.begin(), d_queue.end(), id);
-
-	if (iter != d_queue.end())
-	{
-		d_queue.erase(iter);
-	}
+	d_queue.erase(iter, d_queue.end());
 
 	// TODO: update priority sum
 }
