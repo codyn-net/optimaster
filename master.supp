@@ -23,6 +23,13 @@
    <insert a suppression name here>
    Memcheck:Leak
    ...
+   fun:_ZN10optimaster6Config*
+   ...
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   ...
    fun:_ZN4Glib9wrap_initEv
    ...
 }
