@@ -66,7 +66,7 @@ OptimizerManager::~OptimizerManager()
 	
 	for (iter = d_optimizers.begin(); iter != d_optimizers.end(); ++iter)
 	{
-		iter->second.Client().onClosed().remove(*this, &OptimizerManager::OnConnectionClosed);
+		iter->second.OnClosed().remove(*this, &OptimizerManager::OnOptimizerClosed);
 	}
 	
 	d_optimizers.clear();
@@ -114,25 +114,24 @@ OptimizerManager::Listen()
 }
 
 void
-OptimizerManager::OnConnectionClosed(int fd)
+OptimizerManager::OnOptimizerClosed(Communicator &communicator)
 {
 	Optimizer optimizer;
-	size_t id = static_cast<size_t>(fd);
-
-	if (Find(id, optimizer))
+	
+	if (Find(communicator.Id(), optimizer))
 	{
 		OnRemoved(optimizer);
-		d_optimizers.erase(id);
+		d_optimizers.erase(optimizer.Id());
 	}
 }
 
 void
 OptimizerManager::OnNewConnection(Client &client)
 {
-	client.onClosed().add(*this, &OptimizerManager::OnConnectionClosed);
-	
 	Optimizer optimizer(client);
 	d_optimizers[optimizer.Id()] = optimizer;
+	
+	optimizer.OnClosed().add(*this, &OptimizerManager::OnOptimizerClosed);
 	
 	if (Debug::enabled(Debug::Domain::Master))
 	{

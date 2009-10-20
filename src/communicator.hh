@@ -70,6 +70,8 @@ namespace optimaster
 				
 				void OnData(os::FileDescriptor::DataArgs &args);
 				void OnClosed(int fd);
+				
+				~Data();
 			};
 			
 			void Set(Data *data, network::Client const &client);

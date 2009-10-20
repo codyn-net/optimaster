@@ -66,6 +66,8 @@ Worker::Worker(AddressInfo &info)
 {
 	d_data = new Data();
 	addPrivateData(d_data);
+	
+	d_data->active = false;
 
 	Set(d_data, network::Client::resolve<network::Client>(info));
 }

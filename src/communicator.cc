@@ -88,6 +88,12 @@ Communicator::Communicator(Data *data)
 	// Empty shell around data
 }
 
+Communicator::Data::~Data()
+{
+	client.onClosed().remove(*this, &Data::OnClosed);
+	client.onData().remove(*this, &Data::OnData);
+}
+
 /**
  * @brief Set communicator data.
  * @param data the communicator data
@@ -216,7 +222,11 @@ void
 Communicator::Data::OnClosed(int fd)
 {
 	Communicator shell(this);
+	
+	// Keep it ALIVE!
+	ref();
 	onClosed(shell);
+	unref();
 }
 
 /**
