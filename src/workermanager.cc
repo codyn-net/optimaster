@@ -74,7 +74,7 @@ WorkerManager::Add(std::string const &connection, Worker &worker)
 		// Add worker to the relevant maps and queues
 		d_workersHash[connection] = worker;
 		d_workers[worker.Id()] = worker;
-		d_idleWorkers[worker.Id()] = worker;
+		d_idleWorkers.push_back(worker);
 
 		// Notification of worker closing
 		worker.OnClosed().add(*this, &WorkerManager::OnWorkerClosed);
@@ -169,7 +169,10 @@ WorkerManager::RemoveWorker(Worker &worker)
 {
 	// Remove from active list
 	d_activeWorkers.erase(worker.Id());
-	d_idleWorkers.erase(worker.Id());
+
+	deque<Worker>::iterator iter = remove(d_idleWorkers.begin(), d_idleWorkers.end(), worker);
+	d_idleWorkers.erase(iter, d_idleWorkers.end());
+
 	d_workers.erase(worker.Id());
 
 	// Remove from the hash
@@ -243,7 +246,7 @@ WorkerManager::Idle(Worker &worker)
 		return false;
 	}
 
-	worker = d_idleWorkers.begin()->second;
+	worker = d_idleWorkers.front();
 	return true;
 }
 
@@ -257,8 +260,10 @@ WorkerManager::Idle(Worker &worker)
 void
 WorkerManager::OnWorkerActivated(Worker &worker)
 {
-	d_idleWorkers.erase(worker.Id());
 	d_activeWorkers[worker.Id()] = worker;
+
+	deque<Worker>::iterator iter = remove(d_idleWorkers.begin(), d_idleWorkers.end(), worker);
+	d_idleWorkers.erase(iter, d_idleWorkers.end());
 }
 
 /**
@@ -272,7 +277,7 @@ void
 WorkerManager::OnWorkerDeactivated(Worker &worker)
 {
 	d_activeWorkers.erase(worker.Id());
-	d_idleWorkers[worker.Id()] = worker;
-	
+
+	d_idleWorkers.push_back(worker);	
 	OnNotifyAvailable();
 }

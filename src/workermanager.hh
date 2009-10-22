@@ -34,7 +34,7 @@ namespace optimaster
 {
 	class WorkerManager
 	{
-		std::map<size_t, Worker> d_idleWorkers;
+		std::deque<Worker> d_idleWorkers;
 		std::map<size_t, Worker> d_activeWorkers;
 		std::map<size_t, Worker> d_workers;
 
