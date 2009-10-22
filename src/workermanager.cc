@@ -193,13 +193,13 @@ WorkerManager::RemoveWorker(Worker &worker)
 
 	worker.OnClosed().remove(*this, &WorkerManager::OnWorkerClosed);
 
+	// Emit the signal
+	OnRemoved(worker);
+
 	if (worker.Active())
 	{
 		worker.Deactivate();
 	}
-
-	// Emit the signal
-	OnRemoved(worker);
 
 	// And finally close the worker
 	worker.Client().close();
