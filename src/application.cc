@@ -70,7 +70,11 @@ Application::Application(int    &argc,
 	d_taskQueue.OnNotifyAvailable.add(*this, &Application::OnNotifyAvailable);
 
 	d_discovery.Listen();
-	d_optimizerManager.Listen();
+	
+	if (!d_optimizerManager.Listen())
+	{
+		cerr << "Failed to start master, could not listen for optimizers (maybe there is another master running?)" << endl;
+	}
 }
 
 /**
@@ -589,6 +593,11 @@ Application::OnDispatch()
 void
 Application::Run(Glib::RefPtr<Glib::MainLoop> loop) 
 {
+	if (!d_optimizerManager)
+	{
+		return;
+	}
+	
 	os::Signals::install();
 	os::Signals::onInterrupt.addData(*this, &Application::OnInterrupt, loop);
 

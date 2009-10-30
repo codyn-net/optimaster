@@ -106,11 +106,17 @@ OptimizerManager::Find(size_t     id,
  *
  * Start listening for new optimizer connections.
  *
+ * @return: true if the manager is now listening, false otherwise
  */
-void
+bool
 OptimizerManager::Listen()
 {
-	d_server.listen();
+	return d_server.listen();
+}
+
+OptimizerManager::operator bool() const
+{
+	return d_server;
 }
 
 void

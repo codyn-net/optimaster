@@ -40,7 +40,9 @@ namespace optimaster
 		
 			/* Public functions */
 			void Set(std::string const &host, std::string const &port);
-			void Listen();
+			
+			bool Listen();
+			operator bool() const;
 			
 			bool Find(size_t id, Optimizer &optimizer);
 			
