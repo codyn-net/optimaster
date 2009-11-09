@@ -53,6 +53,22 @@ Worker::Worker()
 {
 }
 
+/** \brief Worker shell constructor.
+ * @param data Worker data
+ * 
+ * Constructor.
+ *
+ * Creates a worker shell around worker data.
+ *
+ */
+
+Worker::Worker(Data *data)
+:
+	Communicator(data)
+{
+	d_data = data;
+}
+
 /**
  * @fn optimaster::Worker::Worker(network::AddressInfo &info)
  * @brief Create worker at address.
@@ -129,6 +145,20 @@ Worker::OnDeactivated()
 	return d_data->onDeactivated;
 }
 
+/** \brief Signal emitted when worker timeout occurred.
+ * 
+ * This signal is emitted when the worker has not responded within the timeout
+ * set on the task.
+ *
+ * @return: the signal object
+ *
+ */
+Signal<Worker> &
+Worker::OnTimeout()
+{
+	return d_data->onTimeout;
+}
+
 /**
  * @brief Send task to the worker.
  * @param task The task to send to the worker
@@ -139,7 +169,7 @@ Worker::OnDeactivated()
  *
  */
 bool
-Worker::Activate(Task &task) 
+Worker::Activate(Task &task, double timeout) 
 {
 	if (d_data->active)
 	{
@@ -156,6 +186,13 @@ Worker::Activate(Task &task)
 	if (Send(communication))
 	{
 		d_data->active = true;
+		task.Begin();
+		
+		if (timeout > 0)
+		{
+			d_data->timeout = Glib::signal_timeout().connect(sigc::mem_fun(*d_data, &Worker::Data::OnTimeout), (unsigned int)(timeout * 1000));
+		}
+		
 		d_data->onActivated(*this);
 
 		return true;
@@ -179,7 +216,13 @@ Worker::Deactivate()
 	{
 		return;
 	}
+	
+	if (d_data->timeout)
+	{
+		d_data->timeout.disconnect();
+	}
 
+	d_data->task.End();
 	d_data->active = false;
 	d_data->onDeactivated(*this);
 }
@@ -227,4 +270,14 @@ bool
 Worker::Active() const
 {
 	return d_data->active;
+}
+
+bool
+Worker::Data::OnTimeout()
+{
+	Worker shell(this);
+	onTimeout(shell);
+	
+	timeout.disconnect();
+	return false;
 }

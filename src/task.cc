@@ -33,25 +33,22 @@ using namespace optimization::messages;
 /**
  * @brief Task constructor.
  * @param id The task group id
- * @param priority The task priority
  * @param task The task
  *
  * Constructor.
  *
  * Create a new task object.
- * \fn Task::Task(size_t id, double priority, optimization::messages::task::Task const &task)
+ * \fn Task::Task(size_t id, optimization::messages::task::Task const &task)
  */
-Task::Task(size_t id, double priority, task::Task const &task) 
+Task::Task(size_t id, task::Task const &task) 
 {
 	d_data = new Data();
 	addPrivateData(d_data);
 	
 	d_data->id = id;
-	d_data->priority = priority;
 	d_data->task = task;
-
-	d_data->overtake = 0;
 	d_data->failures = 0;
+	d_data->lastRunTime = 0;
 }
 
 /**
@@ -64,23 +61,6 @@ Task::Task(size_t id, double priority, task::Task const &task)
  */
 Task::Task()
 {
-}
-
-/**
- * @brief Checks whether the task can overtake some other task (const).
- * @param other the other task
- *
- * Checks whether the current task has enough 'overtake credits' to overtake
- * the other task. This essentially checks if the task has priority over
- * the other task.
- *
- * @return: true if the task can overtake the other task, false otherwise
- *
- */
-bool
-Task::CanOvertake(Task const &other) const
-{
-	return Overtake() > other.Overtake();
 }
 
 /**
@@ -134,71 +114,7 @@ Task::Failures()
 bool
 Task::operator==(size_t id) const
 {
-	return d_data->id == id;	
-}
-
-/**
- * @brief Overtake another task.
- * @param other the other task
- *
- * Overtake another task. This decreases the overtake credits of the other
- * task and sequence decreases the overtake of this task.
- *
- */
-void
-Task::Overtake(Task &other) 
-{
-	other.d_data->overtake -= d_data->overtake;
-	
-	if (d_data->nextInSequence)
-	{
-		d_data->nextInSequence->SequenceDecrease(d_data->overtake);
-		d_data->nextInSequence.clear();
-	}
-}
-
-/**
- * @brief Sequence task after this task.
- * @param other the other task
- *
- * Sequence the other task after the task.
- *
- */
-void
-Task::Sequence(Task &other) 
-{
-	d_data->nextInSequence = other;
-	other.d_data->overtake += d_data->overtake;
-}
-
-/**
- * @brief Reset sequence.
- *
- * Reset the task sequence.
- *
- */
-void
-Task::Sequence()
-{
-	d_data->nextInSequence.clear();
-}
-
-/**
- * @brief Decrease the sequence.
- * @param overtake overtake to decrease
- *
- * Decreases by overtake, and propagates to next in sequence.
- *
- */
-void
-Task::SequenceDecrease(double overtake)
-{
-	d_data->overtake -= overtake;
-
-	if (d_data->nextInSequence)
-	{
-		d_data->nextInSequence->SequenceDecrease(d_data->overtake);
-	}
+	return d_data->id == id;
 }
 
 /**
@@ -230,33 +146,6 @@ Task::Message() const
 }
 
 /**
- * @brief Get task overtak (const).
- *
- * Get the task overtak.
- *
- * @return: the task overtake
- *
- */
-double
-Task::Overtake() const
-{
-	return d_data->overtake;
-}
-
-/**
- * @brief Set the task overtake.
- * @param overtake the task overtake
- *
- * Set the task overtake.
- *
- */
-void
-Task::SetOvertake(double overtake)
-{
-	d_data->overtake = overtake;
-}
-
-/**
  * @brief Get the task id (const).
  *
  * Get the task id.
@@ -270,16 +159,32 @@ Task::Id() const
 	return d_data->id;
 }
 
+void
+Task::Begin()
+{
+	d_data->started.assign_current_time();
+	d_data->lastRunTime = 0;
+}
+
+void
+Task::End()
+{
+	Glib::TimeVal tv;
+	tv.assign_current_time();
+	
+	d_data->lastRunTime = (tv - d_data->started).as_double();
+}
+
 /**
- * @brief Get the task priority (const).
+ * @brief Get the time to run the last task (const).
  *
- * Get the task priority.
+ * Returns the time it took to run the last task in seconds.
  *
- * @return: the task priority
+ * @return: the last run time in seconds
  *
  */
 double
-Task::Priority() const
+Task::LastRunTime() const
 {
-	return d_data->priority;
+	return d_data->lastRunTime;
 }

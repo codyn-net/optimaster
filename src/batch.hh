@@ -1,5 +1,5 @@
 /*
- * config.hh
+ * batch.hh
  * This file is part of optimaster
  *
  * Copyright (C) 2009 - Jesse van den Kieboom
@@ -20,43 +20,54 @@
  * Boston, MA  02110-1301  USA
  */
 
-#ifndef __OPTIMASTER_CONFIG_H__
-#define __OPTIMASTER_CONFIG_H__
+#ifndef __OPTIMASTER_BATCH_H__
+#define __OPTIMASTER_BATCH_H__
 
-#include <base/Config/config.hh>
-#include <glibmm.h>
+#include <optimization/messages.hh>
+#include "task.hh"
 
 namespace optimaster
 {
-	class Config : public base::Config
+	class Batch : public base::Object
 	{
-		static Config *s_instance;
-
-		public:
-			/** Discovery namespace setting. */
-			Glib::ustring DiscoveryNamespace;
+		struct Data : public base::Object::PrivateData
+		{
+			size_t id;
+			std::deque<Task> tasks;
 			
-			/** Discovery address setting. */
-			Glib::ustring DiscoveryAddress;
+			double priority;
+			double timeout;
 			
-			/** Address on which to listen. */
-			Glib::ustring ListenAddress;
-			
-			/** Maximum number of allowed task failures. */
-			size_t MaxTaskFailures;
-			
-			/** Number of runs to measure run time estimation */
-			size_t RunTimeEstimation;
-			
-			/* Constructor/destructor */
-			static Config &Initialize(std::string const &filename);
-			static Config &Instance();
+			double waitTime;
+			double bias;
+		};
 		
-			/* Public functions */
-		private:
-			/* Private functions */
-			Config();
+		Data *d_data;
+		
+		public:
+			Batch();
+			Batch(size_t idx, double bias, optimization::messages::task::Batch const &batch);
+
+			size_t Id() const;
+
+			double Priority() const;
+			double Timeout() const;
+			
+			void Push(Task const &task);
+			bool Pop(Task &task);
+			
+			bool Empty() const;
+
+			bool operator==(size_t id) const;
+			bool operator>(Batch const &other) const;
+
+			void Wait();
+			void WaitReset();
+			double WaitTime() const;
+
+			virtual Batch *clone() const;
 	};
 }
 
-#endif /* __OPTIMASTER_CONFIG_H__ */
+#endif /* __OPTIMASTER_BATCH_H__ */
+

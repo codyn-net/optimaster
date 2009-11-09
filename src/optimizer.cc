@@ -21,7 +21,9 @@
  */
 
 #include "optimizer.hh"
+#include "config.hh"
 
+#include <numeric>
 #include <optimization/messages.hh>
 
 using namespace std;
@@ -78,10 +80,18 @@ Optimizer::Data::OnWorkerDeactivated(Worker &worker)
 	// Remove worker from list of active workers
 	vector<Worker>::iterator iter;
 	iter = std::remove(activeWorkers.begin(), activeWorkers.end(), worker);
-	
+
 	activeWorkers.erase(iter, activeWorkers.end());
-	
+
 	worker.OnDeactivated().remove(*this, &Optimizer::Data::OnWorkerDeactivated);
+	
+	Config &config = Config::Instance();
+	while (lastRunTimes.size() > config.RunTimeEstimation - 1)
+	{
+		lastRunTimes.pop_front();
+	}
+	
+	lastRunTimes.push_back(worker.ActiveTask().LastRunTime());
 }
 
 /**
@@ -112,4 +122,26 @@ vector<Worker> &
 Optimizer::ActiveWorkers()
 {
 	return d_data->activeWorkers;
+}
+
+/** \brief Get average task run time.
+ * 
+ * Returns the average run time of tasks from this optimizer.
+ *
+ * @return: Average run time in seconds
+ *
+ */
+
+double
+Optimizer::AverageRunTime() const
+{
+	size_t num = d_data->lastRunTimes.size();
+	
+	if (num == 0)
+	{
+		return 0;
+	}
+	
+	double sum = accumulate(d_data->lastRunTimes.begin(), d_data->lastRunTimes.end(), 0);
+	return sum / num;
 }

@@ -19,6 +19,7 @@ optimaster_LDFLAGS = $(PACKAGE_OPTIMASTER_LIBS)
 optimaster_SOURCES = \
 	optimaster.cc \
 	application.cc \
+	batch.cc \
 	config.cc \
 	communicator.cc \
 	optimizer.cc \
@@ -30,6 +31,7 @@ optimaster_SOURCES = \
 
 noinst_HEADERS = \
 	application.hh \
+	batch.hh \
 	config.hh \
 	communicator.hh \
 	optimizer.hh \

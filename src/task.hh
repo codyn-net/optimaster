@@ -32,43 +32,36 @@ namespace optimaster
 		struct Data : public base::Object::PrivateData
 		{
 			optimization::messages::task::Task task;
-			base::Cloneable<Task> nextInSequence;
 
 			size_t id;
-			double priority;
-			double overtake;
-			
 			size_t failures;
+
+			Glib::TimeVal started;
+			double lastRunTime;
 		};
 		
 		Data *d_data;
 		
 		public:
 			Task();
-			Task(size_t idx, double priority, optimization::messages::task::Task const &task);
+			Task(size_t idx, optimization::messages::task::Task const &task);
 
 			size_t Id() const;
-			double Priority() const;
-			double Overtake() const;
 
-			bool CanOvertake(Task const &other) const;
-			void Overtake(Task &other);
-			void SetOvertake(double overtake);
-
-			void Sequence(Task &other);
-			void Sequence();
-			
 			void Failed();
 			size_t Failures();
-			
+
 			bool operator==(size_t id) const;
-			
+
+			void Begin();
+			void End();
+
+			double LastRunTime() const;
+
 			optimization::messages::task::Task &Message();
 			optimization::messages::task::Task const &Message() const;
-			
+
 			virtual Task *clone() const;
-		private:
-			void SequenceDecrease(double overtake);
 	};
 }
 

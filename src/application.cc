@@ -332,7 +332,7 @@ Application::HandleOptimizerBatch(Optimizer                 &optimizer,
 	             << optimizer.Id() << "): "
 	             << communication.batch().tasks_size() << endl;
 
-	d_taskQueue.Queue(optimizer.Id(), communication.batch());
+	d_taskQueue.Push(optimizer.Id(), optimizer.AverageRunTime(), communication.batch());
 }
 
 /**
@@ -401,6 +401,7 @@ void
 Application::OnWorkerAdded(Worker &worker)
 {
 	worker.OnCommunication().add(*this, &Application::OnWorkerCommunication);
+	worker.OnTimeout().add(*this, &Application::OnWorkerTimeout);
 }
 
 /**
@@ -414,11 +415,12 @@ void
 Application::OnWorkerRemoved(Worker &worker)
 {
 	worker.OnCommunication().remove(*this, &Application::OnWorkerCommunication);
+	worker.OnTimeout().remove(*this, &Application::OnWorkerTimeout);
 
 	// Reschedule the task the worker was working on
 	if (worker.Active())
 	{
-		d_taskQueue.Queue(worker.ActiveTask());
+		d_taskQueue.Push(worker.ActiveTask());
 	}
 }
 
@@ -469,6 +471,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 
 			optimizer.Send(args.Communication);
 			worker.Deactivate();
+
+			d_taskQueue.Finished(task);
 		break;
 		// Task execution failed
 		case task::Response::Failed:
@@ -490,6 +494,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				// Relay failure to optimizer
 				optimizer.Send(args.Communication);
 				worker.Deactivate();
+
+				d_taskQueue.Finished(task);
 			}
 			else
 			{
@@ -505,7 +511,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				}
 
 				// Reschedule task
-				d_taskQueue.Queue(task);
+				d_taskQueue.Push(task);
 				worker.Deactivate();
 			}
 		break;
@@ -565,9 +571,13 @@ Application::OnDispatch()
 	while (d_workerManager.Idle(worker) && d_taskQueue.Pop(task))
 	{
 		// Activate the worker with the task
-		if (!worker.Activate(task))
+		Batch batch;
+		d_taskQueue.Lookup(task.Id(), batch);
+
+		if (!worker.Activate(task, batch.Timeout()))
 		{
-			break;
+			d_taskQueue.Push(task);
+			continue;
 		}
 
 		Optimizer optimizer;
@@ -655,4 +665,14 @@ Application::OnNotifyAvailable()
 {
 	// Start idle dispatch
 	IdleDispatch();
+}
+
+void
+Application::OnWorkerTimeout(Worker &worker)
+{
+	// Reschedule and cancel
+	Task task = worker.ActiveTask();
+	worker.Cancel();
+	
+	d_taskQueue.Push(task);
 }

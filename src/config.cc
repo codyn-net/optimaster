@@ -61,11 +61,14 @@ Config::Config()
 	s.str("");
 	s << ":" << optimization::Constants::MasterPort;
 	ListenAddress = s.str();
+	
+	RunTimeEstimation = 10;
 
 	registerProperty("discovery namespace", DiscoveryNamespace);
 	registerProperty("discovery address", DiscoveryAddress);
 	registerProperty("listen address", ListenAddress);
 	registerProperty("max task failures", MaxTaskFailures);
+	registerProperty("runtime estimation", RunTimeEstimation);
 }
 
 /**

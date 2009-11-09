@@ -39,17 +39,18 @@ namespace optimaster
 			Worker(network::AddressInfo &info);
 
 			/* Public functions */
-			bool Activate(Task &task);
+			bool Activate(Task &task, double timeout);
 			void Deactivate();
 
 			bool Cancel();
 			bool Active() const;
-
+			
 			Task const &ActiveTask() const;
 			Task &ActiveTask();
 
 			base::signals::Signal<Worker> &OnActivated();
 			base::signals::Signal<Worker> &OnDeactivated();
+			base::signals::Signal<Worker> &OnTimeout();
 		private:
 			/* Private functions */
 			struct Data : public Communicator::Data
@@ -59,10 +60,15 @@ namespace optimaster
 
 				base::signals::Signal<Worker> onActivated;
 				base::signals::Signal<Worker> onDeactivated;
+				base::signals::Signal<Worker> onTimeout;
 
 				Task task;
+
+				sigc::connection timeout;
+				bool OnTimeout();
 			};
 
+			Worker(Data *data);
 			Data *d_data;
 	};
 }

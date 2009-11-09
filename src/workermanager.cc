@@ -247,6 +247,9 @@ WorkerManager::Idle(Worker &worker)
 	}
 
 	worker = d_idleWorkers.front();
+	d_idleWorkers.pop_front();
+	d_idleWorkers.push_back(worker);
+
 	return true;
 }
 

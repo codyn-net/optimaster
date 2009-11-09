@@ -24,39 +24,38 @@
 #define __OPTIMASTER_TASK_QUEUE_H__
 
 #include <base/base.hh>
-#include "task.hh"
+#include "batch.hh"
 #include <list>
 
 namespace optimaster
 {
 	class TaskQueue
 	{
-		std::list<Task> d_queue;
-		double d_prioritySum;
+		std::map<size_t, Batch> d_batches;
 
 		public:
 			/* Constructor/destructor */
 			TaskQueue();
 
 			/* Public functions */
-			void Queue(size_t id, optimization::messages::task::Batch const &batch);
-			void Queue(Task &task);
+			void Push(size_t id, double bias, optimization::messages::task::Batch const &batch);
+			void Push(Task &task);
 
 			bool Pop(Task &item);
+			void Finished(Task const &item);
+
+			bool Lookup(size_t id, Batch &batch);
 
 			bool Empty() const;
 			void Remove(size_t id);
 
 			/**
- * @brief OnNotifyAvailable signal
+			 * @brief OnNotifyAvailable signal
 			 *
 			 * Signal emitted when new tasks are available on the queue
 			 */
 			base::signals::Signal<> OnNotifyAvailable;
 		private:
-			/* Private functions */
-			bool Insert(Task &item);
-			void UpdatePrioritySum(double num);
 	};
 }
 

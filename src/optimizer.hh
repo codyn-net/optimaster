@@ -41,11 +41,15 @@ namespace optimaster
 			
 			void Add(Worker &worker);
 			std::vector<Worker> &ActiveWorkers();
+			
+			double AverageRunTime() const;
 		private:
 			struct Data : public Communicator::Data
 			{
 				std::vector<Worker> activeWorkers;
 				void OnWorkerDeactivated(Worker &worker);
+				
+				std::list<double> lastRunTimes;
 			};
 
 			Data *d_data;

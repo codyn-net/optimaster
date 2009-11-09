@@ -68,6 +68,7 @@ namespace optimaster
 			void OnWorkerAdded(Worker &worker);
 			void OnWorkerRemoved(Worker &worker);
 			void OnWorkerCommunication(Worker::CommunicationArgs &args);
+			void OnWorkerTimeout(Worker &worker);
 
 			void OnOptimizerAdded(Optimizer &optimizer);
 			void OnOptimizerRemoved(Optimizer &optimizer);

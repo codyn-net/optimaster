@@ -42,7 +42,6 @@ using namespace optimization::messages;
  */
 TaskQueue::TaskQueue() 
 {
-	d_prioritySum = 1;
 }
 
 /**
@@ -56,45 +55,7 @@ TaskQueue::TaskQueue()
 bool
 TaskQueue::Empty() const
 {
-	return d_queue.empty();
-}
-
-/**
- * @brief Insert a task in the task queue.
- * @param task a task
- *
- * Inserts a task in the queue.
- *
- * @return: true if the task was inserted at the end, false otherwise
- *
- */
-bool
-TaskQueue::Insert(Task &task) 
-{
-	// Return true if task is inserted at the end of the queue
-	list<Task>::reverse_iterator iter;
-
-	for (iter = d_queue.rbegin(); iter != d_queue.rend(); ++iter)
-	{
-		if (!task.CanOvertake(*iter))
-		{
-			break;
-		}
-	}
-
-	if (iter == d_queue.rbegin())
-	{
-		d_queue.push_back(task);
-		return true;
-	}
-	else
-	{
-		--iter;
-
-		task.Overtake(*iter);
-		d_queue.insert(iter.base(), task);
-		return false;
-	}
+	return d_batches.empty();
 }
 
 /**
@@ -109,61 +70,69 @@ TaskQueue::Insert(Task &task)
 bool
 TaskQueue::Pop(Task &task)
 {
-	if (d_queue.empty())
+	double maxWaitTime = 0;
+	Cloneable<Batch> maxBatch;
+
+	// Find batch with the highest wait time, reset it and tick them
+	for (map<size_t, Batch>::iterator iter = d_batches.begin(); iter != d_batches.end(); ++iter)
+	{
+		Batch &batch = iter->second;
+		batch.Wait();
+
+		if (batch.WaitTime() > maxWaitTime && !batch.Empty())
+		{
+			maxBatch = batch;
+			maxWaitTime = batch.WaitTime();
+		}
+	}
+
+	if (maxBatch)
+	{
+		maxBatch->WaitReset();
+		maxBatch->Pop(task);
+
+		return true;
+	}
+	else
 	{
 		return false;
 	}
-
-	task = d_queue.front();
-	d_queue.pop_front();
-
-	// TODO: update priority sum?
-	return true;
 }
 
 /**
  * @brief Queue batch of tasks.
  * @param id the task group id
+ * @param bias the bias
  * @param batch a batch of tasks to add
  *
  * Adds a batch of tasks to the task queue.
  * \fn TaskQueue::Queue(size_t id, optimization::messages::task::Batch const &batch)
  */
 void
-TaskQueue::Queue(size_t             id,
-                 task::Batch const &batch) 
+TaskQueue::Push(size_t             id,
+                double             bias,
+                task::Batch const &batch)
 {
 	if (batch.tasks_size() == 0)
 	{
 		return;
 	}
 
-	Cloneable<Task> prev;
-	UpdatePrioritySum(batch.tasks_size() * batch.priority());
-	bool inserted = false;
+	Batch ret;
 
-	for (size_t idx = 0; idx < batch.tasks_size(); ++idx)
+	if (Lookup(id, ret))
 	{
-		Task task(id, batch.priority(), batch.tasks(idx));
-		task.SetOvertake(d_prioritySum / batch.priority());
-
-		if (Insert(task))
+		for (size_t i = 0; i < batch.tasks_size(); ++i)
 		{
-			if (prev)
-			{
-				prev->Sequence(task);
-			}
-
-			prev = task;
-
-			inserted = true;
+			ret.Push(Task(id, batch.tasks(i)));
 		}
 	}
-
-	if (inserted)
+	else
 	{
-		OnNotifyAvailable();
+		d_batches[id] = Batch(id, bias, batch);
 	}
+
+	OnNotifyAvailable();
 }
 
 /**
@@ -174,31 +143,26 @@ TaskQueue::Queue(size_t             id,
  *
  */
 void
-TaskQueue::Queue(Task &task)
+TaskQueue::Push(Task &task)
 {
-	UpdatePrioritySum(task.Priority());
-
-	task.SetOvertake(d_prioritySum / task.Priority());
-	task.Sequence();
-
-	bool same = (d_queue.begin() == d_queue.end() || d_queue.back().Id() != task.Id());
-
-	if (Insert(task) && same)
+	Batch batch;
+	
+	if (Lookup(task.Id(), batch))
 	{
-		list<Task>::iterator iter = d_queue.end();
-
-		// task was inserted at the end, so we go 2 back to get the
-		// previously last item and squence it with the new item
-		--iter;
-		--iter;
-
-		if (iter != d_queue.end())
-		{
-			iter->Sequence(task);
-		}
+		batch.Push(task);
+		OnNotifyAvailable();
 	}
+}
 
-	OnNotifyAvailable();
+void
+TaskQueue::Finished(Task const &task)
+{
+	Batch batch;
+	
+	if (Lookup(task.Id(), batch) && batch.Empty())
+	{
+		Remove(batch.Id());
+	}
 }
 
 /**
@@ -211,33 +175,24 @@ TaskQueue::Queue(Task &task)
 void
 TaskQueue::Remove(size_t id)
 {
-	std::list<Task>::iterator iter;
+	std::map<size_t, Batch>::iterator iter = d_batches.find(id);
 
-	iter = std::remove(d_queue.begin(), d_queue.end(), id);
-	d_queue.erase(iter, d_queue.end());
-
-	// TODO: update priority sum
+	if (iter != d_batches.end())
+	{
+		d_batches.erase(iter);
+	}
 }
 
-/**
- * @brief Update priority sum.
- * @param num number with which to update the priority sum
- *
- * Updates the priority sum which is used to normalize the overtake credits.
- *
- */
-void
-TaskQueue::UpdatePrioritySum(double num) 
+bool
+TaskQueue::Lookup(size_t id, Batch &batch)
 {
-	list<Task>::iterator iter;
+	std::map<size_t, Batch>::iterator iter = d_batches.find(id);
 
-	double prioritySum = d_prioritySum + num;
-	double ratio = prioritySum / d_prioritySum;
-
-	d_prioritySum = prioritySum;
-
-	for (iter = d_queue.begin(); iter != d_queue.end(); ++iter)
+	if (iter != d_batches.end())
 	{
-		iter->SetOvertake(iter->Overtake() * ratio);
+		batch = iter->second;
+		return true;
 	}
+	
+	return false;
 }

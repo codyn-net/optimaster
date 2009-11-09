@@ -75,9 +75,8 @@ namespace optimaster
 			};
 			
 			void Set(Data *data, network::Client const &client);
-		private:
 			Communicator(Data *data);
-			
+		private:
 			Data *d_data;
 	};
 
