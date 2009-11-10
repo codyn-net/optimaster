@@ -1,12 +1,14 @@
+ACLOCAL_AMFLAGS = -I m4
 
-include Makefile.am.inc
+SUBDIRS = src
 
-optimaster_CFLAGS += $(GCRYPT_CFLAGS)
-optimaster_LDFLAGS += $(GCRYPT_LIBS)
+if ENABLE_DOCS
+SUBDIRS += docs
+endif
 
 opticonfdir = $(datadir)/optimaster
 opticonf_DATA = \
 	optimaster.conf.ex
 
-EXTRA_DIST += \
+EXTRA_DIST = \
 	$(opticonf_DATA)

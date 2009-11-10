@@ -1,9 +1,11 @@
-AC_INIT(optimaster, 0.3)
+AC_INIT(optimaster, 1.0)
 
 AM_INIT_AUTOMAKE([subdir-objects])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
+
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 AC_ISC_POSIX
 AC_STDC_HEADERS
@@ -13,15 +15,26 @@ AC_HEADER_STDC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
+AC_ARG_ENABLE([docs],
+	AS_HELP_STRING([--enable-docs],[Enable documentation building (default: disabled)]),
+	[enable_docs=$enableval],
+	[enable_docs=no])
+
+if test "x$enable_docs" != "xno"; then
+	AC_CHECK_PROG(DOXYGEN, doxygen, doxygen, no)
+	
+	if test x"$DOXYGEN" == "xno"; then
+		AC_MSG_ERROR([you need to have doxygen installed for generating documentation])
+	fi
+fi
+
+AM_CONDITIONAL(ENABLE_DOCS, test x"$enable_docs" = "xyes")
+
 AC_CONFIG_HEADERS(config.h)
 AM_MAINTAINER_MODE
 
-AC_CHECK_LIB([gcrypt],[gcry_check_version], [], [AC_MSG_ERROR([libgcrypt could not be found])])
-
 PKG_CHECK_MODULES(PACKAGE_OPTIMASTER, [
-	libjessevdk-0.1
-	liboptimization-0.1
-	libxml++-2.6
+	liboptimization-1.0
 ])
 
 AC_SUBST(PACKAGE_OPTIMASTER_CFLAGS)
@@ -29,5 +42,7 @@ AC_SUBST(PACKAGE_OPTIMASTER_LIBS)
 
 AC_OUTPUT(
 Makefile
-
+src/Makefile
+docs/Makefile
+docs/doxygen.cfg
 )

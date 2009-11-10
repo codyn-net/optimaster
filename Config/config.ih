@@ -1,8 +1,0 @@
-#include "config.hh"
-
-#include <optimization/Constants/constants.hh>
-#include <os/os.hh>
-
-using namespace std;
-using namespace optimaster;
-using namespace os;

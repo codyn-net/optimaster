@@ -1,0 +1,20 @@
+PROJECT_NAME = optimaster
+
+INPUT = @top_srcdir@/src
+
+FILE_PATTERNS = *.cc *.hh
+
+GENERATE_HTML = YES
+GENERATE_LATEX = NO
+
+ALPHABETICAL_INDEX = YES
+SEARCHENGINE = YES
+GENERATE_TREEVIEW = YES
+USE_INLINE_TREES = YES
+
+HTML_FOOTER = templates/footer.html
+HTML_HEADER = templates/header.html
+HTML_STYLESHEET = templates/stylesheet.css
+HTML_DYNAMIC_SECTIONS = YES
+
+JAVADOC_AUTOBRIEF = YES

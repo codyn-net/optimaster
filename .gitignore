@@ -21,3 +21,8 @@ missing
 stamp-h1
 .dirstamp
 optimaster
+*.Tpo
+docs/html
+docs/latex
+docs/Doxyfile
+docs/doxygen.cfg
