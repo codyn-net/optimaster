@@ -142,6 +142,6 @@ Optimizer::AverageRunTime() const
 		return 0;
 	}
 	
-	double sum = accumulate(d_data->lastRunTimes.begin(), d_data->lastRunTimes.end(), 0);
+	double sum = std::accumulate(d_data->lastRunTimes.begin(), d_data->lastRunTimes.end(), 0.0);
 	return sum / num;
 }
