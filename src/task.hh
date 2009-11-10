@@ -33,7 +33,7 @@ namespace optimaster
 		{
 			optimization::messages::task::Task task;
 
-			size_t id;
+			size_t group;
 			size_t failures;
 
 			Glib::TimeVal started;
@@ -44,14 +44,13 @@ namespace optimaster
 		
 		public:
 			Task();
-			Task(size_t idx, optimization::messages::task::Task const &task);
+			Task(size_t group, optimization::messages::task::Task const &task);
 
 			size_t Id() const;
+			size_t Group() const;
 
 			void Failed();
 			size_t Failures();
-
-			bool operator==(size_t id) const;
 
 			void Begin();
 			void End();

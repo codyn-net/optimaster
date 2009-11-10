@@ -52,6 +52,7 @@ namespace optimaster
 
 			double Priority() const;
 			double Timeout() const;
+			double Bias() const;
 			
 			void Push(Task const &task);
 			bool Pop(Task &task);

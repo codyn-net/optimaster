@@ -32,20 +32,20 @@ using namespace optimization::messages;
 
 /**
  * @brief Task constructor.
- * @param id The task group id
+ * @param group The task group
  * @param task The task
  *
  * Constructor.
  *
  * Create a new task object.
- * \fn Task::Task(size_t id, optimization::messages::task::Task const &task)
+ * \fn Task::Task(size_t group, optimization::messages::task::Task const &task)
  */
-Task::Task(size_t id, task::Task const &task) 
+Task::Task(size_t group, task::Task const &task) 
 {
 	d_data = new Data();
 	addPrivateData(d_data);
 	
-	d_data->id = id;
+	d_data->group = group;
 	d_data->task = task;
 	d_data->failures = 0;
 	d_data->lastRunTime = 0;
@@ -104,20 +104,6 @@ Task::Failures()
 }
 
 /**
- * @brief Task equality.
- *
- * Test for task id
- *
- * @return: true of the task matches the id
- *
- */
-bool
-Task::operator==(size_t id) const
-{
-	return d_data->id == id;
-}
-
-/**
  * @brief Get task message associated to the task.
  *
  * Get the task message associated to this task.
@@ -146,17 +132,23 @@ Task::Message() const
 }
 
 /**
- * @brief Get the task id (const).
+ * @brief Get the task group (const).
  *
- * Get the task id.
+ * Get the task group.
  *
- * @return: the task id
+ * @return: the task group
  *
  */
 size_t
+Task::Group() const
+{
+	return d_data->group;
+}
+
+size_t
 Task::Id() const
 {
-	return d_data->id;
+	return d_data->task.id();
 }
 
 void

@@ -49,7 +49,7 @@ Batch::Batch(size_t id, double bias, task::Batch const &batch)
 	d_data->bias = bias > 0 ? bias : 1;
 
 	d_data->timeout = batch.has_timeout() ? batch.timeout() : -1;
-	d_data->priority = batch.has_priority() ? batch.priority() : 1;
+	d_data->priority = batch.priority();
 	d_data->waitTime = 0;
 
 	// Create tasks from the batch
@@ -117,6 +117,12 @@ double
 Batch::Priority() const
 {
 	return d_data->priority;
+}
+
+double
+Batch::Bias() const
+{
+	return d_data->bias;
 }
 
 double

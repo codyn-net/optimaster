@@ -449,7 +449,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	Optimizer optimizer;
 
 	// Check if the optimizer for this task is still present
-	if (!d_optimizerManager.Find(task.Id(), optimizer))
+	if (!d_optimizerManager.Find(task.Group(), optimizer))
 	{
 		debug_worker << "Optimizer no longer connected..." << endl;
 		worker.Deactivate();
@@ -466,7 +466,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				             << worker.Client().address().host(true)
 				             << ":"
 				             << worker.Client().address().port(true)
-				             << ") for (" << task.Id()
+				             << ") for (" << task.Group()
 				             << ", " << task.Message().id() << ")"
 				             << endl;
 			}
@@ -489,7 +489,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 					             << worker.Client().address().host(true)
 					             << ":"
 					             << worker.Client().address().port(true)
-					             << ") for (" << task.Id() << ", "
+					             << ") for (" << task.Group() << ", "
 					             << task.Message().id() << ")" << endl;
 				}
 
@@ -508,7 +508,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 					debug_worker << "Task failed, rescheduling ("
 					             << worker.Client().address().host(true) <<
 					             ":" << worker.Client().address().port(true)
-					             << ") for (" << task.Id() << ", "
+					             << ") for (" << task.Group() << ", "
 					             << task.Message().id() << ")" << endl;
 				}
 
@@ -526,7 +526,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				             << ":"
 				             << worker.Client().address().port(true)
 				             << ") for ("
-				             << task.Id() << ", "
+				             << task.Group() << ", "
 				             << task.Message().id() << ")" << endl;
 			}
 
@@ -574,7 +574,7 @@ Application::OnDispatch()
 	{
 		// Activate the worker with the task
 		Batch batch;
-		d_taskQueue.Lookup(task.Id(), batch);
+		d_taskQueue.Lookup(task.Group(), batch);
 
 		if (!worker.Activate(task, batch.Timeout()))
 		{
@@ -583,12 +583,12 @@ Application::OnDispatch()
 		}
 
 		Optimizer optimizer;
-		if (d_optimizerManager.Find(task.Id(), optimizer))
+		if (d_optimizerManager.Find(task.Group(), optimizer))
 		{
 			optimizer.Add(worker);
 		}
 
-		debug_master << "Worker activated for: " << task.Id() << endl;
+		debug_master << "Worker activated for: " << task.Group() << " (" << task.Id() << ")" << endl;
 	}
 
 	d_idleDispatch.disconnect();

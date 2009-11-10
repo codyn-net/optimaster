@@ -21,6 +21,7 @@
  */
 
 #include "taskqueue.hh"
+#include "debug.hh"
 
 using namespace std;
 using namespace optimaster;
@@ -40,7 +41,7 @@ using namespace optimization::messages;
  * Create a new task queue.
  *
  */
-TaskQueue::TaskQueue() 
+TaskQueue::TaskQueue()
 {
 }
 
@@ -79,7 +80,8 @@ TaskQueue::Pop(Task &task)
 		Batch &batch = iter->second;
 		batch.Wait();
 
-		if (batch.WaitTime() > maxWaitTime && !batch.Empty())
+		debug_scheduler << "Increasing wait time on " << batch.Id() << ": " << batch.WaitTime() << " (" << batch.Priority() << ", " << batch.Bias() << ")" << endl;
+		if ((!maxBatch || batch.WaitTime() > maxWaitTime) && !batch.Empty())
 		{
 			maxBatch = batch;
 			maxWaitTime = batch.WaitTime();
@@ -88,6 +90,8 @@ TaskQueue::Pop(Task &task)
 
 	if (maxBatch)
 	{
+		debug_scheduler << "Found highest priority batch " << maxBatch->Id() << ": " << maxBatch->WaitTime() << endl;
+
 		maxBatch->WaitReset();
 		maxBatch->Pop(task);
 
@@ -122,6 +126,8 @@ TaskQueue::Push(size_t             id,
 
 	if (Lookup(id, ret))
 	{
+		debug_scheduler << "Scheduled existing batch: [id = " << id << ", bias = " << bias << "]: " << batch.tasks_size() << endl;
+
 		for (size_t i = 0; i < batch.tasks_size(); ++i)
 		{
 			ret.Push(Task(id, batch.tasks(i)));
@@ -129,6 +135,8 @@ TaskQueue::Push(size_t             id,
 	}
 	else
 	{
+		debug_scheduler << "Scheduled new batch: [id = " << id << ", bias = " << bias << "]: " << batch.tasks_size() << endl;
+
 		d_batches[id] = Batch(id, bias, batch);
 	}
 
@@ -147,10 +155,15 @@ TaskQueue::Push(Task &task)
 {
 	Batch batch;
 	
-	if (Lookup(task.Id(), batch))
+	if (Lookup(task.Group(), batch))
 	{
+		debug_scheduler << "Pushing single task in batch: [id = " << task.Group() << endl;
 		batch.Push(task);
 		OnNotifyAvailable();
+	}
+	else
+	{
+		debug_scheduler << "Batch not found while pushing single task: [id = " << task.Group() << endl;
 	}
 }
 
@@ -159,8 +172,9 @@ TaskQueue::Finished(Task const &task)
 {
 	Batch batch;
 	
-	if (Lookup(task.Id(), batch) && batch.Empty())
+	if (Lookup(task.Group(), batch) && batch.Empty())
 	{
+		debug_scheduler << "Removing batch after last task finished: [id = " << task.Group() << "]" << endl;
 		Remove(batch.Id());
 	}
 }
@@ -179,6 +193,7 @@ TaskQueue::Remove(size_t id)
 
 	if (iter != d_batches.end())
 	{
+		debug_scheduler << "Removing batch: [id = " << id << "]" << endl;
 		d_batches.erase(iter);
 	}
 }
