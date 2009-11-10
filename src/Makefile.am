@@ -34,6 +34,7 @@ noinst_HEADERS = \
 	batch.hh \
 	config.hh \
 	communicator.hh \
+	debug.hh \
 	optimizer.hh \
 	optimizermanager.hh \
 	task.hh \

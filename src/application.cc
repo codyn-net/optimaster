@@ -22,6 +22,7 @@
 
 #include "application.hh"
 #include "config.hh"
+#include "debug.hh"
 
 #include <os/os.hh>
 #include <sstream>
@@ -212,14 +213,14 @@ void
 Application::EnableEnvironment()
 {
 	static DebugInfo infos[] = {
-		{"DEBUG_BASE", Debug::Domain::Base},
-		{"DEBUG_NETWORK", Debug::Domain::Network},
-		{"DEBUG_DATA", Debug::Domain::Data},
-		{"DEBUG_OS", Debug::Domain::OS},
-		{"DEBUG_OPTIMIZATION", Debug::Domain::Optimization},
-		{"DEBUG_MODULES", Debug::Domain::Modules},
-		{"DEBUG_WORKER", Debug::Domain::Worker},
-		{"DEBUG_MASTER", Debug::Domain::Master},
+		{"DEBUG_BASE", base::Debug::Domain::Base},
+		{"DEBUG_NETWORK", base::Debug::Domain::Network},
+		{"DEBUG_DATA", base::Debug::Domain::Data},
+		{"DEBUG_OS", base::Debug::Domain::OS},
+		{"DEBUG_MODULES", base::Debug::Domain::Modules},
+		{"DEBUG_WORKER", optimization::Debug::Domain::Worker},
+		{"DEBUG_MASTER", optimization::Debug::Domain::Master},
+		{"DEBUG_SCHEDULER", optimaster::Debug::Domain::Scheduler}
 	};
 
 	for (size_t i = 0; i < sizeof(infos) / sizeof(DebugInfo); ++i)
@@ -356,6 +357,7 @@ Application::HandleOptimizerToken(Optimizer                 &optimizer,
 	{
 		if (iter->ActiveTask().Id() == communication.token().id())
 		{
+			debug_master << "Relaying token message to worker" << endl;
 			iter->Send(communication);
 			break;
 		}
@@ -458,7 +460,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	{
 		// Task was completed successfully
 		case task::Response::Success:
-			if (Debug::enabled(Debug::Domain::Worker))
+			if (Debug::enabled(optimization::Debug::Domain::Worker))
 			{
 				debug_worker << "Worker success ("
 				             << worker.Client().address().host(true)
@@ -481,7 +483,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			if (task.Failures() >= Config::Instance().MaxTaskFailures)
 			{
 				// Task failed too many times
-				if (Debug::enabled(Debug::Domain::Worker))
+				if (Debug::enabled(optimization::Debug::Domain::Worker))
 				{
 					debug_worker << "Task failed to many times ("
 					             << worker.Client().address().host(true)
@@ -501,7 +503,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			{
 				// Reschedule the task because the failure might be due to a
 				// faulty worker, or maybe some network problems
-				if (Debug::enabled(Debug::Domain::Worker))
+				if (Debug::enabled(optimization::Debug::Domain::Worker))
 				{
 					debug_worker << "Task failed, rescheduling ("
 					             << worker.Client().address().host(true) <<
@@ -517,7 +519,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 		break;
 		case task::Response::Challenge:
 			// Simply relay to optimizer
-			if (Debug::enabled(Debug::Domain::Worker))
+			if (Debug::enabled(optimization::Debug::Domain::Worker))
 			{
 				debug_worker << "Worker challenge ("
 				             << worker.Client().address().host(true)

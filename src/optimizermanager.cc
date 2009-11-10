@@ -139,7 +139,7 @@ OptimizerManager::OnNewConnection(Client &client)
 	
 	optimizer.OnClosed().add(*this, &OptimizerManager::OnOptimizerClosed);
 	
-	if (Debug::enabled(Debug::Domain::Master))
+	if (base::Debug::enabled(optimization::Debug::Domain::Master))
 	{
 		debug_master << "New optimizer connected: "
 		             << optimizer.Id() << " ("

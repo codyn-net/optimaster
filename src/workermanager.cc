@@ -141,7 +141,7 @@ WorkerManager::OnWorkerClosed(Communicator &communicator)
 		return;
 	}
 
-	if (Debug::enabled(Debug::Domain::Worker))
+	if (Debug::enabled(optimization::Debug::Domain::Worker))
 	{
 		debug_worker << "Worker disconnected: "
 		             << worker.Client().address().host(true)
