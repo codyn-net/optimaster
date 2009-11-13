@@ -6,9 +6,7 @@ Build-Depends: debhelper (>= 7),
                cdbs,
                pkg-config,
                liboptimization-dev,
-               libglibmm-2.4-dev,
-               libxml++2.6-dev,
-               libgcrypt11-dev
+               libglibmm-2.4-dev
 Standards-Version: 3.8.0
 Section: libs
 Homepage: http://birg.epfl.ch
