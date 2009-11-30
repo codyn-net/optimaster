@@ -95,6 +95,8 @@ TaskQueue::Pop(Task &task)
 		maxBatch->WaitReset();
 		maxBatch->Pop(task);
 
+		d_running[maxBatch->Id()][task.Id()] = true;
+
 		return true;
 	}
 	else
@@ -130,7 +132,9 @@ TaskQueue::Push(size_t             id,
 
 		for (size_t i = 0; i < batch.tasks_size(); ++i)
 		{
-			ret.Push(Task(id, batch.tasks(i)));
+			Task task = Task(id, batch.tasks(i));
+			ret.Push(task);
+			d_running[id].erase(task.Id());
 		}
 	}
 	else
@@ -138,6 +142,7 @@ TaskQueue::Push(size_t             id,
 		debug_scheduler << "Scheduled new batch: [id = " << id << ", bias = " << bias << "]: " << batch.tasks_size() << endl;
 
 		d_batches[id] = Batch(id, bias, batch);
+		d_running[id] = map<size_t, bool>();
 	}
 
 	OnNotifyAvailable();
@@ -157,13 +162,16 @@ TaskQueue::Push(Task &task)
 	
 	if (Lookup(task.Group(), batch))
 	{
-		debug_scheduler << "Pushing single task in batch: [id = " << task.Group() << endl;
+		debug_scheduler << "Pushing single task in batch: [group = " << task.Group() << ", id = " << task.Id() << "]" << endl;
+		
 		batch.Push(task);
+		d_running[batch.Id()].erase(task.Id());
+
 		OnNotifyAvailable();
 	}
 	else
 	{
-		debug_scheduler << "Batch not found while pushing single task: [id = " << task.Group() << endl;
+		debug_scheduler << "Batch not found while pushing single task: [group = " << task.Group() << ", id = " << task.Id() << "]" << endl;
 	}
 }
 
@@ -172,10 +180,16 @@ TaskQueue::Finished(Task const &task)
 {
 	Batch batch;
 	
-	if (Lookup(task.Group(), batch) && batch.Empty())
+	if (Lookup(task.Group(), batch))
 	{
-		debug_scheduler << "Removing batch after last task finished: [id = " << task.Group() << "]" << endl;
-		Remove(batch.Id());
+		map<size_t, bool> &mapping = d_running[task.Group()];
+		mapping.erase(task.Id());
+
+		if (batch.Empty() && mapping.empty())
+		{
+			debug_scheduler << "Removing batch after last task finished: [id = " << task.Group() << "]" << endl;
+			Remove(batch.Id());
+		}
 	}
 }
 
@@ -194,7 +208,9 @@ TaskQueue::Remove(size_t id)
 	if (iter != d_batches.end())
 	{
 		debug_scheduler << "Removing batch: [id = " << id << "]" << endl;
+
 		d_batches.erase(iter);
+		d_running.erase(id);
 	}
 }
 
