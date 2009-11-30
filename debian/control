@@ -5,7 +5,7 @@ Build-Depends: debhelper (>= 7),
                autotools-dev,
                cdbs,
                pkg-config,
-               liboptimization-dev,
+               liboptimization-dev (>= 1.1),
                libglibmm-2.4-dev
 Standards-Version: 3.8.0
 Section: libs
@@ -14,8 +14,7 @@ Homepage: http://birg.epfl.ch
 Package: optimaster
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Suggests: liboptimization-optimizers-pso0
+Depends: ${shlibs:Depends}, ${misc:Depends}, liboptimization1 (>= 1.1)
 Conflicts: liboptimization0-applications-optimaster
 Replaces: liboptimization0-applications-optimaster
 Description: liboptimization master application
