@@ -505,7 +505,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				// faulty worker, or maybe some network problems
 				if (Debug::enabled(optimization::Debug::Domain::Worker))
 				{
-					debug_worker << "Task failed, rescheduling ("
+					debug_worker << "Task failed (" << FailureToString(response.failure()) << "), rescheduling ("
 					             << worker.Client().address().host(true) <<
 					             ":" << worker.Client().address().port(true)
 					             << ") for (" << task.Group() << ", "
@@ -677,4 +677,44 @@ Application::OnWorkerTimeout(Worker &worker)
 	worker.Cancel();
 	
 	d_taskQueue.Push(task);
+}
+
+string
+Application::FailureToString(task::Response::Failure const &failure) const
+{
+	string type;
+
+	switch (failure.type())
+	{
+		case task::Response::Failure::Disconnected:
+			type = "Disconnected";
+		break;
+		case task::Response::Failure::Dispatcher:
+			type = "Dispatcher failure";
+		break;
+		case task::Response::Failure::DispatcherNotFound:
+			type = "Dispatcher not found";
+		break;
+		case task::Response::Failure::NoResponse:
+			type = "No response";
+		break;
+		case task::Response::Failure::Timeout:
+			type = "Timeout";
+		break;
+		case task::Response::Failure::WrongRequest:
+			type = "Wrong request";
+		break;
+		default:
+			type = "Unknown";
+		break;
+	}
+
+	if (failure.has_message())
+	{
+		return type + ": " + failure.message();
+	}
+	else
+	{
+		return type;
+	}
 }

@@ -32,6 +32,7 @@ namespace optimaster
 	class TaskQueue
 	{
 		std::map<size_t, Batch> d_batches;
+		std::map<size_t, std::map<size_t, bool> > d_running;
 
 		public:
 			/* Constructor/destructor */
