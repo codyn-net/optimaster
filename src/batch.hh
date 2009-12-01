@@ -58,6 +58,7 @@ namespace optimaster
 			bool Pop(Task &task);
 			
 			bool Empty() const;
+			size_t Size() const;
 
 			bool operator==(size_t id) const;
 			bool operator>(Batch const &other) const;

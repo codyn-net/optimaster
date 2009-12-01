@@ -284,3 +284,15 @@ WorkerManager::OnWorkerDeactivated(Worker &worker)
 	d_idleWorkers.push_back(worker);	
 	OnNotifyAvailable();
 }
+
+size_t
+WorkerManager::Size() const
+{
+	return d_workers.size();
+}
+
+size_t
+WorkerManager::Active() const
+{
+	return d_activeWorkers.size();
+}

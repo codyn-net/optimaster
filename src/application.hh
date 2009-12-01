@@ -81,6 +81,8 @@ namespace optimaster
 
 			void OnNotifyAvailable();
 			std::string FailureToString(optimization::messages::task::Response::Failure const &failure) const;
+
+			void LogStatus() const;
 	};
 }
 

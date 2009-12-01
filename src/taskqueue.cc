@@ -42,6 +42,8 @@ using namespace optimization::messages;
  *
  */
 TaskQueue::TaskQueue()
+:
+	d_size(0)
 {
 }
 
@@ -96,6 +98,7 @@ TaskQueue::Pop(Task &task)
 		maxBatch->Pop(task);
 
 		d_running[maxBatch->Id()][task.Id()] = true;
+		--d_size;
 
 		return true;
 	}
@@ -145,6 +148,8 @@ TaskQueue::Push(size_t             id,
 		d_running[id] = map<size_t, bool>();
 	}
 
+	d_size += batch.tasks_size();
+
 	OnNotifyAvailable();
 }
 
@@ -167,6 +172,8 @@ TaskQueue::Push(Task &task)
 		batch.Push(task);
 		d_running[batch.Id()].erase(task.Id());
 
+		++d_size;
+
 		OnNotifyAvailable();
 	}
 	else
@@ -182,6 +189,8 @@ TaskQueue::Finished(Task const &task)
 	
 	if (Lookup(task.Group(), batch))
 	{
+		--d_size;
+
 		map<size_t, bool> &mapping = d_running[task.Group()];
 		mapping.erase(task.Id());
 
@@ -209,6 +218,8 @@ TaskQueue::Remove(size_t id)
 	{
 		debug_scheduler << "Removing batch: [id = " << id << "]" << endl;
 
+		d_size -= iter->second.Size();
+
 		d_batches.erase(iter);
 		d_running.erase(id);
 	}
@@ -226,4 +237,10 @@ TaskQueue::Lookup(size_t id, Batch &batch)
 	}
 	
 	return false;
+}
+
+size_t
+TaskQueue::Size() const
+{
+	return d_size;
 }

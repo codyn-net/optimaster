@@ -33,6 +33,7 @@ namespace optimaster
 	{
 		std::map<size_t, Batch> d_batches;
 		std::map<size_t, std::map<size_t, bool> > d_running;
+		size_t d_size;
 
 		public:
 			/* Constructor/destructor */
@@ -49,6 +50,8 @@ namespace optimaster
 
 			bool Empty() const;
 			void Remove(size_t id);
+
+			size_t Size() const;
 
 			/**
 			 * @brief OnNotifyAvailable signal

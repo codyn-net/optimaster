@@ -175,7 +175,14 @@ Batch::WaitTime() const
 	return d_data->waitTime;
 }
 
-bool Batch::operator>(Batch const &other) const
+bool
+Batch::operator>(Batch const &other) const
 {
 	return WaitTime() > other.WaitTime();
+}
+
+size_t
+Batch::Size() const
+{
+	return d_data->tasks.size();
 }

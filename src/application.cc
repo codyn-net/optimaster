@@ -29,6 +29,7 @@
 #include <network/network.hh>
 #include <os/os.hh>
 #include <vector>
+#include <syslog.h>
 
 using namespace std;
 using namespace optimaster;
@@ -76,6 +77,10 @@ Application::Application(int    &argc,
 	{
 		cerr << "Failed to start master, could not listen for optimizers (maybe there is another master running?)" << endl;
 	}
+	else
+	{
+		openlog("optimaster", 0, LOG_USER);
+	}
 }
 
 /**
@@ -98,6 +103,7 @@ Application::~Application()
 	d_taskQueue.OnNotifyAvailable.remove(*this, &Application::OnNotifyAvailable);
 
 	d_discovery.OnGreeting().remove(*this, &Application::OnGreeting);
+	closelog();
 }
 
 /**
@@ -283,6 +289,7 @@ Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop)
 void
 Application::OnOptimizerAdded(Optimizer &optimizer)
 {
+	syslog(LOG_NOTICE, "optimizer-connected: %lu, %s", optimizer.Id(), optimizer.Client().address().host(true).c_str());
 	optimizer.OnCommunication().add(*this, &Application::OnOptimizerCommunication);
 }
 
@@ -298,6 +305,7 @@ Application::OnOptimizerRemoved(Optimizer &optimizer)
 {
 	debug_master << "Optimizer disconnected: " << optimizer.Id() << endl;
 
+	syslog(LOG_NOTICE, "optimizer-disconnected: %lu", optimizer.Id());
 	optimizer.OnCommunication().remove(*this, &Application::OnOptimizerCommunication);
 
 	// Remove all tasks from the task queue for this optimizer
@@ -314,6 +322,8 @@ Application::OnOptimizerRemoved(Optimizer &optimizer)
 			iter->Deactivate();
 		}
 	}
+
+	LogStatus();
 }
 
 /**
@@ -332,6 +342,12 @@ Application::HandleOptimizerBatch(Optimizer                 &optimizer,
 	debug_master << "Received batch from optimizer ("
 	             << optimizer.Id() << "): "
 	             << communication.batch().tasks_size() << endl;
+
+	syslog(LOG_NOTICE,
+	       "optimizer-batch: %lu, %d, %.3f",
+	       optimizer.Id(),
+	       communication.batch().tasks_size(),
+	       communication.batch().priority());
 
 	d_taskQueue.Push(optimizer.Id(), optimizer.AverageRunTime(), communication.batch());
 }
@@ -424,6 +440,8 @@ Application::OnWorkerRemoved(Worker &worker)
 	{
 		d_taskQueue.Push(worker.ActiveTask());
 	}
+
+	LogStatus();
 }
 
 /**
@@ -493,6 +511,11 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 					             << task.Message().id() << ")" << endl;
 				}
 
+				syslog(LOG_ERR,
+				       "task-failed: %lu, %u, task failed too many times",
+				       task.Group(),
+				       task.Message().id());
+
 				// Relay failure to optimizer
 				optimizer.Send(args.Communication);
 				worker.Deactivate();
@@ -511,6 +534,12 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 					             << ") for (" << task.Group() << ", "
 					             << task.Message().id() << ")" << endl;
 				}
+
+				syslog(LOG_ERR,
+				       "task-failed: %lu, %u, task failed and rescheduling: %s",
+				       task.Group(),
+				       task.Message().id(),
+				       FailureToString(response.failure()).c_str());
 
 				// Reschedule task
 				d_taskQueue.Push(task);
@@ -590,6 +619,8 @@ Application::OnDispatch()
 
 		debug_master << "Worker activated for: " << task.Group() << " (" << task.Id() << ")" << endl;
 	}
+
+	LogStatus();
 
 	d_idleDispatch.disconnect();
 	return false;
@@ -717,4 +748,11 @@ Application::FailureToString(task::Response::Failure const &failure) const
 	{
 		return type;
 	}
+}
+
+void
+Application::LogStatus() const
+{
+	syslog(LOG_NOTICE, "workers-status: %lu/%lu", d_workerManager.Active(), d_workerManager.Size());
+	syslog(LOG_NOTICE, "queue-status: %lu", d_taskQueue.Size());
 }
