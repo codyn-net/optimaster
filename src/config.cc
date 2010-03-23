@@ -23,11 +23,11 @@
 #include "config.hh"
 
 #include <optimization/constants.hh>
-#include <os/os.hh>
+#include <jessevdk/os/os.hh>
 
 using namespace std;
 using namespace optimaster;
-using namespace os;
+using namespace jessevdk::os;
 
 Config *Config::s_instance = 0;
 
@@ -53,7 +53,7 @@ Config::Config()
 	DiscoveryAddress = s.str();
 	
 	string user;
-	if (Environment::variable("USER", user))
+	if (Environment::Variable("USER", user))
 	{
 		DiscoveryNamespace = user;
 	}
@@ -64,11 +64,11 @@ Config::Config()
 	
 	RunTimeEstimation = 10;
 
-	registerProperty("discovery namespace", DiscoveryNamespace);
-	registerProperty("discovery address", DiscoveryAddress);
-	registerProperty("listen address", ListenAddress);
-	registerProperty("max task failures", MaxTaskFailures);
-	registerProperty("runtime estimation", RunTimeEstimation);
+	Register("discovery namespace", DiscoveryNamespace);
+	Register("discovery address", DiscoveryAddress);
+	Register("listen address", ListenAddress);
+	Register("max task failures", MaxTaskFailures);
+	Register("runtime estimation", RunTimeEstimation);
 }
 
 /**
@@ -88,7 +88,7 @@ Config::Initialize(string const &filename)
 		s_instance = new Config();
 	}
 	
-	s_instance->read(filename);
+	s_instance->Read(filename);
 	return *s_instance;
 }
 

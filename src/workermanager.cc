@@ -23,13 +23,13 @@
 #include "workermanager.hh"
 
 #include <algorithm>
-#include <network/network.hh>
+#include <jessevdk/network/network.hh>
 
 using namespace std;
-using namespace base;
+using namespace jessevdk::base;
 using namespace optimaster;
 using namespace optimization::messages;
-using namespace network;
+using namespace jessevdk::network;
 
 /**
  * @class optimaster::WorkerManager
@@ -77,11 +77,11 @@ WorkerManager::Add(std::string const &connection, Worker &worker)
 		d_idleWorkers.push_back(worker);
 
 		// Notification of worker closing
-		worker.OnClosed().add(*this, &WorkerManager::OnWorkerClosed);
+		worker.OnClosed().Add(*this, &WorkerManager::OnWorkerClosed);
 
 		// Activation notification
-		worker.OnActivated().add(*this, &WorkerManager::OnWorkerActivated);
-		worker.OnDeactivated().add(*this, &WorkerManager::OnWorkerDeactivated);
+		worker.OnActivated().Add(*this, &WorkerManager::OnWorkerActivated);
+		worker.OnDeactivated().Add(*this, &WorkerManager::OnWorkerDeactivated);
 
 		// Emit the Added signal
 		OnAdded(worker);
@@ -141,12 +141,12 @@ WorkerManager::OnWorkerClosed(Communicator &communicator)
 		return;
 	}
 
-	if (Debug::enabled(optimization::Debug::Domain::Worker))
+	if (Debug::Enabled(optimization::Debug::Domain::Worker))
 	{
 		debug_worker << "Worker disconnected: "
-		             << worker.Client().address().host(true)
+		             << worker.Client().Address().Host(true)
 		             << ":"
-		             << worker.Client().address().port(true)
+		             << worker.Client().Address().Port(true)
 		             << endl;
 	}
 
@@ -188,10 +188,10 @@ WorkerManager::RemoveWorker(Worker &worker)
 	}
 
 	// Remove callbacks on the worker
-	worker.OnActivated().remove(*this, &WorkerManager::OnWorkerActivated);
-	worker.OnDeactivated().remove(*this, &WorkerManager::OnWorkerDeactivated);
+	worker.OnActivated().Remove(*this, &WorkerManager::OnWorkerActivated);
+	worker.OnDeactivated().Remove(*this, &WorkerManager::OnWorkerDeactivated);
 
-	worker.OnClosed().remove(*this, &WorkerManager::OnWorkerClosed);
+	worker.OnClosed().Remove(*this, &WorkerManager::OnWorkerClosed);
 
 	// Emit the signal
 	OnRemoved(worker);
@@ -202,7 +202,7 @@ WorkerManager::RemoveWorker(Worker &worker)
 	}
 
 	// And finally close the worker
-	worker.Client().close();
+	worker.Client().Close();
 }
 
 /**

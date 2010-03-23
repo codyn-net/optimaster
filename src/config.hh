@@ -23,12 +23,12 @@
 #ifndef __OPTIMASTER_CONFIG_H__
 #define __OPTIMASTER_CONFIG_H__
 
-#include <base/Config/config.hh>
+#include <jessevdk/base/base.hh>
 #include <glibmm.h>
 
 namespace optimaster
 {
-	class Config : public base::Config
+	class Config : public jessevdk::base::Config
 	{
 		static Config *s_instance;
 

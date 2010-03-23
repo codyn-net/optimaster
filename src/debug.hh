@@ -3,7 +3,7 @@
 
 #include <optimization/debug.hh>
 
-#define debug_optimaster_out(domain) (base::Debug::out(optimaster::Debug::Domain::domain, #domain,  __FILE__, __FUNCTION__, __LINE__))
+#define debug_optimaster_out(domain) (jessevdk::base::Debug::Out(optimaster::Debug::Domain::domain, #domain,  __FILE__, __FUNCTION__, __LINE__))
 
 #define debug_scheduler (debug_optimaster_out(Scheduler))
 
@@ -16,7 +16,7 @@ namespace optimaster
 			{
 				enum Values
 				{
-					Scheduler = optimization::Debug::Domain::User << 1,
+					Scheduler = optimization::Debug::Domain::Last << 1,
 				};
 			};
 	};

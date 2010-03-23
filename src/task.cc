@@ -43,7 +43,7 @@ using namespace optimization::messages;
 Task::Task(size_t group, task::Task const &task) 
 {
 	d_data = new Data();
-	addPrivateData(d_data);
+	AddPrivateData(d_data);
 	
 	d_data->group = group;
 	d_data->task = task;
@@ -72,7 +72,7 @@ Task::Task()
  *
  */
 Task *
-Task::clone() const
+Task::Clone() const
 {
 	return new Task(*this);
 }

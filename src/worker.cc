@@ -27,11 +27,11 @@
 
 using namespace std;
 using namespace optimaster;
-using namespace network;
+using namespace jessevdk::network;
 using namespace optimization;
 using namespace optimization::messages;
-using namespace base;
-using namespace base::signals;
+using namespace jessevdk::base;
+using namespace jessevdk::base::signals;
 
 /**
  * @class optimaster::Worker
@@ -81,11 +81,11 @@ Worker::Worker(Data *data)
 Worker::Worker(AddressInfo &info)
 {
 	d_data = new Data();
-	addPrivateData(d_data);
+	AddPrivateData(d_data);
 	
 	d_data->active = false;
 
-	Set(d_data, network::Client::resolve<network::Client>(info));
+	Set(d_data, jessevdk::network::Client::Resolve<jessevdk::network::Client>(info));
 }
 
 /**

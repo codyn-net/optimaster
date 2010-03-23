@@ -23,7 +23,7 @@
 #ifndef __OPTIMASTER_OPTIMIZER_MANAGER_H__
 #define __OPTIMASTER_OPTIMIZER_MANAGER_H__
 
-#include <network/network.hh>
+#include <jessevdk/network/network.hh>
 #include "optimizer.hh"
 
 namespace optimaster
@@ -31,7 +31,7 @@ namespace optimaster
 	class OptimizerManager
 	{
 		std::map<int, Optimizer> d_optimizers;
-		network::TcpServer d_server;
+		jessevdk::network::TcpServer d_server;
 
 		public:
 			/* Constructor/destructor */
@@ -51,17 +51,17 @@ namespace optimaster
 			 *
 			 * Signal emitted when optimizer is added to the manager
 			 */
-			base::signals::Signal<Optimizer> OnAdded;
+			jessevdk::base::signals::Signal<Optimizer> OnAdded;
 			
 			/**
 			* @brief OnRemoved signal
 			 *
 			 * Signal emitted when optimizer is removed from the manager
 			 */
-			base::signals::Signal<Optimizer> OnRemoved;
+			jessevdk::base::signals::Signal<Optimizer> OnRemoved;
 		private:
 			/* Private functions */
-			void OnNewConnection(network::Client &client);
+			void OnNewConnection(jessevdk::network::Client &client);
 			void OnOptimizerClosed(Communicator &communicator);
 	};
 }

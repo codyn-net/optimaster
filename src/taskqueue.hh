@@ -23,7 +23,7 @@
 #ifndef __OPTIMASTER_TASK_QUEUE_H__
 #define __OPTIMASTER_TASK_QUEUE_H__
 
-#include <base/base.hh>
+#include <jessevdk/base/base.hh>
 #include "batch.hh"
 #include <list>
 
@@ -58,7 +58,7 @@ namespace optimaster
 			 *
 			 * Signal emitted when new tasks are available on the queue
 			 */
-			base::signals::Signal<> OnNotifyAvailable;
+			jessevdk::base::signals::Signal<> OnNotifyAvailable;
 		private:
 	};
 }

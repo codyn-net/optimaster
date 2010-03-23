@@ -28,9 +28,9 @@
 
 namespace optimaster
 {
-	class Batch : public base::Object
+	class Batch : public jessevdk::base::Object
 	{
-		struct Data : public base::Object::PrivateData
+		struct Data : public jessevdk::base::Object::PrivateData
 		{
 			size_t id;
 			std::deque<Task> tasks;
@@ -67,7 +67,7 @@ namespace optimaster
 			void WaitReset();
 			double WaitTime() const;
 
-			virtual Batch *clone() const;
+			virtual Batch *Clone() const;
 	};
 }
 

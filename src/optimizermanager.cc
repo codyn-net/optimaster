@@ -26,9 +26,9 @@
 
 using namespace std;
 using namespace optimaster;
-using namespace network;
+using namespace jessevdk::network;
 using namespace optimization;
-using namespace base;
+using namespace jessevdk::base;
 
 /**
  * @class optimaster::OptimizerManager
@@ -49,7 +49,7 @@ OptimizerManager::OptimizerManager()
 :
 	d_server(Constants::MasterPort)
 {
-	d_server.onNewConnection().add(*this, &OptimizerManager::OnNewConnection);
+	d_server.OnNewConnection().Add(*this, &OptimizerManager::OnNewConnection);
 }
 
 /**
@@ -60,13 +60,13 @@ OptimizerManager::OptimizerManager()
  */
 OptimizerManager::~OptimizerManager()
 {
-	d_server.onNewConnection().remove(*this, &OptimizerManager::OnNewConnection);
+	d_server.OnNewConnection().Remove(*this, &OptimizerManager::OnNewConnection);
 	
 	map<int, Optimizer>::iterator iter;
 	
 	for (iter = d_optimizers.begin(); iter != d_optimizers.end(); ++iter)
 	{
-		iter->second.OnClosed().remove(*this, &OptimizerManager::OnOptimizerClosed);
+		iter->second.OnClosed().Remove(*this, &OptimizerManager::OnOptimizerClosed);
 	}
 	
 	d_optimizers.clear();
@@ -111,7 +111,7 @@ OptimizerManager::Find(size_t     id,
 bool
 OptimizerManager::Listen()
 {
-	return d_server.listen();
+	return d_server.Listen();
 }
 
 OptimizerManager::operator bool() const
@@ -137,14 +137,14 @@ OptimizerManager::OnNewConnection(Client &client)
 	Optimizer optimizer(client);
 	d_optimizers[optimizer.Id()] = optimizer;
 	
-	optimizer.OnClosed().add(*this, &OptimizerManager::OnOptimizerClosed);
+	optimizer.OnClosed().Add(*this, &OptimizerManager::OnOptimizerClosed);
 	
-	if (base::Debug::enabled(optimization::Debug::Domain::Master))
+	if (jessevdk::base::Debug::Enabled(optimization::Debug::Domain::Master))
 	{
 		debug_master << "New optimizer connected: "
 		             << optimizer.Id() << " ("
-		             << client.address().host(true) << ":"
-		             << client.address().port(true) << ")" << endl;
+		             << client.Address().Host(true) << ":"
+		             << client.Address().Port(true) << ")" << endl;
 	}
 	
 	OnAdded(optimizer);
@@ -162,5 +162,5 @@ void
 OptimizerManager::Set(string const &host,
                       string const &port)
 {
-	d_server.set(host, port);
+	d_server.Set(host, port);
 }

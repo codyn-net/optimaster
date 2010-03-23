@@ -23,7 +23,7 @@
 #ifndef __OPTIMASTER_OPTIMIZER_H__
 #define __OPTIMASTER_OPTIMIZER_H__
 
-#include <network/network.hh>
+#include <jessevdk/network/network.hh>
 #include <optimization/messages.hh>
 #include <map>
 #include <vector>
@@ -37,7 +37,7 @@ namespace optimaster
 		public:
 			/* Constructor/destructor */
 			Optimizer();
-			Optimizer(network::Client &client);
+			Optimizer(jessevdk::network::Client &client);
 			
 			void Add(Worker &worker);
 			std::vector<Worker> &ActiveWorkers();

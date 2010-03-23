@@ -28,7 +28,7 @@
 
 using namespace std;
 using namespace optimaster;
-using namespace network;
+using namespace jessevdk::network;
 using namespace optimization::messages;
 using namespace optimization;
 
@@ -46,10 +46,10 @@ using namespace optimization;
  * Construct an optimizer object for a certain clien.
  *
  */
-Optimizer::Optimizer(network::Client &client)
+Optimizer::Optimizer(jessevdk::network::Client &client)
 {
 	d_data = new Data();
-	addPrivateData(d_data);
+	AddPrivateData(d_data);
 
 	Set(d_data, client);
 }
@@ -83,7 +83,7 @@ Optimizer::Data::OnWorkerDeactivated(Worker &worker)
 
 	activeWorkers.erase(iter, activeWorkers.end());
 
-	worker.OnDeactivated().remove(*this, &Optimizer::Data::OnWorkerDeactivated);
+	worker.OnDeactivated().Remove(*this, &Optimizer::Data::OnWorkerDeactivated);
 	
 	Config &config = Config::Instance();
 	while (lastRunTimes.size() > config.RunTimeEstimation - 1)
@@ -107,7 +107,7 @@ void
 Optimizer::Add(Worker &worker)
 {
 	d_data->activeWorkers.push_back(worker);
-	worker.OnDeactivated().add(*d_data, &Optimizer::Data::OnWorkerDeactivated);
+	worker.OnDeactivated().Add(*d_data, &Optimizer::Data::OnWorkerDeactivated);
 }
 
 /**

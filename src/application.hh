@@ -30,7 +30,7 @@
 #include "optimizermanager.hh"
 
 #include <glibmm.h>
-#include <network/network.hh>
+#include <jessevdk/network/network.hh>
 
 namespace optimaster
 {

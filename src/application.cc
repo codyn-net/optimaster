@@ -24,18 +24,17 @@
 #include "config.hh"
 #include "debug.hh"
 
-#include <os/os.hh>
+#include <jessevdk/os/os.hh>
 #include <sstream>
-#include <network/network.hh>
-#include <os/os.hh>
+#include <jessevdk/network/network.hh>
 #include <vector>
 #include <syslog.h>
 
 using namespace std;
 using namespace optimaster;
-using namespace base;
-using namespace os;
-using namespace network;
+using namespace jessevdk::base;
+using namespace jessevdk::os;
+using namespace jessevdk::network;
 using namespace optimization::messages;
 
 /**
@@ -58,18 +57,18 @@ Application::Application(int    &argc,
 {
 	EnableEnvironment();
 
-	d_discovery.OnGreeting().add(*this, &Application::OnGreeting);
+	d_discovery.OnGreeting().Add(*this, &Application::OnGreeting);
 
-	d_workerManager.OnAdded.add(*this, &Application::OnWorkerAdded);
-	d_workerManager.OnRemoved.add(*this, &Application::OnWorkerRemoved);
-	d_workerManager.OnNotifyAvailable.add(*this, &Application::OnNotifyAvailable);
+	d_workerManager.OnAdded.Add(*this, &Application::OnWorkerAdded);
+	d_workerManager.OnRemoved.Add(*this, &Application::OnWorkerRemoved);
+	d_workerManager.OnNotifyAvailable.Add(*this, &Application::OnNotifyAvailable);
 
 	ParseArguments(argc, argv);
 
-	d_optimizerManager.OnAdded.add(*this, &Application::OnOptimizerAdded);
-	d_optimizerManager.OnRemoved.add(*this, &Application::OnOptimizerRemoved);
+	d_optimizerManager.OnAdded.Add(*this, &Application::OnOptimizerAdded);
+	d_optimizerManager.OnRemoved.Add(*this, &Application::OnOptimizerRemoved);
 
-	d_taskQueue.OnNotifyAvailable.add(*this, &Application::OnNotifyAvailable);
+	d_taskQueue.OnNotifyAvailable.Add(*this, &Application::OnNotifyAvailable);
 
 	d_discovery.Listen();
 	
@@ -93,16 +92,16 @@ Application::Application(int    &argc,
  */
 Application::~Application()
 {
-	d_optimizerManager.OnAdded.remove(*this, &Application::OnOptimizerAdded);
-	d_optimizerManager.OnRemoved.remove(*this, &Application::OnOptimizerRemoved);
+	d_optimizerManager.OnAdded.Remove(*this, &Application::OnOptimizerAdded);
+	d_optimizerManager.OnRemoved.Remove(*this, &Application::OnOptimizerRemoved);
 
-	d_workerManager.OnAdded.remove(*this, &Application::OnWorkerAdded);
-	d_workerManager.OnRemoved.remove(*this, &Application::OnWorkerRemoved);
-	d_workerManager.OnNotifyAvailable.remove(*this, &Application::OnNotifyAvailable);
+	d_workerManager.OnAdded.Remove(*this, &Application::OnWorkerAdded);
+	d_workerManager.OnRemoved.Remove(*this, &Application::OnWorkerRemoved);
+	d_workerManager.OnNotifyAvailable.Remove(*this, &Application::OnNotifyAvailable);
 
-	d_taskQueue.OnNotifyAvailable.remove(*this, &Application::OnNotifyAvailable);
+	d_taskQueue.OnNotifyAvailable.Remove(*this, &Application::OnNotifyAvailable);
 
-	d_discovery.OnGreeting().remove(*this, &Application::OnGreeting);
+	d_discovery.OnGreeting().Remove(*this, &Application::OnGreeting);
 	closelog();
 }
 
@@ -147,11 +146,11 @@ Application::ParseArguments(int    &argc,
 	context.set_main_group(group);
 	context.parse(argc, argv);
 
-	vector<string> parts = String(disc).split(":", 2);
+	vector<string> parts = String(disc).Split(":", 2);
 	string host = parts[0];
 	string port = parts.size() == 2 ? parts[1] : "";
 
-	if (AddressInfo::isIPAddress(host))
+	if (AddressInfo::IsIPAddress(host))
 	{
 		if (port != "")
 		{
@@ -175,17 +174,17 @@ Application::ParseArguments(int    &argc,
 		config.DiscoveryNamespace = host;
 	}
 
-	parts = String(config.DiscoveryAddress).split(":", 2);
+	parts = String(config.DiscoveryAddress).Split(":", 2);
 
 	if (parts[0] == "")
 	{
 		parts[0] = optimization::Constants::DiscoveryGroup;
 	}
 
-	d_discovery.set(parts[0], parts[1]);
+	d_discovery.Set(parts[0], parts[1]);
 	d_discovery.SetNamespace(config.DiscoveryNamespace);
 
-	parts = String(config.ListenAddress).split(":", 2);
+	parts = String(config.ListenAddress).Split(":", 2);
 
 	if (parts.size() == 1 || parts[1] == "")
 	{
@@ -219,11 +218,10 @@ void
 Application::EnableEnvironment()
 {
 	static DebugInfo infos[] = {
-		{"DEBUG_BASE", base::Debug::Domain::Base},
-		{"DEBUG_NETWORK", base::Debug::Domain::Network},
-		{"DEBUG_DATA", base::Debug::Domain::Data},
-		{"DEBUG_OS", base::Debug::Domain::OS},
-		{"DEBUG_MODULES", base::Debug::Domain::Modules},
+		{"DEBUG_BASE", jessevdk::base::Debug::Domain::Base},
+		{"DEBUG_NETWORK", jessevdk::base::Debug::Domain::Network},
+		{"DEBUG_DATA", jessevdk::base::Debug::Domain::Data},
+		{"DEBUG_OS", jessevdk::base::Debug::Domain::OS},
 		{"DEBUG_WORKER", optimization::Debug::Domain::Worker},
 		{"DEBUG_MASTER", optimization::Debug::Domain::Master},
 		{"DEBUG_SCHEDULER", optimaster::Debug::Domain::Scheduler}
@@ -231,9 +229,9 @@ Application::EnableEnvironment()
 
 	for (size_t i = 0; i < sizeof(infos) / sizeof(DebugInfo); ++i)
 	{
-		if (Environment::variable(infos[i].name))
+		if (Environment::Variable(infos[i].name))
 		{
-			Debug::enable(infos[i].flag);
+			Debug::Enable(infos[i].flag);
 		}
 	}
 }
@@ -289,8 +287,8 @@ Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop)
 void
 Application::OnOptimizerAdded(Optimizer &optimizer)
 {
-	syslog(LOG_NOTICE, "optimizer-connected: %lu, %s", optimizer.Id(), optimizer.Client().address().host(true).c_str());
-	optimizer.OnCommunication().add(*this, &Application::OnOptimizerCommunication);
+	syslog(LOG_NOTICE, "optimizer-connected: %lu, %s", optimizer.Id(), optimizer.Client().Address().Host(true).c_str());
+	optimizer.OnCommunication().Add(*this, &Application::OnOptimizerCommunication);
 }
 
 /**
@@ -306,7 +304,7 @@ Application::OnOptimizerRemoved(Optimizer &optimizer)
 	debug_master << "Optimizer disconnected: " << optimizer.Id() << endl;
 
 	syslog(LOG_NOTICE, "optimizer-disconnected: %lu", optimizer.Id());
-	optimizer.OnCommunication().remove(*this, &Application::OnOptimizerCommunication);
+	optimizer.OnCommunication().Remove(*this, &Application::OnOptimizerCommunication);
 
 	// Remove all tasks from the task queue for this optimizer
 	d_taskQueue.Remove(optimizer.Id());
@@ -418,8 +416,8 @@ Application::OnOptimizerCommunication(Optimizer::CommunicationArgs &args)
 void
 Application::OnWorkerAdded(Worker &worker)
 {
-	worker.OnCommunication().add(*this, &Application::OnWorkerCommunication);
-	worker.OnTimeout().add(*this, &Application::OnWorkerTimeout);
+	worker.OnCommunication().Add(*this, &Application::OnWorkerCommunication);
+	worker.OnTimeout().Add(*this, &Application::OnWorkerTimeout);
 }
 
 /**
@@ -432,8 +430,8 @@ Application::OnWorkerAdded(Worker &worker)
 void
 Application::OnWorkerRemoved(Worker &worker)
 {
-	worker.OnCommunication().remove(*this, &Application::OnWorkerCommunication);
-	worker.OnTimeout().remove(*this, &Application::OnWorkerTimeout);
+	worker.OnCommunication().Remove(*this, &Application::OnWorkerCommunication);
+	worker.OnTimeout().Remove(*this, &Application::OnWorkerTimeout);
 
 	// Reschedule the task the worker was working on
 	if (worker.Active())
@@ -478,12 +476,12 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	{
 		// Task was completed successfully
 		case task::Response::Success:
-			if (Debug::enabled(optimization::Debug::Domain::Worker))
+			if (Debug::Enabled(optimization::Debug::Domain::Worker))
 			{
 				debug_worker << "Worker success ("
-				             << worker.Client().address().host(true)
+				             << worker.Client().Address().Host(true)
 				             << ":"
-				             << worker.Client().address().port(true)
+				             << worker.Client().Address().Port(true)
 				             << ") for (" << task.Group()
 				             << ", " << task.Message().id() << ")"
 				             << endl;
@@ -501,12 +499,12 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			if (task.Failures() >= Config::Instance().MaxTaskFailures)
 			{
 				// Task failed too many times
-				if (Debug::enabled(optimization::Debug::Domain::Worker))
+				if (Debug::Enabled(optimization::Debug::Domain::Worker))
 				{
 					debug_worker << "Task failed to many times ("
-					             << worker.Client().address().host(true)
+					             << worker.Client().Address().Host(true)
 					             << ":"
-					             << worker.Client().address().port(true)
+					             << worker.Client().Address().Port(true)
 					             << ") for (" << task.Group() << ", "
 					             << task.Message().id() << ")" << endl;
 				}
@@ -526,11 +524,11 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			{
 				// Reschedule the task because the failure might be due to a
 				// faulty worker, or maybe some network problems
-				if (Debug::enabled(optimization::Debug::Domain::Worker))
+				if (Debug::Enabled(optimization::Debug::Domain::Worker))
 				{
 					debug_worker << "Task failed (" << FailureToString(response.failure()) << "), rescheduling ("
-					             << worker.Client().address().host(true) <<
-					             ":" << worker.Client().address().port(true)
+					             << worker.Client().Address().Host(true) <<
+					             ":" << worker.Client().Address().Port(true)
 					             << ") for (" << task.Group() << ", "
 					             << task.Message().id() << ")" << endl;
 				}
@@ -548,12 +546,12 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 		break;
 		case task::Response::Challenge:
 			// Simply relay to optimizer
-			if (Debug::enabled(optimization::Debug::Domain::Worker))
+			if (Debug::Enabled(optimization::Debug::Domain::Worker))
 			{
 				debug_worker << "Worker challenge ("
-				             << worker.Client().address().host(true)
+				             << worker.Client().Address().Host(true)
 				             << ":"
-				             << worker.Client().address().port(true)
+				             << worker.Client().Address().Port(true)
 				             << ") for ("
 				             << task.Group() << ", "
 				             << task.Message().id() << ")" << endl;
@@ -641,10 +639,10 @@ Application::Run(Glib::RefPtr<Glib::MainLoop> loop)
 		return;
 	}
 	
-	os::Signals::install();
-	os::Signals::onInterrupt.addData(*this, &Application::OnInterrupt, loop);
+	jessevdk::os::Signals::Install();
+	jessevdk::os::Signals::OnInterrupt.AddData(*this, &Application::OnInterrupt, loop);
 
-	if (d_discovery.isMulticast())
+	if (d_discovery.IsMulticast())
 	{
 		// Send discovery wakeup message if we are in multicast mode
 		SendWakeup();
@@ -677,12 +675,12 @@ Application::SendWakeup()
 	optimization::messages::discovery::Wakeup *wakeup = disc.mutable_wakeup();
 
 	// Set the connection
-	wakeup->set_connection(d_discovery.connection());
+	wakeup->set_connection(d_discovery.Connection());
 	string serialized;
 
 	if (optimization::Messages::Create(disc, serialized))
 	{
-		client.write(serialized);
+		client.Write(serialized);
 	}
 }
 

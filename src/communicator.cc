@@ -24,11 +24,11 @@
 
 using namespace std;
 using namespace optimaster;
-using namespace network;
+using namespace jessevdk::network;
 using namespace optimization;
 using namespace optimization::messages;
-using namespace base;
-using namespace base::signals;
+using namespace jessevdk::base;
+using namespace jessevdk::base::signals;
 
 /**
  * @class optimaster::Communicator
@@ -90,8 +90,8 @@ Communicator::Communicator(Data *data)
 
 Communicator::Data::~Data()
 {
-	client.onClosed().remove(*this, &Data::OnClosed);
-	client.onData().remove(*this, &Data::OnData);
+	client.OnClosed().Remove(*this, &Data::OnClosed);
+	client.OnData().Remove(*this, &Data::OnData);
 }
 
 /**
@@ -103,15 +103,15 @@ Communicator::Data::~Data()
  *
  */
 void
-Communicator::Set(Data *data, network::Client const &client)
+Communicator::Set(Data *data, jessevdk::network::Client const &client)
 {
 	d_data = data;
 	d_data->client = client;
 	
-	d_data->id = static_cast<size_t>(client.fd());
+	d_data->id = static_cast<size_t>(client.Fd());
 
-	d_data->client.onData().add(*d_data, &Data::OnData);
-	d_data->client.onClosed().add(*d_data, &Data::OnClosed);
+	d_data->client.OnData().Add(*d_data, &Data::OnData);
+	d_data->client.OnClosed().Add(*d_data, &Data::OnClosed);
 }
 
 /**
@@ -196,7 +196,7 @@ Communicator::OnClosed()
  *
  */
 void
-Communicator::Data::OnData(os::FileDescriptor::DataArgs &args)
+Communicator::Data::OnData(jessevdk::os::FileDescriptor::DataArgs &args)
 {
 	vector<task::Communication> communications;
 	vector<task::Communication>::iterator iter;
@@ -224,9 +224,9 @@ Communicator::Data::OnClosed(int fd)
 	Communicator shell(this);
 	
 	// Keep it ALIVE!
-	ref();
+	Ref();
 	onClosed(shell);
-	unref();
+	Unref();
 }
 
 /**

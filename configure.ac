@@ -1,4 +1,4 @@
-AC_INIT(optimaster, 1.1)
+AC_INIT(optimaster, 2.0)
 
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -34,7 +34,7 @@ AC_CONFIG_HEADERS(config.h)
 AM_MAINTAINER_MODE
 
 PKG_CHECK_MODULES(PACKAGE_OPTIMASTER, [
-	liboptimization-1.0
+	liboptimization-2.0
 ])
 
 AC_SUBST(PACKAGE_OPTIMASTER_CFLAGS)

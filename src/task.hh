@@ -27,9 +27,9 @@
 
 namespace optimaster
 {
-	class Task : public base::Object
+	class Task : public jessevdk::base::Object
 	{
-		struct Data : public base::Object::PrivateData
+		struct Data : public jessevdk::base::Object::PrivateData
 		{
 			optimization::messages::task::Task task;
 
@@ -60,7 +60,7 @@ namespace optimaster
 			optimization::messages::task::Task &Message();
 			optimization::messages::task::Task const &Message() const;
 
-			virtual Task *clone() const;
+			virtual Task *Clone() const;
 	};
 }
 

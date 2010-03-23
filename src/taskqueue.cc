@@ -25,7 +25,7 @@
 
 using namespace std;
 using namespace optimaster;
-using namespace base;
+using namespace jessevdk::base;
 using namespace optimization::messages;
 
 /**

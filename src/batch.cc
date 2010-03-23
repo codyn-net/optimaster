@@ -43,7 +43,7 @@ using namespace optimization::messages;
 Batch::Batch(size_t id, double bias, task::Batch const &batch) 
 {
 	d_data = new Data();
-	addPrivateData(d_data);
+	AddPrivateData(d_data);
 	
 	d_data->id = id;
 	d_data->bias = bias > 0 ? bias : 1;
@@ -80,7 +80,7 @@ Batch::Batch()
  *
  */
 Batch *
-Batch::clone() const
+Batch::Clone() const
 {
 	return new Batch(*this);
 }
