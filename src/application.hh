@@ -27,7 +27,7 @@
 
 #include "workermanager.hh"
 #include "taskqueue.hh"
-#include "optimizermanager.hh"
+#include "jobmanager.hh"
 
 #include <glibmm.h>
 #include <jessevdk/network/network.hh>
@@ -38,7 +38,7 @@ namespace optimaster
 	{
 		optimization::Discovery d_discovery;
 
-		OptimizerManager d_optimizerManager;
+		JobManager d_jobManager;
 		WorkerManager d_workerManager;
 
 		TaskQueue d_taskQueue;
@@ -48,6 +48,7 @@ namespace optimaster
 
 		size_t d_tasksFailed;
 		size_t d_tasksSuccess;
+		std::map<std::string, bool> d_activeUsers;
 
 		public:
 			/* Constructor/destructor */
@@ -75,14 +76,17 @@ namespace optimaster
 			void OnWorkerCommunication(Worker::CommunicationArgs &args);
 			void OnWorkerTimeout(Worker &worker);
 
-			void OnOptimizerAdded(Optimizer &optimizer);
-			void OnOptimizerRemoved(Optimizer &optimizer);
-			void OnOptimizerCommunication(Optimizer::CommunicationArgs &args);
+			void OnJobAdded(Job &job);
+			void OnJobRemoved(Job &job);
+			void OnJobCommunication(Job::CommunicationArgs &args);
 
-			void HandleOptimizerBatch(Optimizer                                         &optimizer,
-			                          optimization::messages::task::Communication const &communication);
-			void HandleOptimizerToken(Optimizer                                         &optimizer,
-			                          optimization::messages::task::Communication const &communication);
+			void HandleJobIdentify(Job                                               &job,
+			                       optimization::messages::task::Communication const &communication);
+
+			void HandleJobBatch(Job                                         &job,
+			                    optimization::messages::task::Communication const &communication);
+			void HandleJobToken(Job                                         &job,
+			                    optimization::messages::task::Communication const &communication);
 
 			void OnNotifyAvailable();
 			std::string FailureToString(optimization::messages::task::Response::Failure const &failure) const;

@@ -22,8 +22,8 @@ optimaster_SOURCES = \
 	batch.cc \
 	config.cc \
 	communicator.cc \
-	optimizer.cc \
-	optimizermanager.cc \
+	job.cc \
+	jobmanager.cc \
 	task.cc \
 	taskqueue.cc \
 	worker.cc \
@@ -35,8 +35,8 @@ noinst_HEADERS = \
 	config.hh \
 	communicator.hh \
 	debug.hh \
-	optimizer.hh \
-	optimizermanager.hh \
+	job.hh \
+	jobmanager.hh \
 	task.hh \
 	taskqueue.hh \
 	worker.hh \

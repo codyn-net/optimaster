@@ -190,7 +190,7 @@ Worker::Activate(Task &task, double timeout)
 		
 		if (timeout > 0)
 		{
-			d_data->timeout = Glib::signal_timeout().connect(sigc::mem_fun(*d_data, &Worker::Data::OnTimeout), (unsigned int)(timeout * 1000));
+			d_data->timeout = Glib::signal_timeout().connect_seconds(sigc::mem_fun(*d_data, &Worker::Data::OnTimeout), (unsigned int)(timeout));
 		}
 		
 		d_data->onActivated(*this);

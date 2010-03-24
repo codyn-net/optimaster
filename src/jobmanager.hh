@@ -20,23 +20,23 @@
  * Boston, MA  02110-1301  USA
  */
 
-#ifndef __OPTIMASTER_OPTIMIZER_MANAGER_H__
-#define __OPTIMASTER_OPTIMIZER_MANAGER_H__
+#ifndef __OPTIMASTER_JOB_MANAGER_H__
+#define __OPTIMASTER_JOB_MANAGER_H__
 
 #include <jessevdk/network/network.hh>
-#include "optimizer.hh"
+#include "job.hh"
 
 namespace optimaster
 {
-	class OptimizerManager
+	class JobManager
 	{
-		std::map<int, Optimizer> d_optimizers;
+		std::map<int, Job> d_jobs;
 		jessevdk::network::TcpServer d_server;
 
 		public:
 			/* Constructor/destructor */
-			OptimizerManager();
-			~OptimizerManager();
+			JobManager();
+			~JobManager();
 		
 			/* Public functions */
 			void Set(std::string const &host, std::string const &port);
@@ -44,26 +44,26 @@ namespace optimaster
 			bool Listen();
 			operator bool() const;
 			
-			bool Find(size_t id, Optimizer &optimizer);
+			bool Find(size_t id, Job &job);
 			
 			/**
 			* @brief OnAdded signal
 			 *
-			 * Signal emitted when optimizer is added to the manager
+			 * Signal emitted when job is added to the manager
 			 */
-			jessevdk::base::signals::Signal<Optimizer> OnAdded;
+			jessevdk::base::signals::Signal<Job> OnAdded;
 			
 			/**
 			* @brief OnRemoved signal
 			 *
-			 * Signal emitted when optimizer is removed from the manager
+			 * Signal emitted when job is removed from the manager
 			 */
-			jessevdk::base::signals::Signal<Optimizer> OnRemoved;
+			jessevdk::base::signals::Signal<Job> OnRemoved;
 		private:
 			/* Private functions */
 			void OnNewConnection(jessevdk::network::Client &client);
-			void OnOptimizerClosed(Communicator &communicator);
+			void OnJobClosed(Communicator &communicator);
 	};
 }
 
-#endif /* __OPTIMASTER_OPTIMIZER_MANAGER_H__ */
+#endif /* __OPTIMASTER_JOB_MANAGER_H__ */

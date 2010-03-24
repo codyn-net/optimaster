@@ -40,7 +40,7 @@ namespace optimaster
 			TaskQueue();
 
 			/* Public functions */
-			void Push(size_t id, double bias, optimization::messages::task::Batch const &batch);
+			void Push(size_t id, double bias, double priority, double timeout, optimization::messages::task::Batch const &batch);
 			void Push(Task &task);
 
 			bool Pop(Task &item);

@@ -120,6 +120,8 @@ TaskQueue::Pop(Task &task)
 void
 TaskQueue::Push(size_t             id,
                 double             bias,
+                double             priority,
+                double             timeout,
                 task::Batch const &batch)
 {
 	if (batch.tasks_size() == 0)
@@ -144,7 +146,7 @@ TaskQueue::Push(size_t             id,
 	{
 		debug_scheduler << "Scheduled new batch: [id = " << id << ", bias = " << bias << "]: " << batch.tasks_size() << endl;
 
-		d_batches[id] = Batch(id, bias, batch);
+		d_batches[id] = Batch(id, bias, priority, timeout, batch);
 		d_running[id] = map<size_t, bool>();
 	}
 

@@ -40,7 +40,11 @@ using namespace optimization::messages;
  * Create a new batch object.
  * \fn Batch::Batch(size_t id, optimization::messages::batch::Batch const &batch)
  */
-Batch::Batch(size_t id, double bias, task::Batch const &batch) 
+Batch::Batch(size_t             id,
+             double             bias,
+             double             priority,
+             double             timeout,
+             task::Batch const &batch)
 {
 	d_data = new Data();
 	AddPrivateData(d_data);
@@ -48,8 +52,8 @@ Batch::Batch(size_t id, double bias, task::Batch const &batch)
 	d_data->id = id;
 	d_data->bias = bias > 0 ? bias : 1;
 
-	d_data->timeout = batch.has_timeout() ? batch.timeout() : -1;
-	d_data->priority = batch.priority() > 0 ? batch.priority() : 1;
+	d_data->timeout = timeout;
+	d_data->priority = priority;
 	d_data->waitTime = 0;
 
 	// Create tasks from the batch

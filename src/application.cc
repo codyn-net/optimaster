@@ -68,8 +68,8 @@ Application::Application(int    &argc,
 
 	ParseArguments(argc, argv);
 
-	d_optimizerManager.OnAdded.Add(*this, &Application::OnOptimizerAdded);
-	d_optimizerManager.OnRemoved.Add(*this, &Application::OnOptimizerRemoved);
+	d_jobManager.OnAdded.Add(*this, &Application::OnJobAdded);
+	d_jobManager.OnRemoved.Add(*this, &Application::OnJobRemoved);
 
 	d_taskQueue.OnNotifyAvailable.Add(*this, &Application::OnNotifyAvailable);
 
@@ -78,9 +78,9 @@ Application::Application(int    &argc,
 	Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Application::OnPeriodicLogStatus),
 	                                       1800);
 
-	if (!d_optimizerManager.Listen())
+	if (!d_jobManager.Listen())
 	{
-		cerr << "Failed to start master, could not listen for optimizers (maybe there is another master running?)" << endl;
+		cerr << "Failed to start master, could not listen for jobs (maybe there is another master running?)" << endl;
 	}
 	else
 	{
@@ -98,8 +98,8 @@ Application::Application(int    &argc,
  */
 Application::~Application()
 {
-	d_optimizerManager.OnAdded.Remove(*this, &Application::OnOptimizerAdded);
-	d_optimizerManager.OnRemoved.Remove(*this, &Application::OnOptimizerRemoved);
+	d_jobManager.OnAdded.Remove(*this, &Application::OnJobAdded);
+	d_jobManager.OnRemoved.Remove(*this, &Application::OnJobRemoved);
 
 	d_workerManager.OnAdded.Remove(*this, &Application::OnWorkerAdded);
 	d_workerManager.OnRemoved.Remove(*this, &Application::OnWorkerRemoved);
@@ -205,7 +205,7 @@ Application::ParseArguments(int    &argc,
 		parts[1] = s.str();
 	}
 
-	d_optimizerManager.Set(parts[0], parts[1]);
+	d_jobManager.Set(parts[0], parts[1]);
 }
 
 struct DebugInfo
@@ -284,43 +284,43 @@ Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop)
 }
 
 /**
- * @brief Optimizer added callback.
- * @param optimizer the optimizer
+ * @brief Job added callback.
+ * @param job the job
  *
- * Called when a new optimizer is connected.
+ * Called when a new job is connected.
  *
  */
 void
-Application::OnOptimizerAdded(Optimizer &optimizer)
+Application::OnJobAdded(Job &job)
 {
 	syslog(LOG_NOTICE,
 	       "job-connected: %lu, %s",
-	       optimizer.Id(),
-	       optimizer.Client().Address().Host(true).c_str());
+	       job.Id(),
+	       job.Client().Address().Host(true).c_str());
 
-	optimizer.OnCommunication().Add(*this, &Application::OnOptimizerCommunication);
+	job.OnCommunication().Add(*this, &Application::OnJobCommunication);
 }
 
 /**
- * @brief Optimizer removed callback.
- * @param optimizer the optimizer
+ * @brief Job removed callback.
+ * @param job the job
  *
- * Called when an optimizer is disconnected.
+ * Called when an job is disconnected.
  *
  */
 void
-Application::OnOptimizerRemoved(Optimizer &optimizer)
+Application::OnJobRemoved(Job &job)
 {
-	debug_master << "Job disconnected: " << optimizer.Id() << endl;
+	debug_master << "Job disconnected: " << job.Id() << endl;
 
-	syslog(LOG_NOTICE, "job-disconnected: %lu", optimizer.Id());
-	optimizer.OnCommunication().Remove(*this, &Application::OnOptimizerCommunication);
+	syslog(LOG_NOTICE, "job-disconnected: %lu", job.Id());
+	job.OnCommunication().Remove(*this, &Application::OnJobCommunication);
 
-	// Remove all tasks from the task queue for this optimizer
-	d_taskQueue.Remove(optimizer.Id());
+	// Remove all tasks from the task queue for this job
+	d_taskQueue.Remove(job.Id());
 
-	// Cancel all the workers that are still active for this optimizer
-	vector<Worker> activeWorkers = optimizer.ActiveWorkers();
+	// Cancel all the workers that are still active for this job
+	vector<Worker> activeWorkers = job.ActiveWorkers();
 	vector<Worker>::iterator iter;
 	
 	for (iter = activeWorkers.begin(); iter != activeWorkers.end(); ++iter)
@@ -335,48 +335,49 @@ Application::OnOptimizerRemoved(Optimizer &optimizer)
 }
 
 /**
- * @brief Handle optimizer batch.
- * @param optimizer the optimizer
+ * @brief Handle job batch.
+ * @param job the job
  * @param batch the batch
  *
- * Handles a batch message from the optimizer.
+ * Handles a batch message from the job.
  *
  */
 void
-Application::HandleOptimizerBatch(Optimizer                 &optimizer,
-                                  task::Communication const &communication)
+Application::HandleJobBatch(Job                 &job,
+                            task::Communication const &communication)
 {
 	// Add batch to the task queue
-	debug_master << "Received batch from optimizer ("
-	             << optimizer.Id() << "): "
+	debug_master << "Received batch from job ("
+	             << job.Id() << "): "
 	             << communication.batch().tasks_size() << endl;
 
 	syslog(LOG_NOTICE,
-	       "job-batch: %lu, %d, %.3f",
-	       optimizer.Id(),
+	       "job-batch: %lu, %s, %d, %.3f",
+	       job.Id(),
+	       job.User().c_str(),
 	       communication.batch().tasks_size(),
-	       communication.batch().priority());
+	       job.Priority());
 
-	d_taskQueue.Push(optimizer.Id(), optimizer.AverageRunTime(), communication.batch());
+	d_taskQueue.Push(job.Id(), job.AverageRunTime(), job.Priority(), job.Timeout(), communication.batch());
 }
 
 /**
- * @brief Handle optimizer token.
- * @param optimizer the optimizer
+ * @brief Handle job token.
+ * @param job the job
  * @param token the token
  *
- * Handles a token message from the optimizer.
+ * Handles a token message from the job.
  *
  */
 void
-Application::HandleOptimizerToken(Optimizer                 &optimizer,
-                                  task::Communication const &communication)
+Application::HandleJobToken(Job                 &job,
+                            task::Communication const &communication)
 {
 	// Relay the token response back to the worker
 	vector<Worker>::iterator iter;
 	
-	for (iter = optimizer.ActiveWorkers().begin();
-	     iter != optimizer.ActiveWorkers().end();
+	for (iter = job.ActiveWorkers().begin();
+	     iter != job.ActiveWorkers().end();
 	     ++iter)
 	{
 		if (iter->ActiveTask().Id() == communication.token().id())
@@ -388,19 +389,40 @@ Application::HandleOptimizerToken(Optimizer                 &optimizer,
 	}
 }
 
+void
+Application::HandleJobIdentify(Job                       &job,
+                               task::Communication const &communication)
+{
+	task::Identify const &identify = communication.identify();
+
+	job.SetUser(identify.user());
+
+	if (identify.has_priority())
+	{
+		job.SetPriority(identify.priority());
+	}
+
+	if (identify.has_timeout())
+	{
+		job.SetTimeout(identify.timeout());
+	}
+
+	d_activeUsers[job.User()] = true;
+}
+
 /**
  * @brief Optmizer communication callback.
  * @param args communication arguments
  *
- * Called when a communication message from an optimizer has been received.
+ * Called when a communication message from an job has been received.
  *
  */
 void
-Application::OnOptimizerCommunication(Optimizer::CommunicationArgs &args)
+Application::OnJobCommunication(Job::CommunicationArgs &args)
 {
-	Optimizer optimizer;
+	Job job;
 	
-	if (!d_optimizerManager.Find(args.Source.Id(), optimizer))
+	if (!d_jobManager.Find(args.Source.Id(), job))
 	{
 		return;
 	}
@@ -408,10 +430,13 @@ Application::OnOptimizerCommunication(Optimizer::CommunicationArgs &args)
 	switch (args.Communication.type())
 	{
 		case task::Communication::CommunicationBatch:
-			HandleOptimizerBatch(optimizer, args.Communication);
+			HandleJobBatch(job, args.Communication);
 		break;
 		case task::Communication::CommunicationToken:
-			HandleOptimizerToken(optimizer, args.Communication);
+			HandleJobToken(job, args.Communication);
+		break;
+		case task::Communication::CommunicationIdentify:
+			HandleJobIdentify(job, args.Communication);
 		break;
 	}
 }
@@ -472,12 +497,12 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 
 	Task &task = worker.ActiveTask();
 	task::Response &response = *args.Communication.mutable_response();
-	Optimizer optimizer;
+	Job job;
 
-	// Check if the optimizer for this task is still present
-	if (!d_optimizerManager.Find(task.Group(), optimizer))
+	// Check if the job for this task is still present
+	if (!d_jobManager.Find(task.Group(), job))
 	{
-		debug_worker << "Optimizer no longer connected..." << endl;
+		debug_worker << "Job no longer connected..." << endl;
 		worker.Deactivate();
 		return;
 	}
@@ -497,7 +522,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				             << endl;
 			}
 
-			optimizer.Send(args.Communication);
+			job.Send(args.Communication);
 			worker.Deactivate();
 
 			d_taskQueue.Finished(task);
@@ -528,8 +553,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				       task.Group(),
 				       task.Message().id());
 
-				// Relay failure to optimizer
-				optimizer.Send(args.Communication);
+				// Relay failure to job
+				job.Send(args.Communication);
 				worker.Deactivate();
 
 				d_taskQueue.Finished(task);
@@ -559,7 +584,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			}
 		break;
 		case task::Response::Challenge:
-			// Simply relay to optimizer
+			// Simply relay to job
 			if (Debug::Enabled(optimization::Debug::Domain::Worker))
 			{
 				debug_worker << "Worker challenge ("
@@ -571,7 +596,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				             << task.Message().id() << ")" << endl;
 			}
 
-			optimizer.Send(args.Communication);
+			job.Send(args.Communication);
 		break;
 		default:
 		break;
@@ -623,10 +648,10 @@ Application::OnDispatch()
 			continue;
 		}
 
-		Optimizer optimizer;
-		if (d_optimizerManager.Find(task.Group(), optimizer))
+		Job job;
+		if (d_jobManager.Find(task.Group(), job))
 		{
-			optimizer.Add(worker);
+			job.Add(worker);
 		}
 
 		debug_master << "Worker activated for: " << task.Group() << " (" << task.Id() << ")" << endl;
@@ -648,7 +673,7 @@ Application::OnDispatch()
 void
 Application::Run(Glib::RefPtr<Glib::MainLoop> loop) 
 {
-	if (!d_optimizerManager)
+	if (!d_jobManager)
 	{
 		return;
 	}
@@ -774,8 +799,21 @@ Application::OnPeriodicLogStatus()
 {
 	LogStatus();
 
-	syslog(LOG_NOTICE, "tasks-status: %lu/%lu", d_tasksFailed, d_tasksSuccess);
+	map<string, bool>::iterator iter;
+	vector<string> users;
+
+	for (iter = d_activeUsers.begin(); iter != d_activeUsers.end(); ++iter)
+	{
+		users.push_back(iter->first);
+	}
+
+	sort(users.begin(), users.end());
+
+	syslog(LOG_NOTICE, "task-status: %lu/%lu", d_tasksFailed, d_tasksSuccess);
+	syslog(LOG_NOTICE, "user-status: %s", String::Join(users, ", ").c_str());
 
 	d_tasksFailed = 0;
 	d_tasksSuccess = 0;
+
+	d_activeUsers.clear();
 }

@@ -1,5 +1,5 @@
 /*
- * optimizer.cc
+ * job.cc
  * This file is part of optimaster
  *
  * Copyright (C) 2009 - Jesse van den Kieboom
@@ -20,7 +20,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-#include "optimizer.hh"
+#include "job.hh"
 #include "config.hh"
 
 #include <numeric>
@@ -33,8 +33,8 @@ using namespace optimization::messages;
 using namespace optimization;
 
 /**
- * @class optimaster::Optimizer
- * @brief Class representing a optimizer connection.
+ * @class optimaster::Job
+ * @brief Class representing a job connection.
  */
 
 /**
@@ -43,13 +43,16 @@ using namespace optimization;
  *
  * Constructor.
  *
- * Construct an optimizer object for a certain clien.
+ * Construct an job object for a certain clien.
  *
  */
-Optimizer::Optimizer(jessevdk::network::Client &client)
+Job::Job(jessevdk::network::Client &client)
 {
 	d_data = new Data();
 	AddPrivateData(d_data);
+
+	d_data->priority = 1;
+	d_data->timeout = -1;
 
 	Set(d_data, client);
 }
@@ -59,10 +62,10 @@ Optimizer::Optimizer(jessevdk::network::Client &client)
  *
  * Constructor.
  *
- * Default constructor. This does not result in a valid optimizer object.
+ * Default constructor. This does not result in a valid job object.
  *
  */
-Optimizer::Optimizer()
+Job::Job()
 {
 }
 
@@ -70,12 +73,12 @@ Optimizer::Optimizer()
  * @brief Callback called when worker is deactivated.
  * @param worker the worker
  *
- * Called when a worker that was executing a task for the optimizer was 
+ * Called when a worker that was executing a task for the job was 
  * deactivated.
  *
  */
 void
-Optimizer::Data::OnWorkerDeactivated(Worker &worker)
+Job::Data::OnWorkerDeactivated(Worker &worker)
 {
 	// Remove worker from list of active workers
 	vector<Worker>::iterator iter;
@@ -83,7 +86,7 @@ Optimizer::Data::OnWorkerDeactivated(Worker &worker)
 
 	activeWorkers.erase(iter, activeWorkers.end());
 
-	worker.OnDeactivated().Remove(*this, &Optimizer::Data::OnWorkerDeactivated);
+	worker.OnDeactivated().Remove(*this, &Job::Data::OnWorkerDeactivated);
 	
 	Config &config = Config::Instance();
 	while (lastRunTimes.size() > config.RunTimeEstimation - 1)
@@ -95,45 +98,45 @@ Optimizer::Data::OnWorkerDeactivated(Worker &worker)
 }
 
 /**
- * @brief Add worker activated for the optimizer.
+ * @brief Add worker activated for the job.
  * @param worker the worker
  *
  * This should be called when a worker is activated for a task of the 
- * optimizer. The optimizer keeps track of which workers are executing tasks
- * belonging to the optimizer.
+ * job. The job keeps track of which workers are executing tasks
+ * belonging to the job.
  *
  */
 void
-Optimizer::Add(Worker &worker)
+Job::Add(Worker &worker)
 {
 	d_data->activeWorkers.push_back(worker);
-	worker.OnDeactivated().Add(*d_data, &Optimizer::Data::OnWorkerDeactivated);
+	worker.OnDeactivated().Add(*d_data, &Job::Data::OnWorkerDeactivated);
 }
 
 /**
  * @brief Get active workers.
  *
- * Get all the workers currently executing tasks for the optimizer.
+ * Get all the workers currently executing tasks for the job.
  *
  * @return: the active workers
  *
  */
 vector<Worker> &
-Optimizer::ActiveWorkers()
+Job::ActiveWorkers()
 {
 	return d_data->activeWorkers;
 }
 
 /** \brief Get average task run time.
  * 
- * Returns the average run time of tasks from this optimizer.
+ * Returns the average run time of tasks from this job.
  *
  * @return: Average run time in seconds
  *
  */
 
 double
-Optimizer::AverageRunTime() const
+Job::AverageRunTime() const
 {
 	size_t num = d_data->lastRunTimes.size();
 	
@@ -144,4 +147,40 @@ Optimizer::AverageRunTime() const
 	
 	double sum = std::accumulate(d_data->lastRunTimes.begin(), d_data->lastRunTimes.end(), 0.0);
 	return sum / num;
+}
+
+double
+Job::Priority() const
+{
+	return d_data->priority;
+}
+
+double
+Job::Timeout() const
+{
+	return d_data->timeout;
+}
+
+void
+Job::SetPriority(double priority)
+{
+	d_data->priority = priority;
+}
+
+void
+Job::SetTimeout(double timeout)
+{
+	d_data->timeout = timeout;
+}
+
+string const &
+Job::User() const
+{
+	return d_data->user;
+}
+
+void
+Job::SetUser(string const &user)
+{
+	d_data->user = user;
 }

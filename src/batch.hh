@@ -34,10 +34,10 @@ namespace optimaster
 		{
 			size_t id;
 			std::deque<Task> tasks;
-			
+
 			double priority;
 			double timeout;
-			
+
 			double waitTime;
 			double bias;
 		};
@@ -46,7 +46,11 @@ namespace optimaster
 		
 		public:
 			Batch();
-			Batch(size_t idx, double bias, optimization::messages::task::Batch const &batch);
+			Batch(size_t                                     idx,
+			      double                                     bias,
+			      double                                     priority,
+			      double                                     timeout,
+			      optimization::messages::task::Batch const &batch);
 
 			size_t Id() const;
 
