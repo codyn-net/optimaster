@@ -293,7 +293,11 @@ Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop)
 void
 Application::OnOptimizerAdded(Optimizer &optimizer)
 {
-	syslog(LOG_NOTICE, "optimizer-connected: %lu, %s", optimizer.Id(), optimizer.Client().Address().Host(true).c_str());
+	syslog(LOG_NOTICE,
+	       "job-connected: %lu, %s",
+	       optimizer.Id(),
+	       optimizer.Client().Address().Host(true).c_str());
+
 	optimizer.OnCommunication().Add(*this, &Application::OnOptimizerCommunication);
 }
 
@@ -307,9 +311,9 @@ Application::OnOptimizerAdded(Optimizer &optimizer)
 void
 Application::OnOptimizerRemoved(Optimizer &optimizer)
 {
-	debug_master << "Optimizer disconnected: " << optimizer.Id() << endl;
+	debug_master << "Job disconnected: " << optimizer.Id() << endl;
 
-	syslog(LOG_NOTICE, "optimizer-disconnected: %lu", optimizer.Id());
+	syslog(LOG_NOTICE, "job-disconnected: %lu", optimizer.Id());
 	optimizer.OnCommunication().Remove(*this, &Application::OnOptimizerCommunication);
 
 	// Remove all tasks from the task queue for this optimizer
@@ -348,7 +352,7 @@ Application::HandleOptimizerBatch(Optimizer                 &optimizer,
 	             << communication.batch().tasks_size() << endl;
 
 	syslog(LOG_NOTICE,
-	       "optimizer-batch: %lu, %d, %.3f",
+	       "job-batch: %lu, %d, %.3f",
 	       optimizer.Id(),
 	       communication.batch().tasks_size(),
 	       communication.batch().priority());
