@@ -20,6 +20,7 @@ optimaster_SOURCES = \
 	optimaster.cc \
 	application.cc \
 	batch.cc \
+	command.cc \
 	config.cc \
 	communicator.cc \
 	job.cc \
@@ -32,6 +33,7 @@ optimaster_SOURCES = \
 noinst_HEADERS = \
 	application.hh \
 	batch.hh \
+	command.hh \
 	config.hh \
 	communicator.hh \
 	debug.hh \

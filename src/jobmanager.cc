@@ -164,3 +164,17 @@ JobManager::Set(string const &host,
 {
 	d_server.Set(host, port);
 }
+
+vector<Job>
+JobManager::Jobs() const
+{
+	map<int, Job>::const_iterator iter;
+	vector<Job> ret;
+
+	for (iter = d_jobs.begin(); iter != d_jobs.end(); ++iter)
+	{
+		ret.push_back(iter->second);
+	}
+
+	return ret;
+}

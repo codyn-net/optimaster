@@ -28,6 +28,7 @@
 #include "workermanager.hh"
 #include "taskqueue.hh"
 #include "jobmanager.hh"
+#include "command.hh"
 
 #include <glibmm.h>
 #include <jessevdk/network/network.hh>
@@ -40,6 +41,8 @@ namespace optimaster
 
 		JobManager d_jobManager;
 		WorkerManager d_workerManager;
+
+		Command d_command;
 
 		TaskQueue d_taskQueue;
 
@@ -57,6 +60,9 @@ namespace optimaster
 
 			/* Public functions */
 			void Run(Glib::RefPtr<Glib::MainLoop> loop);
+
+			JobManager const &Manager() const;
+			JobManager &Manager();
 		private:
 			/* Private functions */
 			void ParseArguments(int &argc, char **&argv);
@@ -83,9 +89,9 @@ namespace optimaster
 			void HandleJobIdentify(Job                                               &job,
 			                       optimization::messages::task::Communication const &communication);
 
-			void HandleJobBatch(Job                                         &job,
+			void HandleJobBatch(Job                                               &job,
 			                    optimization::messages::task::Communication const &communication);
-			void HandleJobToken(Job                                         &job,
+			void HandleJobToken(Job                                               &job,
 			                    optimization::messages::task::Communication const &communication);
 
 			void OnNotifyAvailable();

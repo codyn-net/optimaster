@@ -15,6 +15,8 @@ AC_HEADER_STDC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
+AC_CHECK_LIB([gcrypt],[gcry_check_version],[],[AC_MSG_ERROR(Could not find gcrypt)])
+
 AC_ARG_ENABLE([docs],
 	AS_HELP_STRING([--enable-docs],[Enable documentation building (default: disabled)]),
 	[enable_docs=$enableval],

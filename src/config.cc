@@ -69,6 +69,7 @@ Config::Config()
 	Register("listen address", ListenAddress);
 	Register("max task failures", MaxTaskFailures);
 	Register("runtime estimation", RunTimeEstimation);
+	Register("command password", CommandPassword);
 }
 
 /**

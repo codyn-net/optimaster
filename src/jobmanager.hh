@@ -45,6 +45,8 @@ namespace optimaster
 			operator bool() const;
 			
 			bool Find(size_t id, Job &job);
+
+			std::vector<Job> Jobs() const;
 			
 			/**
 			* @brief OnAdded signal

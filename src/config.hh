@@ -47,6 +47,9 @@ namespace optimaster
 			
 			/** Number of runs to measure run time estimation */
 			size_t RunTimeEstimation;
+
+			/** Command password */
+			Glib::ustring CommandPassword;
 			
 			/* Constructor/destructor */
 			static Config &Initialize(std::string const &filename);

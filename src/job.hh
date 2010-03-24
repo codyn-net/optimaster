@@ -44,6 +44,9 @@ namespace optimaster
 			
 			double AverageRunTime() const;
 
+			std::string const &Name() const;
+			void SetName(std::string const &name);
+
 			std::string const &User() const;
 			void SetUser(std::string const &user);
 
@@ -52,6 +55,17 @@ namespace optimaster
 
 			void SetTimeout(double timeout);
 			void SetPriority(double priority);
+
+			size_t TasksFailed() const;
+			void SetTasksFailed(size_t num);
+
+			size_t TasksSuccess() const;
+			void SetTasksSuccess(size_t num);
+
+			double Progress() const;
+			void SetProgress(double progress);
+
+			Glib::TimeVal const &Started() const;
 		private:
 			struct Data : public Communicator::Data
 			{
@@ -60,9 +74,17 @@ namespace optimaster
 				
 				std::list<double> lastRunTimes;
 
+				std::string name;
 				std::string user;
 				double priority;
 				double timeout;
+
+				size_t tasksFailed;
+				size_t tasksSuccess;
+
+				double progress;
+
+				Glib::TimeVal started;
 			};
 
 			Data *d_data;

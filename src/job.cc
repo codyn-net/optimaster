@@ -53,6 +53,11 @@ Job::Job(jessevdk::network::Client &client)
 
 	d_data->priority = 1;
 	d_data->timeout = -1;
+	d_data->progress = 0;
+	d_data->tasksFailed = 0;
+	d_data->tasksSuccess = 0;
+
+	d_data->started.assign_current_time();
 
 	Set(d_data, client);
 }
@@ -174,6 +179,18 @@ Job::SetTimeout(double timeout)
 }
 
 string const &
+Job::Name() const
+{
+	return d_data->name;
+}
+
+void
+Job::SetName(string const &name)
+{
+	d_data->name = name;
+}
+
+string const &
 Job::User() const
 {
 	return d_data->user;
@@ -183,4 +200,46 @@ void
 Job::SetUser(string const &user)
 {
 	d_data->user = user;
+}
+
+size_t
+Job::TasksFailed() const
+{
+	return d_data->tasksFailed;
+}
+
+void
+Job::SetTasksFailed(size_t num)
+{
+	d_data->tasksFailed = num;
+}
+
+size_t
+Job::TasksSuccess() const
+{
+	return d_data->tasksSuccess;
+}
+
+void
+Job::SetTasksSuccess(size_t num)
+{
+	d_data->tasksSuccess = num;
+}
+
+double
+Job::Progress() const
+{
+	return d_data->progress;
+}
+
+void
+Job::SetProgress(double progress)
+{
+	d_data->progress = progress;
+}
+
+Glib::TimeVal const &
+Job::Started() const
+{
+	return d_data->started;
 }

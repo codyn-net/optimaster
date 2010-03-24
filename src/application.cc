@@ -55,6 +55,7 @@ using namespace optimization::messages;
 Application::Application(int    &argc,
                          char **&argv)
 :
+	d_command(*this),
 	d_tasksFailed(0),
 	d_tasksSuccess(0)
 {
@@ -77,6 +78,8 @@ Application::Application(int    &argc,
 
 	Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Application::OnPeriodicLogStatus),
 	                                       1800);
+
+	d_command.Listen();
 
 	if (!d_jobManager.Listen())
 	{
@@ -358,6 +361,8 @@ Application::HandleJobBatch(Job                 &job,
 	       communication.batch().tasks_size(),
 	       job.Priority());
 
+	job.SetProgress(communication.batch().progress());
+
 	d_taskQueue.Push(job.Id(), job.AverageRunTime(), job.Priority(), job.Timeout(), communication.batch());
 }
 
@@ -396,6 +401,7 @@ Application::HandleJobIdentify(Job                       &job,
 	task::Identify const &identify = communication.identify();
 
 	job.SetUser(identify.user());
+	job.SetName(identify.name());
 
 	if (identify.has_priority())
 	{
@@ -528,12 +534,15 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			d_taskQueue.Finished(task);
 
 			++d_tasksSuccess;
+			job.SetTasksSuccess(job.TasksSuccess() + 1);
 		break;
 		// Task execution failed
 		case task::Response::Failed:
 			task.Failed();
 
 			++d_tasksFailed;
+
+			job.SetTasksFailed(job.TasksFailed() + 1);
 
 			if (task.Failures() >= Config::Instance().MaxTaskFailures)
 			{
@@ -816,4 +825,16 @@ Application::OnPeriodicLogStatus()
 	d_tasksSuccess = 0;
 
 	d_activeUsers.clear();
+}
+
+JobManager const &
+Application::Manager() const
+{
+	return d_jobManager;
+}
+
+JobManager &
+Application::Manager()
+{
+	return d_jobManager;
 }
