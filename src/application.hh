@@ -46,6 +46,9 @@ namespace optimaster
 		sigc::connection d_idleDispatch;
 		Glib::RefPtr<Glib::MainLoop> d_mainLoop;
 
+		size_t d_tasksFailed;
+		size_t d_tasksSuccess;
+
 		public:
 			/* Constructor/destructor */
 			Application(int &argc, char **&argv);
@@ -64,6 +67,8 @@ namespace optimaster
 
 			void IdleDispatch();
 			bool OnDispatch();
+
+			bool OnPeriodicLogStatus();
 
 			void OnWorkerAdded(Worker &worker);
 			void OnWorkerRemoved(Worker &worker);

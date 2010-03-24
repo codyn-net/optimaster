@@ -54,6 +54,9 @@ using namespace optimization::messages;
  */
 Application::Application(int    &argc,
                          char **&argv)
+:
+	d_tasksFailed(0),
+	d_tasksSuccess(0)
 {
 	EnableEnvironment();
 
@@ -71,7 +74,10 @@ Application::Application(int    &argc,
 	d_taskQueue.OnNotifyAvailable.Add(*this, &Application::OnNotifyAvailable);
 
 	d_discovery.Listen();
-	
+
+	Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Application::OnPeriodicLogStatus),
+	                                       1800);
+
 	if (!d_optimizerManager.Listen())
 	{
 		cerr << "Failed to start master, could not listen for optimizers (maybe there is another master running?)" << endl;
@@ -491,10 +497,14 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			worker.Deactivate();
 
 			d_taskQueue.Finished(task);
+
+			++d_tasksSuccess;
 		break;
 		// Task execution failed
 		case task::Response::Failed:
 			task.Failed();
+
+			++d_tasksFailed;
 
 			if (task.Failures() >= Config::Instance().MaxTaskFailures)
 			{
@@ -753,4 +763,15 @@ Application::LogStatus() const
 {
 	syslog(LOG_NOTICE, "workers-status: %lu/%lu", d_workerManager.Active(), d_workerManager.Size());
 	syslog(LOG_NOTICE, "queue-status: %lu", d_taskQueue.Size());
+}
+
+bool
+Application::OnPeriodicLogStatus()
+{
+	LogStatus();
+
+	syslog(LOG_NOTICE, "tasks-status: %lu/%lu", d_tasksFailed, d_tasksSuccess);
+
+	d_tasksFailed = 0;
+	d_tasksSuccess = 0;
 }
