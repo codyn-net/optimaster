@@ -88,6 +88,7 @@ Application::Application(int    &argc,
 	else
 	{
 		openlog("optimaster", 0, LOG_USER);
+		syslog(LOG_NOTICE, "started");
 	}
 }
 
@@ -111,6 +112,8 @@ Application::~Application()
 	d_taskQueue.OnNotifyAvailable.Remove(*this, &Application::OnNotifyAvailable);
 
 	d_discovery.OnGreeting().Remove(*this, &Application::OnGreeting);
+
+	syslog(LOG_NOTICE, "stopped");
 	closelog();
 }
 

@@ -5,6 +5,7 @@
 
 #include <optimization/constants.hh>
 #include <gcrypt.h>
+#include <syslog.h>
 
 using namespace optimaster;
 using namespace jessevdk::network;
@@ -226,6 +227,10 @@ Command::Data::ValidateChallenge(Client                             &client,
 	}
 	else
 	{
+		syslog(LOG_ALERT,
+		       "command: invalid authentication from %s",
+		       client.Address().Host(true).c_str());
+
 		command::Response response = CreateResponse(command::Authenticate,
 		                                            false,
 		                                            "Invalid password");
