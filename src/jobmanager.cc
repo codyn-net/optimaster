@@ -136,7 +136,7 @@ JobManager::OnNewConnection(Client &client)
 {
 	Job job(client);
 	d_jobs[job.Id()] = job;
-	
+
 	job.OnClosed().Add(*this, &JobManager::OnJobClosed);
 	
 	if (jessevdk::base::Debug::Enabled(optimization::Debug::Domain::Master))
@@ -146,7 +146,9 @@ JobManager::OnNewConnection(Client &client)
 		             << client.Address().Host(true) << ":"
 		             << client.Address().Port(true) << ")" << endl;
 	}
-	
+
+	client.SetOption(Socket::Level::Tcp, Socket::Options::NoDelay);
+
 	OnAdded(job);
 }
 

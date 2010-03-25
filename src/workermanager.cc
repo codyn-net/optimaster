@@ -71,6 +71,11 @@ WorkerManager::Add(std::string const &connection, Worker &worker)
 	{
 		debug_worker << "Ready for work: " << connection << endl;
 
+		if (info.Protocol() == Socket::Level::Tcp)
+		{
+			worker.Client().SetOption(Socket::Level::Tcp, Socket::Options::NoDelay);
+		}
+
 		// Add worker to the relevant maps and queues
 		d_workersHash[connection] = worker;
 		d_workers[worker.Id()] = worker;
