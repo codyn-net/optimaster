@@ -58,6 +58,7 @@ Job::Job(jessevdk::network::Client &client)
 	d_data->tasksSuccess = 0;
 
 	d_data->started.assign_current_time();
+	d_data->lastUpdate.assign_current_time();
 
 	Set(d_data, client);
 }
@@ -236,10 +237,17 @@ void
 Job::SetProgress(double progress)
 {
 	d_data->progress = progress;
+	d_data->lastUpdate.assign_current_time();
 }
 
 Glib::TimeVal const &
 Job::Started() const
 {
 	return d_data->started;
+}
+
+Glib::TimeVal const &
+Job::LastUpdate() const
+{
+	return d_data->lastUpdate;
 }

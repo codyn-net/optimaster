@@ -66,6 +66,8 @@ namespace optimaster
 			void SetProgress(double progress);
 
 			Glib::TimeVal const &Started() const;
+
+			Glib::TimeVal const &LastUpdate() const;
 		private:
 			struct Data : public Communicator::Data
 			{
@@ -85,6 +87,7 @@ namespace optimaster
 				double progress;
 
 				Glib::TimeVal started;
+				Glib::TimeVal lastUpdate;
 			};
 
 			Data *d_data;

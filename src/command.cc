@@ -406,10 +406,15 @@ Command::Data::FillJob(Job const    &job,
 	cjob.set_id(job.Id());
 	cjob.set_name(job.Name());
 	cjob.set_user(job.User());
+
 	cjob.set_started((size_t)job.Started().as_double());
+	cjob.set_lastupdate((size_t)job.LastUpdate().as_double());
+
 	cjob.set_priority(job.Priority());
 	cjob.set_progress(job.Progress());
 
 	cjob.set_taskssuccess(job.TasksSuccess());
 	cjob.set_tasksfailed(job.TasksFailed());
+
+	cjob.set_runtime(job.AverageRunTime());
 }
