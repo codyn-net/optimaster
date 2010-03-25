@@ -260,28 +260,68 @@ Command::Data::OnClientData(FileDescriptor::DataArgs &args, Client client)
 	for (iter = cmds.begin(); iter != cmds.end(); ++iter)
 	{
 		command::Command &c = *iter;
+		bool invalid = false;
 		
 		switch (c.type())
 		{
 			case command::List:
-				HandleList(client, c.list());
+				if (c.has_list())
+				{
+					HandleList(client, c.list());
+				}
+				else
+				{
+					invalid = true;
+				}
 			break;
 			case command::Info:
-				HandleInfo(client, c.info());
+				if (c.has_info())
+				{
+					HandleInfo(client, c.info());
+				}
+				else
+				{
+					invalid = true;
+				}
 			break;
 			case command::Kill:
-				HandleKill(client, c.kill());
+				if (c.has_kill())
+				{
+					HandleKill(client, c.kill());
+				}
+				else
+				{
+					invalid = true;
+				}
 			break;
 			case command::SetPriority:
-				HandleSetPriority(client, c.setpriority());
+				if (c.has_setpriority())
+				{
+					HandleSetPriority(client, c.setpriority());
+				}
+				else
+				{
+					invalid = true;
+				}
 			break;
 			case command::Authenticate:
-				HandleAuthenticate(client, c.authenticate());
+				if (c.has_authenticate())
+				{
+					HandleAuthenticate(client, c.authenticate());
+				}
+				else
+				{
+					invalid = true;
+				}
 			break;
 			default:
-				/* Write back response... */
-				Respond(client, c.type(), false, "Unknown command");
 			break;
+		}
+
+		if (invalid)
+		{
+			/* Write back response... */
+			Respond(client, c.type(), false, "Invalid command");
 		}
 	}
 }
@@ -304,6 +344,8 @@ Command::Data::CreateResponse(command::CommandType  type,
 	response.set_type(type);
 	response.set_status(status);
 	response.set_message(message);
+
+	return response;
 }
 
 void
