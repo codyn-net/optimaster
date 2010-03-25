@@ -37,6 +37,8 @@ Command::Data::Accept()
 		client.OnData().AddData(*this, &Data::OnClientData, client);
 		client.OnClosed().AddData(*this, &Data::OnClientClosed, client);
 	}
+
+	return client;
 }
 
 void
