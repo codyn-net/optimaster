@@ -6,6 +6,7 @@
 #include <optimization/constants.hh>
 #include <gcrypt.h>
 #include <syslog.h>
+#include <iomanip>
 
 using namespace optimaster;
 using namespace jessevdk::network;
@@ -168,14 +169,23 @@ Command::Data::GenerateChallenge(Client                             &client,
 	unsigned char blk[CHALLENGE_SIZE / 2];
 	stringstream challenge;
 
+	ClientData &data = clientData[client.Fd()];
+
+	if (data.authenticated)
+	{
+		command::Response response = CreateResponse(command::Authenticate, true);
+
+		Respond(client, response);
+		return;
+	}
+
 	gcry_create_nonce(blk, sizeof(blk));
 
 	for (size_t i = 0; i < CHALLENGE_SIZE / 2; ++i)
 	{
-		challenge << hex << blk[i];
+		challenge << hex << setfill('0') << setw(2) << (unsigned short)blk[i];
 	}
 
-	ClientData &data = clientData[client.Fd()];
 	data.challenge = challenge.str();
 	
 	command::Response response = CreateResponse(command::Authenticate, true);
@@ -210,10 +220,12 @@ Command::Data::ValidateChallenge(Client                             &client,
 
 	for (size_t i = 0; i < gcry_md_get_algo_dlen(GCRY_MD_SHA1); ++i)
 	{
-		token << hex << ptr[i];
+		token << hex << setfill('0') << setw(2) << (unsigned short)ptr[i];
 	}
 
 	gcry_md_close(hd);
+
+	data.challenge = "";
 
 	if (command.token() == token.str() && passwd != "")
 	{
@@ -221,7 +233,6 @@ Command::Data::ValidateChallenge(Client                             &client,
 
 		command::Response response = CreateResponse(command::Authenticate,
 		                                            true);
-		response.mutable_authenticate();
 
 		Respond(client, response);
 	}
