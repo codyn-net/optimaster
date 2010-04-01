@@ -31,7 +31,9 @@
 #include "command.hh"
 
 #include <glibmm.h>
+#include <syslog.h>
 #include <jessevdk/network/network.hh>
+#include <jessevdk/db/db.hh>
 
 namespace optimaster
 {
@@ -49,11 +51,30 @@ namespace optimaster
 		sigc::connection d_idleDispatch;
 		Glib::RefPtr<Glib::MainLoop> d_mainLoop;
 
+		double d_idleTime;
+
 		size_t d_tasksFailed;
 		size_t d_tasksSuccess;
-		std::map<std::string, bool> d_activeUsers;
+
+		std::map<std::string, double> d_activeUsers;
+
+		jessevdk::db::sqlite::SQLite d_logStorage;
 
 		public:
+			struct LogType
+			{
+				enum Values
+				{
+					Alert = LOG_ALERT,
+					Critical = LOG_CRIT,
+					Error = LOG_ERR,
+					Warning = LOG_WARNING,
+					Notice = LOG_NOTICE,
+					Information = LOG_INFO,
+					Debug = LOG_DEBUG
+				};
+			};
+
 			/* Constructor/destructor */
 			Application(int &argc, char **&argv);
 			~Application();
@@ -63,6 +84,9 @@ namespace optimaster
 
 			JobManager const &Manager() const;
 			JobManager &Manager();
+
+			void Log(LogType::Values type, std::string const &format, ...);
+			void Log(LogType::Values type, std::string const &user, std::string const &format, ...);
 		private:
 			/* Private functions */
 			void ParseArguments(int &argc, char **&argv);
@@ -97,7 +121,12 @@ namespace optimaster
 			void OnNotifyAvailable();
 			std::string FailureToString(optimization::messages::task::Response::Failure const &failure) const;
 
-			void LogStatus() const;
+			void LogStatus();
+
+			void InitializeLog();
+			void InitializeLogStorage();
+
+			void LogStorage(LogType::Values type, std::string const &user, std::string const &message);
 	};
 }
 

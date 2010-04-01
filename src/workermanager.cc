@@ -286,7 +286,7 @@ WorkerManager::OnWorkerDeactivated(Worker &worker)
 {
 	d_activeWorkers.erase(worker.Id());
 
-	d_idleWorkers.push_back(worker);	
+	d_idleWorkers.push_back(worker);
 	OnNotifyAvailable();
 }
 
@@ -300,4 +300,19 @@ size_t
 WorkerManager::Active() const
 {
 	return d_activeWorkers.size();
+}
+
+double
+WorkerManager::ResetIdleTime()
+{
+	deque<Worker>::iterator iter;
+	double ret;
+
+	for (iter = d_idleWorkers.begin(); iter != d_idleWorkers.end(); ++iter)
+	{
+		ret += iter->IdleTime().elapsed();
+		iter->IdleTime().start();
+	}
+
+	return ret;
 }

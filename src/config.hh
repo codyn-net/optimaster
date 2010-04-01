@@ -50,6 +50,12 @@ namespace optimaster
 
 			/** Command password */
 			Glib::ustring CommandPassword;
+
+			/** Log storage */
+			Glib::ustring LogStorage;
+
+			/** Periodic reporting interval in minutes */
+			int LogInterval;
 			
 			/* Constructor/destructor */
 			static Config &Initialize(std::string const &filename);

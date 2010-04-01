@@ -51,6 +51,8 @@ namespace optimaster
 			jessevdk::base::signals::Signal<Worker> &OnActivated();
 			jessevdk::base::signals::Signal<Worker> &OnDeactivated();
 			jessevdk::base::signals::Signal<Worker> &OnTimeout();
+
+			Glib::Timer &IdleTime();
 		private:
 			/* Private functions */
 			struct Data : public Communicator::Data
@@ -63,6 +65,8 @@ namespace optimaster
 				jessevdk::base::signals::Signal<Worker> onTimeout;
 
 				Task task;
+
+				Glib::Timer idleTime;
 
 				sigc::connection timeout;
 				bool OnTimeout();

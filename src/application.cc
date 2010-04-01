@@ -28,11 +28,11 @@
 #include <sstream>
 #include <jessevdk/network/network.hh>
 #include <vector>
-#include <syslog.h>
 
 using namespace std;
 using namespace optimaster;
 using namespace jessevdk::base;
+using namespace jessevdk::db;
 using namespace jessevdk::os;
 using namespace jessevdk::network;
 using namespace optimization::messages;
@@ -76,8 +76,13 @@ Application::Application(int    &argc,
 
 	d_discovery.Listen();
 
-	Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Application::OnPeriodicLogStatus),
-	                                       1800);
+	Config &config = Config::Instance();
+
+	if (config.LogInterval >= 1)
+	{
+		Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Application::OnPeriodicLogStatus),
+		                                       config.LogInterval * 60);
+	}
 
 	d_command.Listen();
 
@@ -87,9 +92,48 @@ Application::Application(int    &argc,
 	}
 	else
 	{
-		openlog("optimaster", 0, LOG_USER);
-		syslog(LOG_NOTICE, "started");
+		InitializeLog();
+
+		Log(LogType::Notice, "started");
 	}
+}
+
+void
+Application::InitializeLogStorage()
+{
+	if (!d_logStorage)
+	{
+		return;
+	}
+
+	d_logStorage("PRAGMA synchronous = OFF");
+	sqlite::Row row = d_logStorage("pragma table_info(log)");
+
+	if (row && !row.Done())
+	{
+		return;
+	}
+
+	d_logStorage("CREATE TABLE `log` (`date` INT, `type` INT, `user` TEXT, `title` TEXT, `message` TEXT)");
+	d_logStorage("CREATE INDEX date_index ON log(`date`)");
+	d_logStorage("CREATE INDEX type_index ON log(`type`)");
+	d_logStorage("CREATE INDEX user_index ON log(`user`)");
+	d_logStorage("CREATE INDEX title_index ON log(`title`)");
+}
+
+void
+Application::InitializeLog()
+{
+	Config &config = Config::Instance();
+
+	if (config.LogStorage != "")
+	{
+		d_logStorage = sqlite::SQLite(config.LogStorage);
+
+		InitializeLogStorage();
+	}
+
+	openlog("optimaster", 0, LOG_DAEMON);
 }
 
 /**
@@ -113,7 +157,7 @@ Application::~Application()
 
 	d_discovery.OnGreeting().Remove(*this, &Application::OnGreeting);
 
-	syslog(LOG_NOTICE, "stopped");
+	Log(LogType::Notice, "stopped");
 	closelog();
 }
 
@@ -152,6 +196,22 @@ Application::ParseArguments(int    &argc,
 	listen.set_description("Listen address");
 
 	group.add_entry(listen, config.ListenAddress);
+
+	Glib::OptionEntry logStorage;
+
+	logStorage.set_long_name("log-storage");
+	logStorage.set_short_name('s');
+	logStorage.set_description("Log storage");
+
+	group.add_entry(logStorage, config.LogStorage);
+
+	Glib::OptionEntry logInterval;
+
+	logInterval.set_long_name("log-interval");
+	logInterval.set_short_name('i');
+	logInterval.set_description("Log interval (in minutes)");
+
+	group.add_entry(logInterval, config.LogInterval);
 
 	Glib::OptionContext context;
 
@@ -299,10 +359,10 @@ Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop)
 void
 Application::OnJobAdded(Job &job)
 {
-	syslog(LOG_NOTICE,
-	       "job-connected: %lu, %s",
-	       job.Id(),
-	       job.Client().Address().Host(true).c_str());
+	Log(LogType::Notice,
+	    "job-connected: %lu, %s",
+	    job.Id(),
+	    job.Client().Address().Host(true).c_str());
 
 	job.OnCommunication().Add(*this, &Application::OnJobCommunication);
 }
@@ -319,7 +379,7 @@ Application::OnJobRemoved(Job &job)
 {
 	debug_master << "Job disconnected: " << job.Id() << endl;
 
-	syslog(LOG_NOTICE, "job-disconnected: %lu", job.Id());
+	Log(LogType::Notice, "job-disconnected: %lu", job.Id());
 	job.OnCommunication().Remove(*this, &Application::OnJobCommunication);
 
 	// Remove all tasks from the task queue for this job
@@ -357,12 +417,12 @@ Application::HandleJobBatch(Job                 &job,
 	             << job.Id() << "): "
 	             << communication.batch().tasks_size() << endl;
 
-	syslog(LOG_NOTICE,
-	       "job-batch: %lu, %s, %d, %.3f",
-	       job.Id(),
-	       job.User().c_str(),
-	       communication.batch().tasks_size(),
-	       job.Priority());
+	Log(LogType::Notice,
+	    "job-batch: %lu, %s, %d, %.3f",
+	    job.Id(),
+	    job.User().c_str(),
+	    communication.batch().tasks_size(),
+	    job.Priority());
 
 	job.SetProgress(communication.batch().progress());
 
@@ -416,7 +476,9 @@ Application::HandleJobIdentify(Job                       &job,
 		job.SetTimeout(identify.timeout());
 	}
 
-	d_activeUsers[job.User()] = true;
+	d_activeUsers[job.User()] = 0;
+
+	Log(LogType::Notice, "Job identified: %d, %s, %s", job.Id(), job.Name().c_str(), job.User().c_str());
 }
 
 /**
@@ -512,6 +574,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	if (!d_jobManager.Find(task.Group(), job))
 	{
 		debug_worker << "Job no longer connected..." << endl;
+
+		d_activeUsers[job.User()] += worker.IdleTime().elapsed();
 		worker.Deactivate();
 		return;
 	}
@@ -532,6 +596,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			}
 
 			job.Send(args.Communication);
+
+			d_activeUsers[job.User()] += worker.IdleTime().elapsed();
 			worker.Deactivate();
 
 			d_taskQueue.Finished(task);
@@ -560,13 +626,15 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 					             << task.Message().id() << ")" << endl;
 				}
 
-				syslog(LOG_ERR,
-				       "task-failed: %lu, %u, task failed too many times",
-				       task.Group(),
-				       task.Message().id());
+				Log(LogType::Error,
+				    "task-failed: %lu, %u, task failed too many times",
+				    task.Group(),
+				    task.Message().id());
 
 				// Relay failure to job
 				job.Send(args.Communication);
+
+				d_activeUsers[job.User()] += worker.IdleTime().elapsed();
 				worker.Deactivate();
 
 				d_taskQueue.Finished(task);
@@ -584,14 +652,16 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 					             << task.Message().id() << ")" << endl;
 				}
 
-				syslog(LOG_ERR,
-				       "task-failed: %lu, %u, task failed and rescheduling: %s",
-				       task.Group(),
-				       task.Message().id(),
-				       FailureToString(response.failure()).c_str());
+				Log(LogType::Error,
+				    "task-failed: %lu, %u, task failed and rescheduling: %s",
+				    task.Group(),
+				    task.Message().id(),
+				    FailureToString(response.failure()).c_str());
 
 				// Reschedule task
 				d_taskQueue.Push(task);
+
+				d_activeUsers[job.User()] += worker.IdleTime().elapsed();
 				worker.Deactivate();
 			}
 		break;
@@ -647,6 +717,8 @@ Application::OnDispatch()
 	Task task;
 	Worker worker;
 
+	bool didSomething = false;
+
 	// As long as there are idle workers and tasks
 	while (d_workerManager.Idle(worker) && d_taskQueue.Pop(task))
 	{
@@ -654,11 +726,15 @@ Application::OnDispatch()
 		Batch batch;
 		d_taskQueue.Lookup(task.Group(), batch);
 
+		double idleTime = worker.IdleTime().elapsed();
+
 		if (!worker.Activate(task, batch.Timeout()))
 		{
 			d_taskQueue.Push(task);
 			continue;
 		}
+
+		d_idleTime += idleTime;
 
 		Job job;
 		if (d_jobManager.Find(task.Group(), job))
@@ -667,9 +743,13 @@ Application::OnDispatch()
 		}
 
 		debug_master << "Worker activated for: " << task.Group() << " (" << task.Id() << ")" << endl;
+		didSomething = true;
 	}
 
-	LogStatus();
+	if (didSomething)
+	{
+		LogStatus();
+	}
 
 	d_idleDispatch.disconnect();
 	return false;
@@ -800,10 +880,10 @@ Application::FailureToString(task::Response::Failure const &failure) const
 }
 
 void
-Application::LogStatus() const
+Application::LogStatus()
 {
-	syslog(LOG_NOTICE, "workers-status: %lu/%lu", d_workerManager.Active(), d_workerManager.Size());
-	syslog(LOG_NOTICE, "queue-status: %lu", d_taskQueue.Size());
+	Log(LogType::Notice, "workers-status: %lu/%lu", d_workerManager.Active(), d_workerManager.Size());
+	Log(LogType::Notice, "queue-status: %lu", d_taskQueue.Size());
 }
 
 bool
@@ -811,21 +891,21 @@ Application::OnPeriodicLogStatus()
 {
 	LogStatus();
 
-	map<string, bool>::iterator iter;
-	vector<string> users;
+	double idleTime = d_idleTime + d_workerManager.ResetIdleTime();
+
+	Log(LogType::Information, "task-status: %lu/%lu", d_tasksFailed, d_tasksSuccess);
+	Log(LogType::Information, "idle-time: %f", idleTime);
+
+	map<string, double>::iterator iter;
 
 	for (iter = d_activeUsers.begin(); iter != d_activeUsers.end(); ++iter)
 	{
-		users.push_back(iter->first);
+		Log(LogType::Information, "user-status: %s, %f", iter->first.c_str(), iter->second);
 	}
-
-	sort(users.begin(), users.end());
-
-	syslog(LOG_NOTICE, "task-status: %lu/%lu", d_tasksFailed, d_tasksSuccess);
-	syslog(LOG_NOTICE, "user-status: %s", String::Join(users, ", ").c_str());
 
 	d_tasksFailed = 0;
 	d_tasksSuccess = 0;
+	d_idleTime = 0;
 
 	d_activeUsers.clear();
 }
@@ -840,4 +920,59 @@ JobManager &
 Application::Manager()
 {
 	return d_jobManager;
+}
+
+void
+Application::LogStorage(LogType::Values type, string const &user, string const &message)
+{
+	string msg = message;
+	string title;
+
+	size_t colon = msg.find_first_of(":");
+	size_t space = msg.find_first_of(" ");
+
+	if (colon != string::npos && space != string::npos && space == colon + 1)
+	{
+		title = msg.substr(0, colon);
+		msg = msg.substr(space + 1);
+	}
+
+	d_logStorage() << "INSERT INTO `log` (`date`, `type`, `user`, `title`, `message`) "
+	               << "VALUES (" << time(0) << , " << type << ", '"
+	               << String(user).Replace("'", "''") << "', '"
+	               << String(title).Replace("'", "''") << "', '"
+	               << String(msg).Replace("'", "''") << "')"
+	               << sqlite::SQLite::Query::End();
+}
+
+void
+Application::Log(LogType::Values type, string const &format, ...)
+{
+	char buffer[4096];
+
+	va_list ap;
+	va_start(ap, format);
+
+	vsnprintf(buffer, sizeof(buffer) - 1, format.c_str(), ap);
+	va_end(ap);
+
+	syslog(type, "%s", buffer);
+
+	LogStorage(type, "", buffer);
+}
+
+void
+Application::Log(LogType::Values type, string const &user, string const &format, ...)
+{
+	char buffer[4096];
+
+	va_list ap;
+	va_start(ap, format);
+
+	vsnprintf(buffer, sizeof(buffer) - 1, format.c_str(), ap);
+	va_end(ap);
+
+	syslog(type, "%s, (%s)", buffer, user.c_str());
+
+	LogStorage(type, user, buffer);
 }

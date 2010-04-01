@@ -5,7 +5,6 @@
 
 #include <optimization/constants.hh>
 #include <gcrypt.h>
-#include <syslog.h>
 #include <iomanip>
 
 using namespace optimaster;
@@ -238,9 +237,9 @@ Command::Data::ValidateChallenge(Client                             &client,
 	}
 	else
 	{
-		syslog(LOG_ALERT,
-		       "command: invalid authentication from %s",
-		       client.Address().Host(true).c_str());
+		application.Log(Application::LogType::Alert,
+		                "command: invalid authentication from %s",
+		                client.Address().Host(true).c_str());
 
 		command::Response response = CreateResponse(command::Authenticate,
 		                                            false,

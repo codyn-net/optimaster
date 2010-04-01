@@ -53,6 +53,8 @@ namespace optimaster
 			size_t Size() const;
 			size_t Active() const;
 
+			double ResetIdleTime();
+
 			/**
 			  * @brief OnAdded signal
 			  *

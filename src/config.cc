@@ -63,6 +63,7 @@ Config::Config()
 	ListenAddress = s.str();
 	
 	RunTimeEstimation = 10;
+	LogInterval = 15;
 
 	Register("discovery namespace", DiscoveryNamespace);
 	Register("discovery address", DiscoveryAddress);
@@ -70,6 +71,8 @@ Config::Config()
 	Register("max task failures", MaxTaskFailures);
 	Register("runtime estimation", RunTimeEstimation);
 	Register("command password", CommandPassword);
+	Register("log storage", LogStorage);
+	Register("log interval", LogInterval);
 }
 
 /**
