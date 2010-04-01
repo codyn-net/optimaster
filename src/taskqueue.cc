@@ -98,6 +98,7 @@ TaskQueue::Pop(Task &task)
 		maxBatch->Pop(task);
 
 		d_running[maxBatch->Id()][task.Id()] = true;
+
 		--d_size;
 
 		return true;
@@ -191,9 +192,8 @@ TaskQueue::Finished(Task const &task)
 	
 	if (Lookup(task.Group(), batch))
 	{
-		--d_size;
-
 		map<size_t, bool> &mapping = d_running[task.Group()];
+
 		mapping.erase(task.Id());
 
 		if (batch.Empty() && mapping.empty())
