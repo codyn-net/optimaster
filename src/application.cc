@@ -938,7 +938,7 @@ Application::LogStorage(LogType::Values type, string const &user, string const &
 	}
 
 	d_logStorage() << "INSERT INTO `log` (`date`, `type`, `user`, `title`, `message`) "
-	               << "VALUES (" << time(0) << , " << type << ", '"
+	               << "VALUES (" << time(0) << ", " << type << ", '"
 	               << String(user).Replace("'", "''") << "', '"
 	               << String(title).Replace("'", "''") << "', '"
 	               << String(msg).Replace("'", "''") << "')"
