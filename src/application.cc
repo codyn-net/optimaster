@@ -574,8 +574,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	if (!d_jobManager.Find(task.Group(), job))
 	{
 		debug_worker << "Job no longer connected..." << endl;
-
-		d_activeUsers[job.User()] += worker.IdleTime().elapsed();
+		
 		worker.Deactivate();
 		return;
 	}
@@ -596,8 +595,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			}
 
 			job.Send(args.Communication);
-
-			d_activeUsers[job.User()] += worker.IdleTime().elapsed();
+			
+			AddIdleTime(job.User(), worker.IdleTime().elapsed());
 			worker.Deactivate();
 
 			d_taskQueue.Finished(task);
@@ -634,7 +633,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				// Relay failure to job
 				job.Send(args.Communication);
 
-				d_activeUsers[job.User()] += worker.IdleTime().elapsed();
+				AddIdleTime(job.User(), worker.IdleTime().elapsed());
 				worker.Deactivate();
 
 				d_taskQueue.Finished(task);
@@ -660,8 +659,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 
 				// Reschedule task
 				d_taskQueue.Push(task);
-
-				d_activeUsers[job.User()] += worker.IdleTime().elapsed();
+				
+				AddIdleTime(job.User(), worker.IdleTime().elapsed());
 				worker.Deactivate();
 			}
 		break;
@@ -682,6 +681,21 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 		break;
 		default:
 		break;
+	}
+}
+
+void
+Application::AddIdleTime(string const &user, double idleTime)
+{
+	map<string, double>::iterator iter = d_activeUsers.find(user);
+	
+	if (iter != d_activeUsers.end())
+	{
+		iter->second += idleTime;
+	}
+	else
+	{
+		d_activeUsers[user] = idleTime;
 	}
 }
 

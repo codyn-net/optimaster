@@ -127,6 +127,7 @@ namespace optimaster
 			void InitializeLogStorage();
 
 			void LogStorage(LogType::Values type, std::string const &user, std::string const &message);
+			void AddIdleTime(std::string const &user, double idleTime);
 	};
 }
 
