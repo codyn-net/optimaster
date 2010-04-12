@@ -23,13 +23,13 @@
 #ifndef __OPTIMASTER_COMMUNICATOR_H__
 #define __OPTIMASTER_COMMUNICATOR_H__
 
-#include <base/base.hh>
+#include <jessevdk/base/base.hh>
 #include <optimization/messages.hh>
-#include <network/network.hh>
+#include <jessevdk/network/network.hh>
 
 namespace optimaster
 {
-	class Communicator : public base::Object
+	class Communicator : public jessevdk::base::Object
 	{
 		public:
 			struct CommunicationArgs
@@ -53,28 +53,28 @@ namespace optimaster
 			bool operator==(size_t id) const;
 			bool operator==(Communicator const &other) const;
 
-			network::Client &Client();
-			network::Client const &Client() const;
+			jessevdk::network::Client &Client();
+			jessevdk::network::Client const &Client() const;
 
-			base::signals::Signal<CommunicationArgs> &OnCommunication();
-			base::signals::Signal<Communicator> &OnClosed();
+			jessevdk::base::signals::Signal<CommunicationArgs> &OnCommunication();
+			jessevdk::base::signals::Signal<Communicator> &OnClosed();
 		protected:
-			struct Data : public base::Object::PrivateData
+			struct Data : public jessevdk::base::Object::PrivateData
 			{
-				network::Client client;
+				jessevdk::network::Client client;
 
 				size_t id;
 
-				base::signals::Signal<CommunicationArgs> onCommunication;
-				base::signals::Signal<Communicator> onClosed;
+				jessevdk::base::signals::Signal<CommunicationArgs> onCommunication;
+				jessevdk::base::signals::Signal<Communicator> onClosed;
 				
-				void OnData(os::FileDescriptor::DataArgs &args);
+				void OnData(jessevdk::os::FileDescriptor::DataArgs &args);
 				void OnClosed(int fd);
 				
 				~Data();
 			};
 			
-			void Set(Data *data, network::Client const &client);
+			void Set(Data *data, jessevdk::network::Client const &client);
 			Communicator(Data *data);
 		private:
 			Data *d_data;
@@ -95,7 +95,7 @@ namespace optimaster
 		
 		if (optimization::Messages::Create(message, serialized))
 		{
-			d_data->client.write(serialized);
+			d_data->client.Write(serialized);
 			return true;
 		}
 		

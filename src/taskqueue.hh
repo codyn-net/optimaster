@@ -23,7 +23,7 @@
 #ifndef __OPTIMASTER_TASK_QUEUE_H__
 #define __OPTIMASTER_TASK_QUEUE_H__
 
-#include <base/base.hh>
+#include <jessevdk/base/base.hh>
 #include "batch.hh"
 #include <list>
 
@@ -33,13 +33,14 @@ namespace optimaster
 	{
 		std::map<size_t, Batch> d_batches;
 		std::map<size_t, std::map<size_t, bool> > d_running;
+		size_t d_size;
 
 		public:
 			/* Constructor/destructor */
 			TaskQueue();
 
 			/* Public functions */
-			void Push(size_t id, double bias, optimization::messages::task::Batch const &batch);
+			void Push(size_t id, double bias, double priority, double timeout, optimization::messages::task::Batch const &batch);
 			void Push(Task &task);
 
 			bool Pop(Task &item);
@@ -50,12 +51,14 @@ namespace optimaster
 			bool Empty() const;
 			void Remove(size_t id);
 
+			size_t Size() const;
+
 			/**
 			 * @brief OnNotifyAvailable signal
 			 *
 			 * Signal emitted when new tasks are available on the queue
 			 */
-			base::signals::Signal<> OnNotifyAvailable;
+			jessevdk::base::signals::Signal<> OnNotifyAvailable;
 		private:
 	};
 }

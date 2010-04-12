@@ -23,7 +23,7 @@
 #ifndef __OPTIMASTER_WORKER_H__
 #define __OPTIMASTER_WORKER_H__
 
-#include <network/network.hh>
+#include <jessevdk/network/network.hh>
 #include <optimization/optimization.hh>
 
 #include "communicator.hh"
@@ -36,7 +36,7 @@ namespace optimaster
 		public:
 			/* Constructor/destructor */
 			Worker();
-			Worker(network::AddressInfo &info);
+			Worker(jessevdk::network::AddressInfo &info);
 
 			/* Public functions */
 			bool Activate(Task &task, double timeout);
@@ -48,9 +48,11 @@ namespace optimaster
 			Task const &ActiveTask() const;
 			Task &ActiveTask();
 
-			base::signals::Signal<Worker> &OnActivated();
-			base::signals::Signal<Worker> &OnDeactivated();
-			base::signals::Signal<Worker> &OnTimeout();
+			jessevdk::base::signals::Signal<Worker> &OnActivated();
+			jessevdk::base::signals::Signal<Worker> &OnDeactivated();
+			jessevdk::base::signals::Signal<Worker> &OnTimeout();
+
+			Glib::Timer &IdleTime();
 		private:
 			/* Private functions */
 			struct Data : public Communicator::Data
@@ -58,11 +60,13 @@ namespace optimaster
 				/* Instance data */
 				bool active;
 
-				base::signals::Signal<Worker> onActivated;
-				base::signals::Signal<Worker> onDeactivated;
-				base::signals::Signal<Worker> onTimeout;
+				jessevdk::base::signals::Signal<Worker> onActivated;
+				jessevdk::base::signals::Signal<Worker> onDeactivated;
+				jessevdk::base::signals::Signal<Worker> onTimeout;
 
 				Task task;
+
+				Glib::Timer idleTime;
 
 				sigc::connection timeout;
 				bool OnTimeout();

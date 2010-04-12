@@ -28,16 +28,16 @@
 
 namespace optimaster
 {
-	class Batch : public base::Object
+	class Batch : public jessevdk::base::Object
 	{
-		struct Data : public base::Object::PrivateData
+		struct Data : public jessevdk::base::Object::PrivateData
 		{
 			size_t id;
 			std::deque<Task> tasks;
-			
+
 			double priority;
 			double timeout;
-			
+
 			double waitTime;
 			double bias;
 		};
@@ -46,7 +46,11 @@ namespace optimaster
 		
 		public:
 			Batch();
-			Batch(size_t idx, double bias, optimization::messages::task::Batch const &batch);
+			Batch(size_t                                     idx,
+			      double                                     bias,
+			      double                                     priority,
+			      double                                     timeout,
+			      optimization::messages::task::Batch const &batch);
 
 			size_t Id() const;
 
@@ -58,6 +62,7 @@ namespace optimaster
 			bool Pop(Task &task);
 			
 			bool Empty() const;
+			size_t Size() const;
 
 			bool operator==(size_t id) const;
 			bool operator>(Batch const &other) const;
@@ -66,7 +71,7 @@ namespace optimaster
 			void WaitReset();
 			double WaitTime() const;
 
-			virtual Batch *clone() const;
+			virtual Batch *Clone() const;
 	};
 }
 

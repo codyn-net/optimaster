@@ -25,7 +25,7 @@
 
 using namespace std;
 using namespace optimaster;
-using namespace base;
+using namespace jessevdk::base;
 using namespace optimization::messages;
 
 /**
@@ -42,6 +42,8 @@ using namespace optimization::messages;
  *
  */
 TaskQueue::TaskQueue()
+:
+	d_size(0)
 {
 }
 
@@ -97,6 +99,8 @@ TaskQueue::Pop(Task &task)
 
 		d_running[maxBatch->Id()][task.Id()] = true;
 
+		--d_size;
+
 		return true;
 	}
 	else
@@ -117,6 +121,8 @@ TaskQueue::Pop(Task &task)
 void
 TaskQueue::Push(size_t             id,
                 double             bias,
+                double             priority,
+                double             timeout,
                 task::Batch const &batch)
 {
 	if (batch.tasks_size() == 0)
@@ -130,7 +136,7 @@ TaskQueue::Push(size_t             id,
 	{
 		debug_scheduler << "Scheduled existing batch: [id = " << id << ", bias = " << bias << "]: " << batch.tasks_size() << endl;
 
-		for (size_t i = 0; i < batch.tasks_size(); ++i)
+		for (int i = 0; i < batch.tasks_size(); ++i)
 		{
 			Task task = Task(id, batch.tasks(i));
 			ret.Push(task);
@@ -141,9 +147,11 @@ TaskQueue::Push(size_t             id,
 	{
 		debug_scheduler << "Scheduled new batch: [id = " << id << ", bias = " << bias << "]: " << batch.tasks_size() << endl;
 
-		d_batches[id] = Batch(id, bias, batch);
+		d_batches[id] = Batch(id, bias, priority, timeout, batch);
 		d_running[id] = map<size_t, bool>();
 	}
+
+	d_size += batch.tasks_size();
 
 	OnNotifyAvailable();
 }
@@ -167,6 +175,8 @@ TaskQueue::Push(Task &task)
 		batch.Push(task);
 		d_running[batch.Id()].erase(task.Id());
 
+		++d_size;
+
 		OnNotifyAvailable();
 	}
 	else
@@ -183,6 +193,7 @@ TaskQueue::Finished(Task const &task)
 	if (Lookup(task.Group(), batch))
 	{
 		map<size_t, bool> &mapping = d_running[task.Group()];
+
 		mapping.erase(task.Id());
 
 		if (batch.Empty() && mapping.empty())
@@ -209,6 +220,8 @@ TaskQueue::Remove(size_t id)
 	{
 		debug_scheduler << "Removing batch: [id = " << id << "]" << endl;
 
+		d_size -= iter->second.Size();
+
 		d_batches.erase(iter);
 		d_running.erase(id);
 	}
@@ -226,4 +239,10 @@ TaskQueue::Lookup(size_t id, Batch &batch)
 	}
 	
 	return false;
+}
+
+size_t
+TaskQueue::Size() const
+{
+	return d_size;
 }

@@ -23,7 +23,7 @@
 #ifndef __OPTIMASTER_WORKER_MANAGER_H__
 #define __OPTIMASTER_WORKER_MANAGER_H__
 
-#include <base/base.hh>
+#include <jessevdk/base/base.hh>
 #include "worker.hh"
 #include "task.hh"
 
@@ -50,26 +50,31 @@ namespace optimaster
 
 			bool Idle(Worker &worker);
 
+			size_t Size() const;
+			size_t Active() const;
+
+			double ResetIdleTime();
+
 			/**
- * @brief OnAdded signal
+			  * @brief OnAdded signal
 			  *
 			  * Signal emitted when a worker was added to the manager.
 			  */
-			base::signals::Signal<Worker> OnAdded;
+			jessevdk::base::signals::Signal<Worker> OnAdded;
 			
 			/**
- * @brief OnRemoved signal
+			  * @brief OnRemoved signal
 			  *
 			  * Signal emitted when a worker was removed to the manager.
 			  */
-			base::signals::Signal<Worker> OnRemoved;
+			jessevdk::base::signals::Signal<Worker> OnRemoved;
 			
 			/**
- * @brief OnNotifyAvailable signal
+			  * @brief OnNotifyAvailable signal
 			  *
 			  * Signal emitted when a worker has become idle
 			  */
-			base::signals::Signal<> OnNotifyAvailable;
+			jessevdk::base::signals::Signal<> OnNotifyAvailable;
 		private:
 			/* Private functions */
 			void OnWorkerClosed(Communicator &communicator);

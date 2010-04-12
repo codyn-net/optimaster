@@ -27,11 +27,11 @@
 
 using namespace std;
 using namespace optimaster;
-using namespace network;
+using namespace jessevdk::network;
 using namespace optimization;
 using namespace optimization::messages;
-using namespace base;
-using namespace base::signals;
+using namespace jessevdk::base;
+using namespace jessevdk::base::signals;
 
 /**
  * @class optimaster::Worker
@@ -67,6 +67,8 @@ Worker::Worker(Data *data)
 	Communicator(data)
 {
 	d_data = data;
+
+	d_data->idleTime.start();
 }
 
 /**
@@ -81,11 +83,13 @@ Worker::Worker(Data *data)
 Worker::Worker(AddressInfo &info)
 {
 	d_data = new Data();
-	addPrivateData(d_data);
+	AddPrivateData(d_data);
 	
 	d_data->active = false;
 
-	Set(d_data, network::Client::resolve<network::Client>(info));
+	Set(d_data, jessevdk::network::Client::Resolve<jessevdk::network::Client>(info));
+
+	d_data->idleTime.start();
 }
 
 /**
@@ -186,13 +190,15 @@ Worker::Activate(Task &task, double timeout)
 	if (Send(communication))
 	{
 		d_data->active = true;
+		d_data->idleTime.start();
+
 		task.Begin();
-		
+
 		if (timeout > 0)
 		{
-			d_data->timeout = Glib::signal_timeout().connect(sigc::mem_fun(*d_data, &Worker::Data::OnTimeout), (unsigned int)(timeout * 1000));
+			d_data->timeout = Glib::signal_timeout().connect_seconds(sigc::mem_fun(*d_data, &Worker::Data::OnTimeout), (unsigned int)(timeout));
 		}
-		
+
 		d_data->onActivated(*this);
 
 		return true;
@@ -201,6 +207,12 @@ Worker::Activate(Task &task, double timeout)
 	{
 		return false;
 	}
+}
+
+Glib::Timer &
+Worker::IdleTime()
+{
+	return d_data->idleTime;
 }
 
 /**
@@ -221,6 +233,8 @@ Worker::Deactivate()
 	{
 		d_data->timeout.disconnect();
 	}
+
+	d_data->idleTime.start();
 
 	d_data->task.End();
 	d_data->active = false;

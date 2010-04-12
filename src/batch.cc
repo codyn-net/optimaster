@@ -40,20 +40,24 @@ using namespace optimization::messages;
  * Create a new batch object.
  * \fn Batch::Batch(size_t id, optimization::messages::batch::Batch const &batch)
  */
-Batch::Batch(size_t id, double bias, task::Batch const &batch) 
+Batch::Batch(size_t             id,
+             double             bias,
+             double             priority,
+             double             timeout,
+             task::Batch const &batch)
 {
 	d_data = new Data();
-	addPrivateData(d_data);
+	AddPrivateData(d_data);
 	
 	d_data->id = id;
 	d_data->bias = bias > 0 ? bias : 1;
 
-	d_data->timeout = batch.has_timeout() ? batch.timeout() : -1;
-	d_data->priority = batch.priority();
+	d_data->timeout = timeout;
+	d_data->priority = priority;
 	d_data->waitTime = 0;
 
 	// Create tasks from the batch
-	for (size_t i = 0; i < batch.tasks_size(); ++i)
+	for (int i = 0; i < batch.tasks_size(); ++i)
 	{
 		Push(Task(id, batch.tasks(i)));
 	}
@@ -80,7 +84,7 @@ Batch::Batch()
  *
  */
 Batch *
-Batch::clone() const
+Batch::Clone() const
 {
 	return new Batch(*this);
 }
@@ -175,7 +179,14 @@ Batch::WaitTime() const
 	return d_data->waitTime;
 }
 
-bool Batch::operator>(Batch const &other) const
+bool
+Batch::operator>(Batch const &other) const
 {
 	return WaitTime() > other.WaitTime();
+}
+
+size_t
+Batch::Size() const
+{
+	return d_data->tasks.size();
 }

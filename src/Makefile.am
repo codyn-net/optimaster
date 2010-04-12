@@ -20,10 +20,11 @@ optimaster_SOURCES = \
 	optimaster.cc \
 	application.cc \
 	batch.cc \
+	command.cc \
 	config.cc \
 	communicator.cc \
-	optimizer.cc \
-	optimizermanager.cc \
+	job.cc \
+	jobmanager.cc \
 	task.cc \
 	taskqueue.cc \
 	worker.cc \
@@ -32,11 +33,12 @@ optimaster_SOURCES = \
 noinst_HEADERS = \
 	application.hh \
 	batch.hh \
+	command.hh \
 	config.hh \
 	communicator.hh \
 	debug.hh \
-	optimizer.hh \
-	optimizermanager.hh \
+	job.hh \
+	jobmanager.hh \
 	task.hh \
 	taskqueue.hh \
 	worker.hh \
