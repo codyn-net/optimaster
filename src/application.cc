@@ -509,6 +509,8 @@ Application::OnJobCommunication(Job::CommunicationArgs &args)
 		case task::Communication::CommunicationIdentify:
 			HandleJobIdentify(job, args.Communication);
 		break;
+		default:
+		break;
 	}
 }
 
@@ -922,6 +924,7 @@ Application::OnPeriodicLogStatus()
 	d_idleTime = 0;
 
 	d_activeUsers.clear();
+	return true;
 }
 
 JobManager const &

@@ -136,7 +136,7 @@ TaskQueue::Push(size_t             id,
 	{
 		debug_scheduler << "Scheduled existing batch: [id = " << id << ", bias = " << bias << "]: " << batch.tasks_size() << endl;
 
-		for (size_t i = 0; i < batch.tasks_size(); ++i)
+		for (int i = 0; i < batch.tasks_size(); ++i)
 		{
 			Task task = Task(id, batch.tasks(i));
 			ret.Push(task);

@@ -306,7 +306,7 @@ double
 WorkerManager::ResetIdleTime()
 {
 	deque<Worker>::iterator iter;
-	double ret;
+	double ret = 0;
 
 	for (iter = d_idleWorkers.begin(); iter != d_idleWorkers.end(); ++iter)
 	{

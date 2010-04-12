@@ -57,7 +57,7 @@ Batch::Batch(size_t             id,
 	d_data->waitTime = 0;
 
 	// Create tasks from the batch
-	for (size_t i = 0; i < batch.tasks_size(); ++i)
+	for (int i = 0; i < batch.tasks_size(); ++i)
 	{
 		Push(Task(id, batch.tasks(i)));
 	}
