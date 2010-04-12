@@ -916,7 +916,7 @@ Application::OnPeriodicLogStatus()
 
 	for (iter = d_activeUsers.begin(); iter != d_activeUsers.end(); ++iter)
 	{
-		Log(LogType::Information, "user-status: %s, %f", iter->first.c_str(), iter->second);
+		Log(LogType::Information, iter->first.c_str(), "user-status: %f", iter->second);
 	}
 
 	d_tasksFailed = 0;
