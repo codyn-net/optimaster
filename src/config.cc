@@ -61,6 +61,10 @@ Config::Config()
 	s.str("");
 	s << ":" << optimization::Constants::MasterPort;
 	ListenAddress = s.str();
+
+	s.str("");
+	s << ":" << optimization::Constants::CommandPort;
+	CommandAddress = s.str();
 	
 	RunTimeEstimation = 10;
 	LogInterval = 15;
@@ -73,6 +77,7 @@ Config::Config()
 	Register("command password", CommandPassword);
 	Register("log storage", LogStorage);
 	Register("log interval", LogInterval);
+	Register("command address", CommandAddress);
 }
 
 /**

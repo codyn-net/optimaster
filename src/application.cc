@@ -213,6 +213,14 @@ Application::ParseArguments(int    &argc,
 
 	group.add_entry(logInterval, config.LogInterval);
 
+	Glib::OptionEntry commandAddress;
+
+	commandAddress.set_long_name("command-address");
+	commandAddress.set_short_name('c');
+	commandAddress.set_description("Command address");
+
+	group.add_entry(commandAddress, config.CommandAddress);
+
 	Glib::OptionContext context;
 
 	context.set_main_group(group);
@@ -272,6 +280,23 @@ Application::ParseArguments(int    &argc,
 	}
 
 	d_jobManager.Set(parts[0], parts[1]);
+
+	parts = String(config.CommandAddress).Split(":", 2);
+
+	if (parts.size() == 1 || parts[1] == "")
+	{
+		if (parts.size() == 1)
+		{
+			parts.push_back("");
+		}
+
+		stringstream s;
+		s << optimization::Constants::CommandPort;
+
+		parts[1] = s.str();
+	}
+
+	d_command.Set(parts[0], parts[1]);
 }
 
 struct DebugInfo
@@ -564,7 +589,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 
 	if (!d_workerManager.Find(args.Source.Id(), worker))
 	{
-		debug_worker << "Could not find worker: " << worker.Id() << endl;
+		debug_master << "Could not find worker: " << worker.Id() << endl;
 		return;
 	}
 
@@ -575,7 +600,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	// Check if the job for this task is still present
 	if (!d_jobManager.Find(task.Group(), job))
 	{
-		debug_worker << "Job no longer connected..." << endl;
+		debug_master << "Job no longer connected..." << endl;
 		
 		worker.Deactivate();
 		return;
@@ -619,7 +644,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				// Task failed too many times
 				if (Debug::Enabled(optimization::Debug::Domain::Worker))
 				{
-					debug_worker << "Task failed to many times ("
+					debug_master << "Task failed to many times ("
 					             << worker.Client().Address().Host(true)
 					             << ":"
 					             << worker.Client().Address().Port(true)
@@ -646,7 +671,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				// faulty worker, or maybe some network problems
 				if (Debug::Enabled(optimization::Debug::Domain::Worker))
 				{
-					debug_worker << "Task failed (" << FailureToString(response.failure()) << "), rescheduling ("
+					debug_master << "Task failed (" << FailureToString(response.failure()) << "), rescheduling ("
 					             << worker.Client().Address().Host(true) <<
 					             ":" << worker.Client().Address().Port(true)
 					             << ") for (" << task.Group() << ", "
