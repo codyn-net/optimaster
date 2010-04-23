@@ -269,7 +269,7 @@ Worker::Cancel()
 		return true;
 	}
 
-	return true;
+	return false;
 }
 
 /**
