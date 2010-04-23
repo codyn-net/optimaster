@@ -107,7 +107,7 @@ Communicator::Set(Data *data, jessevdk::network::Client const &client)
 {
 	d_data = data;
 	d_data->client = client;
-	
+
 	d_data->id = static_cast<size_t>(client.Fd());
 
 	d_data->client.OnData().Add(*d_data, &Data::OnData);
@@ -160,7 +160,7 @@ Communicator::operator==(Communicator const &other) const
 
 /**
  * @brief Communication received signal.
- * 
+ *
  * Get the signal object which is fired when a communication message has been
  * received.
  *
@@ -175,7 +175,7 @@ Communicator::OnCommunication()
 
 /**
  * @brief Connection closed signal.
- * 
+ *
  * Get the signal object which is fired when the connection
  * is closed.
  *
@@ -191,7 +191,7 @@ Communicator::OnClosed()
 /**
  * @brief Data received callback.
  * @param args The received data argument
- * 
+ *
  * Callback called when data has been received from the worker.
  *
  */
@@ -214,7 +214,7 @@ Communicator::Data::OnData(jessevdk::os::FileDescriptor::DataArgs &args)
 /**
  * @brief Connection closed callback.
  * @param fd The connection file descriptor
- * 
+ *
  * Callback called when the connection with the worker is closed.
  *
  */
@@ -222,7 +222,7 @@ void
 Communicator::Data::OnClosed(int fd)
 {
 	Communicator shell(this);
-	
+
 	// Keep it ALIVE!
 	Ref();
 	onClosed(shell);

@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -61,14 +61,14 @@ JobManager::JobManager()
 JobManager::~JobManager()
 {
 	d_server.OnNewConnection().Remove(*this, &JobManager::OnNewConnection);
-	
+
 	map<int, Job>::iterator iter;
-	
+
 	for (iter = d_jobs.begin(); iter != d_jobs.end(); ++iter)
 	{
 		iter->second.OnClosed().Remove(*this, &JobManager::OnJobClosed);
 	}
-	
+
 	d_jobs.clear();
 }
 
@@ -83,13 +83,13 @@ JobManager::~JobManager()
  *
  */
 bool
-JobManager::Find(size_t     id, 
+JobManager::Find(size_t     id,
                        Job &job)
 {
 	map<int, Job>::iterator found;
-	
+
 	found = d_jobs.find(id);
-	
+
 	if (found != d_jobs.end())
 	{
 		job = found->second;
@@ -123,7 +123,7 @@ void
 JobManager::OnJobClosed(Communicator &communicator)
 {
 	Job job;
-	
+
 	if (Find(communicator.Id(), job))
 	{
 		OnRemoved(job);
@@ -138,7 +138,7 @@ JobManager::OnNewConnection(Client &client)
 	d_jobs[job.Id()] = job;
 
 	job.OnClosed().Add(*this, &JobManager::OnJobClosed);
-	
+
 	if (jessevdk::base::Debug::Enabled(optimization::Debug::Domain::Master))
 	{
 		debug_master << "New job connected: "

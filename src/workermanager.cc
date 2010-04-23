@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -52,7 +52,7 @@ using namespace jessevdk::network;
  *
  */
 bool
-WorkerManager::Add(std::string const &connection, Worker &worker) 
+WorkerManager::Add(std::string const &connection, Worker &worker)
 {
 	// Check if the worker already exists
 	if (d_workersHash.find(connection) != d_workersHash.end())
@@ -105,7 +105,7 @@ WorkerManager::~WorkerManager()
 {
 	map<size_t, Worker> workers = d_workers;
 	map<size_t, Worker>::iterator iter;
-	
+
 	for (iter = workers.begin(); iter != workers.end(); ++iter)
 	{
 		RemoveWorker(iter->second);

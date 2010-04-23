@@ -186,7 +186,7 @@ Command::Data::GenerateChallenge(Client                             &client,
 	}
 
 	data.challenge = challenge.str();
-	
+
 	command::Response response = CreateResponse(command::Authenticate, true);
 	response.mutable_authenticate()->set_challenge(data.challenge.c_str());
 
@@ -276,7 +276,7 @@ Command::Data::OnClientData(FileDescriptor::DataArgs &args, Client client)
 	{
 		command::Command &c = *iter;
 		bool invalid = false;
-		
+
 		switch (c.type())
 		{
 			case command::List:

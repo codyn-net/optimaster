@@ -26,7 +26,7 @@
 
 using namespace optimaster;
 
-int 
+int
 main(int argc, char *argv[])
 {
 	Glib::init();

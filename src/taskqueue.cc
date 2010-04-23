@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -167,11 +167,11 @@ void
 TaskQueue::Push(Task &task)
 {
 	Batch batch;
-	
+
 	if (Lookup(task.Group(), batch))
 	{
 		debug_scheduler << "Pushing single task in batch: [group = " << task.Group() << ", id = " << task.Id() << "]" << endl;
-		
+
 		batch.Push(task);
 		d_running[batch.Id()].erase(task.Id());
 
@@ -189,7 +189,7 @@ void
 TaskQueue::Finished(Task const &task)
 {
 	Batch batch;
-	
+
 	if (Lookup(task.Group(), batch))
 	{
 		map<size_t, bool> &mapping = d_running[task.Group()];
@@ -237,7 +237,7 @@ TaskQueue::Lookup(size_t id, Batch &batch)
 		batch = iter->second;
 		return true;
 	}
-	
+
 	return false;
 }
 

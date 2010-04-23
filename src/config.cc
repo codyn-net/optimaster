@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -51,13 +51,13 @@ Config::Config()
 
 	MaxTaskFailures = 5;
 	DiscoveryAddress = s.str();
-	
+
 	string user;
 	if (Environment::Variable("USER", user))
 	{
 		DiscoveryNamespace = user;
 	}
-	
+
 	s.str("");
 	s << ":" << optimization::Constants::MasterPort;
 	ListenAddress = s.str();
@@ -65,7 +65,7 @@ Config::Config()
 	s.str("");
 	s << ":" << optimization::Constants::CommandPort;
 	CommandAddress = s.str();
-	
+
 	RunTimeEstimation = 10;
 	LogInterval = 15;
 
@@ -96,7 +96,7 @@ Config::Initialize(string const &filename)
 	{
 		s_instance = new Config();
 	}
-	
+
 	s_instance->Read(filename);
 	return *s_instance;
 }

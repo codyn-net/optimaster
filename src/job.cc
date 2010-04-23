@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -79,7 +79,7 @@ Job::Job()
  * @brief Callback called when worker is deactivated.
  * @param worker the worker
  *
- * Called when a worker that was executing a task for the job was 
+ * Called when a worker that was executing a task for the job was
  * deactivated.
  *
  */
@@ -93,13 +93,13 @@ Job::Data::OnWorkerDeactivated(Worker &worker)
 	activeWorkers.erase(iter, activeWorkers.end());
 
 	worker.OnDeactivated().Remove(*this, &Job::Data::OnWorkerDeactivated);
-	
+
 	Config &config = Config::Instance();
 	while (lastRunTimes.size() > config.RunTimeEstimation - 1)
 	{
 		lastRunTimes.pop_front();
 	}
-	
+
 	lastRunTimes.push_back(worker.ActiveTask().LastRunTime());
 }
 
@@ -107,7 +107,7 @@ Job::Data::OnWorkerDeactivated(Worker &worker)
  * @brief Add worker activated for the job.
  * @param worker the worker
  *
- * This should be called when a worker is activated for a task of the 
+ * This should be called when a worker is activated for a task of the
  * job. The job keeps track of which workers are executing tasks
  * belonging to the job.
  *
@@ -134,7 +134,7 @@ Job::ActiveWorkers()
 }
 
 /** \brief Get average task run time.
- * 
+ *
  * Returns the average run time of tasks from this job.
  *
  * @return: Average run time in seconds
@@ -145,12 +145,12 @@ double
 Job::AverageRunTime() const
 {
 	size_t num = d_data->lastRunTimes.size();
-	
+
 	if (num == 0)
 	{
 		return 0;
 	}
-	
+
 	double sum = std::accumulate(d_data->lastRunTimes.begin(), d_data->lastRunTimes.end(), 0.0);
 	return sum / num;
 }

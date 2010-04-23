@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -169,9 +169,9 @@ Application::~Application()
  * Parses command line arguments.
  *
  */
-void 
-Application::ParseArguments(int    &argc, 
-                            char **&argv) 
+void
+Application::ParseArguments(int    &argc,
+                            char **&argv)
 {
 	// Parse config file first
 	optimaster::Config &config = optimaster::Config::Initialize(CONFDIR "/optimaster.conf");
@@ -342,7 +342,7 @@ Application::EnableEnvironment()
  *
  */
 void
-Application::OnGreeting(optimization::Discovery::Info &info) 
+Application::OnGreeting(optimization::Discovery::Info &info)
 {
 	string protocol;
 	string host = info.Host;
@@ -368,7 +368,7 @@ Application::OnGreeting(optimization::Discovery::Info &info)
  *
  */
 bool
-Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop) 
+Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop)
 {
 	loop->quit();
 	return true;
@@ -413,11 +413,12 @@ Application::OnJobRemoved(Job &job)
 	// Cancel all the workers that are still active for this job
 	vector<Worker> activeWorkers = job.ActiveWorkers();
 	vector<Worker>::iterator iter;
-	
+
 	for (iter = activeWorkers.begin(); iter != activeWorkers.end(); ++iter)
 	{
 		if (!iter->Cancel())
 		{
+			// Still need to deactivate if cancel failed actually
 			iter->Deactivate();
 		}
 	}
@@ -468,7 +469,7 @@ Application::HandleJobToken(Job                 &job,
 {
 	// Relay the token response back to the worker
 	vector<Worker>::iterator iter;
-	
+
 	for (iter = job.ActiveWorkers().begin();
 	     iter != job.ActiveWorkers().end();
 	     ++iter)
@@ -517,7 +518,7 @@ void
 Application::OnJobCommunication(Job::CommunicationArgs &args)
 {
 	Job job;
-	
+
 	if (!d_jobManager.Find(args.Source.Id(), job))
 	{
 		return;
@@ -587,6 +588,12 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 {
 	Worker worker;
 
+	if (args.Communication.type() != task::Communication::CommunicationResponse)
+	{
+		debug_master << "Received something else: " << args.Communication.type() << endl;
+		return;
+	}
+
 	if (!d_workerManager.Find(args.Source.Id(), worker))
 	{
 		debug_master << "Could not find worker: " << worker.Id() << endl;
@@ -601,7 +608,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	if (!d_jobManager.Find(task.Group(), job))
 	{
 		debug_master << "Job no longer connected..." << endl;
-		
+
 		worker.Deactivate();
 		return;
 	}
@@ -622,7 +629,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			}
 
 			job.Send(args.Communication);
-			
+
 			AddIdleTime(job.User(), worker.IdleTime().elapsed());
 			worker.Deactivate();
 
@@ -686,7 +693,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 
 				// Reschedule task
 				d_taskQueue.Push(task);
-				
+
 				AddIdleTime(job.User(), worker.IdleTime().elapsed());
 				worker.Deactivate();
 			}
@@ -715,7 +722,7 @@ void
 Application::AddIdleTime(string const &user, double idleTime)
 {
 	map<string, double>::iterator iter = d_activeUsers.find(user);
-	
+
 	if (iter != d_activeUsers.end())
 	{
 		iter->second += idleTime;
@@ -804,13 +811,13 @@ Application::OnDispatch()
  *
  */
 void
-Application::Run(Glib::RefPtr<Glib::MainLoop> loop) 
+Application::Run(Glib::RefPtr<Glib::MainLoop> loop)
 {
 	if (!d_jobManager)
 	{
 		return;
 	}
-	
+
 	jessevdk::os::Signals::Install();
 	jessevdk::os::Signals::OnInterrupt.AddData(*this, &Application::OnInterrupt, loop);
 
@@ -876,7 +883,7 @@ Application::OnWorkerTimeout(Worker &worker)
 	// Reschedule and cancel
 	Task task = worker.ActiveTask();
 	worker.Cancel();
-	
+
 	d_taskQueue.Push(task);
 }
 
