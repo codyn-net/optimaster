@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -40,7 +40,7 @@ using namespace jessevdk::base::signals;
 
 /**
  * @brief Create stub worker.
- * 
+ *
  * Constructor.
  *
  * Creates an empty stub worker object. You cannot use this object since it
@@ -55,7 +55,7 @@ Worker::Worker()
 
 /** \brief Worker shell constructor.
  * @param data Worker data
- * 
+ *
  * Constructor.
  *
  * Creates a worker shell around worker data.
@@ -84,7 +84,7 @@ Worker::Worker(AddressInfo &info)
 {
 	d_data = new Data();
 	AddPrivateData(d_data);
-	
+
 	d_data->active = false;
 
 	Set(d_data, jessevdk::network::Client::Resolve<jessevdk::network::Client>(info));
@@ -94,7 +94,7 @@ Worker::Worker(AddressInfo &info)
 
 /**
  * @brief Get the current worker task.
- * 
+ *
  * Get the task currently being executed by the worker.
  *
  * @return: the current task
@@ -108,7 +108,7 @@ Worker::ActiveTask()
 
 /**
  * @brief Get the current worker task (const).
- * 
+ *
  * Get the task currently being executed by the worker.
  *
  * @return: the current task
@@ -150,7 +150,7 @@ Worker::OnDeactivated()
 }
 
 /** \brief Signal emitted when worker timeout occurred.
- * 
+ *
  * This signal is emitted when the worker has not responded within the timeout
  * set on the task.
  *
@@ -166,14 +166,14 @@ Worker::OnTimeout()
 /**
  * @brief Send task to the worker.
  * @param task The task to send to the worker
- * 
+ *
  * Send a task to the worker to be executed.
  *
  * @return: true if the task was send or false otherwise
  *
  */
 bool
-Worker::Activate(Task &task, double timeout) 
+Worker::Activate(Task &task, double timeout)
 {
 	if (d_data->active)
 	{
@@ -228,17 +228,31 @@ Worker::Deactivate()
 	{
 		return;
 	}
-	
+
 	if (d_data->timeout)
 	{
 		d_data->timeout.disconnect();
 	}
+
+	d_data->totalActiveTime[d_data->task.Group()] += d_data->idleTime.elapsed();
 
 	d_data->idleTime.start();
 
 	d_data->task.End();
 	d_data->active = false;
 	d_data->onDeactivated(*this);
+}
+
+map<size_t, double> const &
+Worker::TotalActiveTime() const
+{
+	return d_data->totalActiveTime;
+}
+
+void
+Worker::ResetTotalActiveTime()
+{
+	d_data->totalActiveTime.clear();
 }
 
 /**
@@ -257,10 +271,10 @@ Worker::Cancel()
 	{
 		return false;
 	}
-	
+
 	task::Communication communication;
 	communication.set_type(task::Communication::CommunicationCancel);
-	
+
 	communication.mutable_cancel()->set_id(d_data->task.Message().id());
 
 	if (Send(communication))
@@ -269,7 +283,7 @@ Worker::Cancel()
 		return true;
 	}
 
-	return true;
+	return false;
 }
 
 /**
@@ -291,7 +305,7 @@ Worker::Data::OnTimeout()
 {
 	Worker shell(this);
 	onTimeout(shell);
-	
+
 	timeout.disconnect();
 	return false;
 }

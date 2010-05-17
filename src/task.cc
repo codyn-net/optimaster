@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -40,11 +40,11 @@ using namespace optimization::messages;
  * Create a new task object.
  * \fn Task::Task(size_t group, optimization::messages::task::Task const &task)
  */
-Task::Task(size_t group, task::Task const &task) 
+Task::Task(size_t group, task::Task const &task)
 {
 	d_data = new Data();
 	AddPrivateData(d_data);
-	
+
 	d_data->group = group;
 	d_data->task = task;
 	d_data->failures = 0;
@@ -163,7 +163,7 @@ Task::End()
 {
 	Glib::TimeVal tv;
 	tv.assign_current_time();
-	
+
 	d_data->lastRunTime = (tv - d_data->started).as_double();
 }
 

@@ -56,6 +56,9 @@ namespace optimaster
 
 			/** Periodic reporting interval in minutes */
 			int LogInterval;
+
+			/** Address on which to listen for commands. */
+			Glib::ustring CommandAddress;
 			
 			/* Constructor/destructor */
 			static Config &Initialize(std::string const &filename);

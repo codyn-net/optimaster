@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -80,8 +80,13 @@ Application::Application(int    &argc,
 
 	if (config.LogInterval >= 1)
 	{
+		d_interval = config.LogInterval * 60;
 		Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Application::OnPeriodicLogStatus),
-		                                       config.LogInterval * 60);
+		                                       d_interval);
+	}
+	else
+	{
+		d_interval = 0;
 	}
 
 	d_command.Listen();
@@ -169,9 +174,9 @@ Application::~Application()
  * Parses command line arguments.
  *
  */
-void 
-Application::ParseArguments(int    &argc, 
-                            char **&argv) 
+void
+Application::ParseArguments(int    &argc,
+                            char **&argv)
 {
 	// Parse config file first
 	optimaster::Config &config = optimaster::Config::Initialize(CONFDIR "/optimaster.conf");
@@ -212,6 +217,14 @@ Application::ParseArguments(int    &argc,
 	logInterval.set_description("Log interval (in minutes)");
 
 	group.add_entry(logInterval, config.LogInterval);
+
+	Glib::OptionEntry commandAddress;
+
+	commandAddress.set_long_name("command-address");
+	commandAddress.set_short_name('c');
+	commandAddress.set_description("Command address");
+
+	group.add_entry(commandAddress, config.CommandAddress);
 
 	Glib::OptionContext context;
 
@@ -272,6 +285,23 @@ Application::ParseArguments(int    &argc,
 	}
 
 	d_jobManager.Set(parts[0], parts[1]);
+
+	parts = String(config.CommandAddress).Split(":", 2);
+
+	if (parts.size() == 1 || parts[1] == "")
+	{
+		if (parts.size() == 1)
+		{
+			parts.push_back("");
+		}
+
+		stringstream s;
+		s << optimization::Constants::CommandPort;
+
+		parts[1] = s.str();
+	}
+
+	d_command.Set(parts[0], parts[1]);
 }
 
 struct DebugInfo
@@ -317,7 +347,7 @@ Application::EnableEnvironment()
  *
  */
 void
-Application::OnGreeting(optimization::Discovery::Info &info) 
+Application::OnGreeting(optimization::Discovery::Info &info)
 {
 	string protocol;
 	string host = info.Host;
@@ -343,7 +373,7 @@ Application::OnGreeting(optimization::Discovery::Info &info)
  *
  */
 bool
-Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop) 
+Application::OnInterrupt(Glib::RefPtr<Glib::MainLoop> loop)
 {
 	loop->quit();
 	return true;
@@ -388,11 +418,12 @@ Application::OnJobRemoved(Job &job)
 	// Cancel all the workers that are still active for this job
 	vector<Worker> activeWorkers = job.ActiveWorkers();
 	vector<Worker>::iterator iter;
-	
+
 	for (iter = activeWorkers.begin(); iter != activeWorkers.end(); ++iter)
 	{
 		if (!iter->Cancel())
 		{
+			// Still need to deactivate if cancel failed actually
 			iter->Deactivate();
 		}
 	}
@@ -443,7 +474,7 @@ Application::HandleJobToken(Job                 &job,
 {
 	// Relay the token response back to the worker
 	vector<Worker>::iterator iter;
-	
+
 	for (iter = job.ActiveWorkers().begin();
 	     iter != job.ActiveWorkers().end();
 	     ++iter)
@@ -492,7 +523,7 @@ void
 Application::OnJobCommunication(Job::CommunicationArgs &args)
 {
 	Job job;
-	
+
 	if (!d_jobManager.Find(args.Source.Id(), job))
 	{
 		return;
@@ -562,9 +593,15 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 {
 	Worker worker;
 
+	if (args.Communication.type() != task::Communication::CommunicationResponse)
+	{
+		debug_master << "Received something else: " << args.Communication.type() << endl;
+		return;
+	}
+
 	if (!d_workerManager.Find(args.Source.Id(), worker))
 	{
-		debug_worker << "Could not find worker: " << worker.Id() << endl;
+		debug_master << "Could not find worker: " << worker.Id() << endl;
 		return;
 	}
 
@@ -575,8 +612,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 	// Check if the job for this task is still present
 	if (!d_jobManager.Find(task.Group(), job))
 	{
-		debug_worker << "Job no longer connected..." << endl;
-		
+		debug_master << "Job no longer connected..." << endl;
+
 		worker.Deactivate();
 		return;
 	}
@@ -597,7 +634,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 			}
 
 			job.Send(args.Communication);
-			
+
 			AddIdleTime(job.User(), worker.IdleTime().elapsed());
 			worker.Deactivate();
 
@@ -619,7 +656,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				// Task failed too many times
 				if (Debug::Enabled(optimization::Debug::Domain::Worker))
 				{
-					debug_worker << "Task failed to many times ("
+					debug_master << "Task failed to many times ("
 					             << worker.Client().Address().Host(true)
 					             << ":"
 					             << worker.Client().Address().Port(true)
@@ -628,9 +665,11 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				}
 
 				Log(LogType::Error,
-				    "task-failed: %lu, %u, task failed too many times",
+				    "task-failed: %lu, %u, %s:%s, task failed too many times",
 				    task.Group(),
-				    task.Message().id());
+				    task.Message().id(),
+				    worker.Client().Address().Host(true).c_str(),
+				    worker.Client().Address().Port(true).c_str());
 
 				// Relay failure to job
 				job.Send(args.Communication);
@@ -646,7 +685,7 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				// faulty worker, or maybe some network problems
 				if (Debug::Enabled(optimization::Debug::Domain::Worker))
 				{
-					debug_worker << "Task failed (" << FailureToString(response.failure()) << "), rescheduling ("
+					debug_master << "Task failed (" << FailureToString(response.failure()) << "), rescheduling ("
 					             << worker.Client().Address().Host(true) <<
 					             ":" << worker.Client().Address().Port(true)
 					             << ") for (" << task.Group() << ", "
@@ -654,14 +693,16 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				}
 
 				Log(LogType::Error,
-				    "task-failed: %lu, %u, task failed and rescheduling: %s",
+				    "task-failed: %lu, %u, %s:%s, task failed and rescheduling: %s",
 				    task.Group(),
 				    task.Message().id(),
+				    worker.Client().Address().Host(true).c_str(),
+				    worker.Client().Address().Port(true).c_str(),
 				    FailureToString(response.failure()).c_str());
 
 				// Reschedule task
 				d_taskQueue.Push(task);
-				
+
 				AddIdleTime(job.User(), worker.IdleTime().elapsed());
 				worker.Deactivate();
 			}
@@ -690,7 +731,7 @@ void
 Application::AddIdleTime(string const &user, double idleTime)
 {
 	map<string, double>::iterator iter = d_activeUsers.find(user);
-	
+
 	if (iter != d_activeUsers.end())
 	{
 		iter->second += idleTime;
@@ -779,13 +820,13 @@ Application::OnDispatch()
  *
  */
 void
-Application::Run(Glib::RefPtr<Glib::MainLoop> loop) 
+Application::Run(Glib::RefPtr<Glib::MainLoop> loop)
 {
 	if (!d_jobManager)
 	{
 		return;
 	}
-	
+
 	jessevdk::os::Signals::Install();
 	jessevdk::os::Signals::OnInterrupt.AddData(*this, &Application::OnInterrupt, loop);
 
@@ -851,7 +892,7 @@ Application::OnWorkerTimeout(Worker &worker)
 	// Reschedule and cancel
 	Task task = worker.ActiveTask();
 	worker.Cancel();
-	
+
 	d_taskQueue.Push(task);
 }
 
@@ -917,6 +958,41 @@ Application::OnPeriodicLogStatus()
 	for (iter = d_activeUsers.begin(); iter != d_activeUsers.end(); ++iter)
 	{
 		Log(LogType::Information, iter->first.c_str(), "user-status: %f", iter->second);
+	}
+
+	map<size_t, Worker> &workers = d_workerManager.Workers();
+
+	for (map<size_t, Worker>::iterator it = workers.begin(); it != workers.end(); ++it)
+	{
+		map<size_t, double> const &activeTime = it->second.TotalActiveTime();
+		stringstream s;
+
+		s << it->second.Client().Address().Host(true) << ":"
+		  << it->second.Client().Address().Port(true) << " => ";
+
+		for (map<size_t, double>::const_iterator itt = activeTime.begin(); itt != activeTime.end(); ++itt)
+		{
+			Job job;
+
+			if (itt != activeTime.begin())
+			{
+				s << ", ";
+			}
+
+			if (d_jobManager.Find(itt->first, job))
+			{
+				s << job.User() << "." << job.Name();
+			}
+			else
+			{
+				s << itt->first;
+			}
+
+			s << " = (" << itt->second << "; " << itt->second / d_interval << ")";
+		}
+
+		Log(LogType::Information, "worker-status: " + s.str());
+		it->second.ResetTotalActiveTime();
 	}
 
 	d_tasksFailed = 0;

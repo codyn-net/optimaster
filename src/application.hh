@@ -52,6 +52,7 @@ namespace optimaster
 		Glib::RefPtr<Glib::MainLoop> d_mainLoop;
 
 		double d_idleTime;
+		double d_interval;
 
 		size_t d_tasksFailed;
 		size_t d_tasksSuccess;

@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -48,7 +48,7 @@ Batch::Batch(size_t             id,
 {
 	d_data = new Data();
 	AddPrivateData(d_data);
-	
+
 	d_data->id = id;
 	d_data->bias = bias > 0 ? bias : 1;
 
@@ -142,10 +142,10 @@ Batch::Pop(Task &task)
 	{
 		return false;
 	}
-	
+
 	task = d_data->tasks.front();
 	d_data->tasks.pop_front();
-	
+
 	return true;
 }
 
