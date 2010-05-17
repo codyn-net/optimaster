@@ -660,9 +660,11 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				}
 
 				Log(LogType::Error,
-				    "task-failed: %lu, %u, task failed too many times",
+				    "task-failed: %lu, %u, %s:%s, task failed too many times",
 				    task.Group(),
-				    task.Message().id());
+				    task.Message().id(),
+				    worker.Client().Address().Host(true).c_str(),
+				    worker.Client().Address().Port(true).c_str());
 
 				// Relay failure to job
 				job.Send(args.Communication);
@@ -686,9 +688,11 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				}
 
 				Log(LogType::Error,
-				    "task-failed: %lu, %u, task failed and rescheduling: %s",
+				    "task-failed: %lu, %u, %s:%s, task failed and rescheduling: %s",
 				    task.Group(),
 				    task.Message().id(),
+				    worker.Client().Address().Host(true).c_str(),
+				    worker.Client().Address().Port(true).c_str(),
 				    FailureToString(response.failure()).c_str());
 
 				// Reschedule task
