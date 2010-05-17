@@ -316,3 +316,15 @@ WorkerManager::ResetIdleTime()
 
 	return ret;
 }
+
+map<size_t, Worker> const &
+WorkerManager::Workers() const
+{
+	return d_workers;
+}
+
+map<size_t, Worker> &
+WorkerManager::Workers()
+{
+	return d_workers;
+}

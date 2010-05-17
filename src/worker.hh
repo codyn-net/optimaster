@@ -48,6 +48,9 @@ namespace optimaster
 			Task const &ActiveTask() const;
 			Task &ActiveTask();
 
+			std::map<size_t, double> const &TotalActiveTime() const;
+			void ResetTotalActiveTime();
+
 			jessevdk::base::signals::Signal<Worker> &OnActivated();
 			jessevdk::base::signals::Signal<Worker> &OnDeactivated();
 			jessevdk::base::signals::Signal<Worker> &OnTimeout();
@@ -65,8 +68,9 @@ namespace optimaster
 				jessevdk::base::signals::Signal<Worker> onTimeout;
 
 				Task task;
-
 				Glib::Timer idleTime;
+
+				std::map<size_t, double> totalActiveTime;
 
 				sigc::connection timeout;
 				bool OnTimeout();

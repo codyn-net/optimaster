@@ -955,6 +955,41 @@ Application::OnPeriodicLogStatus()
 		Log(LogType::Information, iter->first.c_str(), "user-status: %f", iter->second);
 	}
 
+	map<size_t, Worker> &workers = d_workerManager.Workers();
+
+	for (map<size_t, Worker>::iterator it = workers.begin(); it != workers.end(); ++it)
+	{
+		map<size_t, double> const &activeTime = it->second.TotalActiveTime();
+		stringstream s;
+
+		s << it->second.Client().Address().Host(true) << ":"
+		  << it->second.Client().Address().Port(true) << " => ";
+
+		for (map<size_t, double>::const_iterator itt = activeTime.begin(); itt != activeTime.end(); ++itt)
+		{
+			Job job;
+
+			if (itt != activeTime.begin())
+			{
+				s << ", ";
+			}
+
+			if (d_jobManager.Find(itt->first, job))
+			{
+				s << job.User() << "." << job.Name();
+			}
+			else
+			{
+				s << itt->first;
+			}
+
+			s << " = (" << itt->second << "; " << itt->second / d_interval << ")";
+		}
+
+		Log(LogType::Information, "worker-status: %s", s.str().c_str());
+		it->second.ResetTotalActiveTime();
+	}
+
 	d_tasksFailed = 0;
 	d_tasksSuccess = 0;
 	d_idleTime = 0;

@@ -53,6 +53,9 @@ namespace optimaster
 			size_t Size() const;
 			size_t Active() const;
 
+			std::map<size_t, Worker> const &Workers() const;
+			std::map<size_t, Worker> &Workers();
+
 			double ResetIdleTime();
 
 			/**

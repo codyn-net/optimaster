@@ -234,11 +234,25 @@ Worker::Deactivate()
 		d_data->timeout.disconnect();
 	}
 
+	d_data->totalActiveTime[d_data->task.Group()] += d_data->idleTime.elapsed();
+
 	d_data->idleTime.start();
 
 	d_data->task.End();
 	d_data->active = false;
 	d_data->onDeactivated(*this);
+}
+
+map<size_t, double> const &
+Worker::TotalActiveTime() const
+{
+	return d_data->totalActiveTime;
+}
+
+void
+Worker::ResetTotalActiveTime()
+{
+	d_data->totalActiveTime.clear();
 }
 
 /**
