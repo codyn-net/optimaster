@@ -80,8 +80,13 @@ Application::Application(int    &argc,
 
 	if (config.LogInterval >= 1)
 	{
+		d_interval = config.LogInterval * 60;
 		Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Application::OnPeriodicLogStatus),
-		                                       config.LogInterval * 60);
+		                                       d_interval);
+	}
+	else
+	{
+		d_interval = 0;
 	}
 
 	d_command.Listen();
@@ -986,7 +991,7 @@ Application::OnPeriodicLogStatus()
 			s << " = (" << itt->second << "; " << itt->second / d_interval << ")";
 		}
 
-		Log(LogType::Information, "worker-status: %s", s.str().c_str());
+		Log(LogType::Information, "worker-status: " + s.str());
 		it->second.ResetTotalActiveTime();
 	}
 
