@@ -57,6 +57,8 @@ Job::Job(jessevdk::network::Client &client)
 	d_data->tasksFailed = 0;
 	d_data->tasksSuccess = 0;
 
+	d_data->protocolVersion = 0;
+
 	d_data->started.assign_current_time();
 	d_data->lastUpdate.assign_current_time();
 
@@ -201,6 +203,24 @@ void
 Job::SetUser(string const &user)
 {
 	d_data->user = user;
+}
+
+size_t
+Job::ProtocolVersion() const
+{
+	return d_data->protocolVersion;
+}
+
+void
+Job::SetProtocolVersion(size_t version)
+{
+	d_data->protocolVersion = version;
+}
+
+bool
+Job::Valid() const
+{
+	return d_data->protocolVersion >= Config::ProtocolVersion;
 }
 
 size_t
