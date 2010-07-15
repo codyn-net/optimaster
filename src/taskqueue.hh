@@ -35,6 +35,8 @@ namespace optimaster
 		std::map<size_t, std::map<size_t, bool> > d_running;
 		size_t d_size;
 
+		static size_t s_uniqueId;
+
 		public:
 			/* Constructor/destructor */
 			TaskQueue();
@@ -60,6 +62,7 @@ namespace optimaster
 			 */
 			jessevdk::base::signals::Signal<> OnNotifyAvailable;
 		private:
+			size_t NextUniqueId();
 	};
 }
 

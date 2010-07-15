@@ -49,8 +49,7 @@ namespace optimaster
 			Batch(size_t                                     idx,
 			      double                                     bias,
 			      double                                     priority,
-			      double                                     timeout,
-			      optimization::messages::task::Batch const &batch);
+			      double                                     timeout);
 
 			size_t Id() const;
 

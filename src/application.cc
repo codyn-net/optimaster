@@ -641,10 +641,10 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 		return;
 	}
 
-	if (task.Message().id() != response.id())
+	if (!task.UniqueId() || !response.has_uniqueid() ||
+	    task.UniqueId() != response.uniqueid())
 	{
 		debug_master << "Received mismatch in task and response id: " << worker.Id() << ", " << task.Message().id() << ", " << response.id() << endl;
-		return;
 	}
 
 	switch (response.status())

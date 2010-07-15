@@ -23,10 +23,14 @@
 #include "taskqueue.hh"
 #include "debug.hh"
 
+#include <limits>
+
 using namespace std;
 using namespace optimaster;
 using namespace jessevdk::base;
 using namespace optimization::messages;
+
+size_t TaskQueue::s_uniqueId = 1;
 
 /**
  * @class optimaster::TaskQueue
@@ -134,21 +138,35 @@ TaskQueue::Push(size_t             id,
 
 	if (Lookup(id, ret))
 	{
-		debug_scheduler << "Scheduled existing batch: [id = " << id << ", bias = " << bias << "]: " << batch.tasks_size() << endl;
+		debug_scheduler << "Scheduled existing batch: [id = "
+		                << id << ", bias = " << bias << "]: "
+		                << batch.tasks_size() << endl;
 
 		for (int i = 0; i < batch.tasks_size(); ++i)
 		{
-			Task task = Task(id, batch.tasks(i));
-			ret.Push(task);
-			d_running[id].erase(task.Id());
+			d_running[id].erase(batch.tasks(i).id());
 		}
 	}
 	else
 	{
-		debug_scheduler << "Scheduled new batch: [id = " << id << ", bias = " << bias << "]: " << batch.tasks_size() << endl;
+		debug_scheduler << "Scheduled new batch: [id = " << id
+		                << ", bias = " << bias << "]: "
+		                << batch.tasks_size() << endl;
 
-		d_batches[id] = Batch(id, bias, priority, timeout, batch);
+		ret = Batch(id, bias, priority, timeout);
+
+		d_batches[id] = ret;
 		d_running[id] = map<size_t, bool>();
+	}
+
+	// Create tasks from the batch
+	for (int i = 0; i < batch.tasks_size(); ++i)
+	{
+		Task task = Task(id, batch.tasks(i));
+
+		task.SetUniqueId(NextUniqueId());
+
+		ret.Push(task);
 	}
 
 	d_size += batch.tasks_size();
@@ -170,7 +188,11 @@ TaskQueue::Push(Task &task)
 
 	if (Lookup(task.Group(), batch))
 	{
-		debug_scheduler << "Pushing single task in batch: [group = " << task.Group() << ", id = " << task.Id() << "]" << endl;
+		debug_scheduler << "Pushing single task in batch: [group = "
+		                << task.Group() << ", id = " << task.Id()
+		                << "]" << endl;
+
+		task.SetUniqueId(NextUniqueId());
 
 		batch.Push(task);
 		d_running[batch.Id()].erase(task.Id());
@@ -181,7 +203,9 @@ TaskQueue::Push(Task &task)
 	}
 	else
 	{
-		debug_scheduler << "Batch not found while pushing single task: [group = " << task.Group() << ", id = " << task.Id() << "]" << endl;
+		debug_scheduler << "Batch not found while pushing single task: [group = "
+		                << task.Group() << ", id = " << task.Id()
+		                << "]" << endl;
 	}
 }
 
@@ -245,4 +269,21 @@ size_t
 TaskQueue::Size() const
 {
 	return d_size;
+}
+
+size_t
+TaskQueue::NextUniqueId()
+{
+	size_t ret = s_uniqueId;
+
+	if (s_uniqueId == numeric_limits<size_t>::max())
+	{
+		s_uniqueId = 1;
+	}
+	else
+	{
+		++s_uniqueId;
+	}
+
+	return ret;
 }
