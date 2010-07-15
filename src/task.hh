@@ -57,6 +57,9 @@ namespace optimaster
 
 			double LastRunTime() const;
 
+			size_t UniqueId() const;
+			void SetUniqueId(size_t id);
+
 			optimization::messages::task::Task &Message();
 			optimization::messages::task::Task const &Message() const;
 

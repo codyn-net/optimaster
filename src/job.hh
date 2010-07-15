@@ -50,6 +50,9 @@ namespace optimaster
 			std::string const &User() const;
 			void SetUser(std::string const &user);
 
+			size_t ProtocolVersion() const;
+			void SetProtocolVersion(size_t version);
+
 			double Priority() const;
 			double Timeout() const;
 
@@ -68,6 +71,8 @@ namespace optimaster
 			Glib::TimeVal const &Started() const;
 
 			Glib::TimeVal const &LastUpdate() const;
+
+			bool Valid() const;
 		private:
 			struct Data : public Communicator::Data
 			{
@@ -78,6 +83,9 @@ namespace optimaster
 
 				std::string name;
 				std::string user;
+
+				size_t protocolVersion;
+
 				double priority;
 				double timeout;
 

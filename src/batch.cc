@@ -43,8 +43,7 @@ using namespace optimization::messages;
 Batch::Batch(size_t             id,
              double             bias,
              double             priority,
-             double             timeout,
-             task::Batch const &batch)
+             double             timeout)
 {
 	d_data = new Data();
 	AddPrivateData(d_data);
@@ -55,12 +54,6 @@ Batch::Batch(size_t             id,
 	d_data->timeout = timeout;
 	d_data->priority = priority;
 	d_data->waitTime = 0;
-
-	// Create tasks from the batch
-	for (int i = 0; i < batch.tasks_size(); ++i)
-	{
-		Push(Task(id, batch.tasks(i)));
-	}
 }
 
 /**

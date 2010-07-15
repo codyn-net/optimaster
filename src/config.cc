@@ -30,6 +30,7 @@ using namespace optimaster;
 using namespace jessevdk::os;
 
 Config *Config::s_instance = 0;
+size_t Config::ProtocolVersion = 2;
 
 /**
  * @class optimaster::Config

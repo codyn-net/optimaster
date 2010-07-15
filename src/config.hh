@@ -33,6 +33,8 @@ namespace optimaster
 		static Config *s_instance;
 
 		public:
+			static size_t ProtocolVersion;
+
 			/** Discovery namespace setting. */
 			Glib::ustring DiscoveryNamespace;
 			

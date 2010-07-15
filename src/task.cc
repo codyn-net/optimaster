@@ -180,3 +180,22 @@ Task::LastRunTime() const
 {
 	return d_data->lastRunTime;
 }
+
+size_t
+Task::UniqueId() const
+{
+	if (d_data->task.has_uniqueid())
+	{
+		return d_data->task.uniqueid();
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+void
+Task::SetUniqueId(size_t id)
+{
+	d_data->task.set_uniqueid(id);
+}

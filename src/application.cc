@@ -443,6 +443,12 @@ void
 Application::HandleJobBatch(Job                 &job,
                             task::Communication const &communication)
 {
+	if (!job.Valid())
+	{
+		debug_master << "Not handling batch for invalid job: " << job.Id() << ", " << job.User() << ", " << job.Name() << endl;
+		return;
+	}
+
 	// Add batch to the task queue
 	debug_master << "Received batch from job ("
 	             << job.Id() << "): "
@@ -472,6 +478,12 @@ void
 Application::HandleJobToken(Job                 &job,
                             task::Communication const &communication)
 {
+	if (!job.Valid())
+	{
+		debug_master << "Not handling token for invalid job: " << job.Id() << ", " << job.User() << ", " << job.Name() << endl;
+		return;
+	}
+
 	// Relay the token response back to the worker
 	vector<Worker>::iterator iter;
 
@@ -505,6 +517,11 @@ Application::HandleJobIdentify(Job                       &job,
 	if (identify.has_timeout())
 	{
 		job.SetTimeout(identify.timeout());
+	}
+
+	if (identify.has_version())
+	{
+		job.SetProtocolVersion(identify.version());
 	}
 
 	d_activeUsers[job.User()] = 0;
@@ -605,6 +622,12 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 		return;
 	}
 
+	if (!worker.Active())
+	{
+		debug_master << "Received response for inactive worker: " << worker.Id() << endl;
+		return;
+	}
+
 	Task &task = worker.ActiveTask();
 	task::Response &response = *args.Communication.mutable_response();
 	Job job;
@@ -618,6 +641,12 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 		return;
 	}
 
+	if (!task.UniqueId() || !response.has_uniqueid() ||
+	    task.UniqueId() != response.uniqueid())
+	{
+		debug_master << "Received mismatch in task and response id: " << worker.Id() << ", " << task.UniqueId() << ", " << (response.has_uniqueid() ? response.uniqueid() : 0) << endl;
+	}
+
 	switch (response.status())
 	{
 		// Task was completed successfully
@@ -629,7 +658,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				             << ":"
 				             << worker.Client().Address().Port(true)
 				             << ") for (" << task.Group()
-				             << ", " << task.Message().id() << ")"
+				             << ", " << worker.Id()
+				             << ", " << task.Message().id() << ", " << response.id() << ")"
 				             << endl;
 			}
 
@@ -661,7 +691,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 					             << ":"
 					             << worker.Client().Address().Port(true)
 					             << ") for (" << task.Group() << ", "
-					             << task.Message().id() << ")" << endl;
+					             << worker.Id() << ", "
+					             << task.Message().id() << ", " << response.id() << ")" << endl;
 				}
 
 				Log(LogType::Error,
@@ -689,7 +720,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 					             << worker.Client().Address().Host(true) <<
 					             ":" << worker.Client().Address().Port(true)
 					             << ") for (" << task.Group() << ", "
-					             << task.Message().id() << ")" << endl;
+					             << worker.Id() << ", "
+					             << task.Message().id() << ", " << response.id() << ")" << endl;
 				}
 
 				Log(LogType::Error,
@@ -717,7 +749,8 @@ Application::OnWorkerCommunication(Communicator::CommunicationArgs &args)
 				             << worker.Client().Address().Port(true)
 				             << ") for ("
 				             << task.Group() << ", "
-				             << task.Message().id() << ")" << endl;
+				             << worker.Id() << ", "
+				             << task.Message().id() << ", " << response.id() << ")" << endl;
 			}
 
 			job.Send(args.Communication);
@@ -799,7 +832,7 @@ Application::OnDispatch()
 			job.Add(worker);
 		}
 
-		debug_master << "Worker activated for: " << task.Group() << " (" << task.Id() << ")" << endl;
+		debug_master << "Worker activated for: " << task.Group() << " (" << worker.Id() << ", " << task.Id() << ")" << endl;
 		didSomething = true;
 	}
 
