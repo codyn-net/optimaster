@@ -269,6 +269,7 @@ Worker::Cancel()
 {
 	if (!d_data->active)
 	{
+		debug_worker << "Tried to cancel inactive worker: " << Id() << endl;
 		return false;
 	}
 
@@ -279,6 +280,7 @@ Worker::Cancel()
 
 	if (Send(communication))
 	{
+		debug_worker << "Cancelled worker: " << Id() << ", " << d_data->task.Id() << endl;
 		Deactivate();
 		return true;
 	}
