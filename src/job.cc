@@ -271,3 +271,27 @@ Job::LastUpdate() const
 {
 	return d_data->lastUpdate;
 }
+
+void
+Job::UpdateProgress(optimization::messages::task::Progress const &progress)
+{
+	d_data->progressItems.push_back(progress);
+}
+
+list<optimization::messages::task::Progress> const &
+Job::ProgressItems() const
+{
+	return d_data->progressItems;
+}
+
+vector<task::Identify::Fitness> const &
+Job::Fitness() const
+{
+	return d_data->fitness;
+}
+
+void
+Job::SetFitness(vector<task::Identify::Fitness> const &fitness)
+{
+	d_data->fitness = fitness;
+}

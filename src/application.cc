@@ -514,6 +514,19 @@ Application::HandleJobBatch(Job                 &job,
 	d_taskQueue.Push(job.Id(), job.AverageRunTime(), job.Priority(), job.Timeout(), communication.batch());
 }
 
+void
+Application::HandleJobProgress(Job                 &job,
+                               task::Communication const &communication)
+{
+	if (!job.Valid())
+	{
+		debug_master << "Not handling progress for invalid job: " << job.Id() << ", " << job.User() << ", " << job.Name() << endl;
+		return;
+	}
+
+	job.UpdateProgress(communication.progress());
+}
+
 /**
  * @brief Handle job token.
  * @param job the job
@@ -572,6 +585,15 @@ Application::HandleJobIdentify(Job                       &job,
 		job.SetProtocolVersion(identify.version());
 	}
 
+	vector<task::Identify::Fitness> fitness;
+
+	for (int i = 0; i < identify.fitness_size(); ++i)
+	{
+		fitness.push_back(identify.fitness(i));
+	}
+
+	job.SetFitness(fitness);
+
 	d_activeUsers[job.User()] = 0;
 
 	Log(LogType::Notice, "Job identified: %d, %s, %s", job.Id(), job.Name().c_str(), job.User().c_str());
@@ -604,6 +626,9 @@ Application::OnJobCommunication(Job::CommunicationArgs &args)
 		break;
 		case task::Communication::CommunicationIdentify:
 			HandleJobIdentify(job, args.Communication);
+		break;
+		case task::Communication::CommunicationProgress:
+			HandleJobProgress(job, args.Communication);
 		break;
 		default:
 		break;

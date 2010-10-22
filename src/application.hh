@@ -121,6 +121,8 @@ namespace optimaster
 			                    optimization::messages::task::Communication const &communication);
 			void HandleJobToken(Job                                               &job,
 			                    optimization::messages::task::Communication const &communication);
+			void HandleJobProgress(Job                                               &job,
+			                       optimization::messages::task::Communication const &communication);
 
 			void OnNotifyAvailable();
 			std::string FailureToString(optimization::messages::task::Response::Failure const &failure) const;

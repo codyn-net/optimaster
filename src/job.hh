@@ -50,6 +50,9 @@ namespace optimaster
 			std::string const &User() const;
 			void SetUser(std::string const &user);
 
+			std::vector<optimization::messages::task::Identify::Fitness> const &Fitness() const;
+			void SetFitness(std::vector<optimization::messages::task::Identify::Fitness> const &fitness);
+
 			size_t ProtocolVersion() const;
 			void SetProtocolVersion(size_t version);
 
@@ -73,6 +76,9 @@ namespace optimaster
 			Glib::TimeVal const &LastUpdate() const;
 
 			bool Valid() const;
+
+			void UpdateProgress(optimization::messages::task::Progress const &progress);
+			std::list<optimization::messages::task::Progress> const &ProgressItems() const;
 		private:
 			struct Data : public Communicator::Data
 			{
@@ -83,6 +89,7 @@ namespace optimaster
 
 				std::string name;
 				std::string user;
+				std::vector<optimization::messages::task::Identify::Fitness> fitness;
 
 				size_t protocolVersion;
 
@@ -96,6 +103,8 @@ namespace optimaster
 
 				Glib::TimeVal started;
 				Glib::TimeVal lastUpdate;
+
+				std::list<optimization::messages::task::Progress> progressItems;
 			};
 
 			Data *d_data;
