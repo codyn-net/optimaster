@@ -57,11 +57,15 @@ Application::Application(int    &argc,
 :
 	d_command(*this),
 	d_tasksFailed(0),
-	d_tasksSuccess(0)
+	d_tasksSuccess(0),
+	d_idleTimer(0)
 {
 	EnableEnvironment();
 
 	d_discovery.OnGreeting().Add(*this, &Application::OnGreeting);
+
+	d_idleTimer = new Glib::Timer();
+	d_idleTimer->start();
 
 	d_workerManager.OnAdded.Add(*this, &Application::OnWorkerAdded);
 	d_workerManager.OnRemoved.Add(*this, &Application::OnWorkerRemoved);
@@ -164,6 +168,22 @@ Application::~Application()
 
 	Log(LogType::Notice, "stopped");
 	closelog();
+
+	if (d_idleTimer)
+	{
+		delete d_idleTimer;
+	}
+}
+
+double
+Application::Idle() const
+{
+	if (!d_idleTimer)
+	{
+		return 0;
+	}
+
+	return d_idleTimer->elapsed();
 }
 
 /**
@@ -395,6 +415,28 @@ Application::OnJobAdded(Job &job)
 	    job.Client().Address().Host(true).c_str());
 
 	job.OnCommunication().Add(*this, &Application::OnJobCommunication);
+
+	if (d_idleTimer)
+	{
+		delete d_idleTimer;
+		d_idleTimer = 0;
+	}
+
+	if (d_workerManager.Size() == 0)
+	{
+		// Notify job
+		task::Communication comm;
+
+		comm.set_type(task::Communication::CommunicationNotification);
+		task::Notification &notification = *comm.mutable_notification();
+
+		notification.set_type(task::Notification::Warning);
+		notification.set_message("There are currently no workers connected... optimaster will try to wakeup available worker nodes. This might take some minutes...");
+
+		job.Send(comm);
+
+		TryWakeup();
+	}
 }
 
 /**
@@ -429,6 +471,12 @@ Application::OnJobRemoved(Job &job)
 	}
 
 	LogStatus();
+
+	if (d_jobManager.Jobs().size() == 0)
+	{
+		d_idleTimer = new Glib::Timer();
+		d_idleTimer->start();
+	}
 }
 
 /**
@@ -1101,4 +1149,20 @@ Application::Log(LogType::Values type, string const &user, string const &format,
 	syslog(type, "%s, (%s)", buffer, user.c_str());
 
 	LogStorage(type, user, buffer);
+}
+
+void
+Application::TryWakeup()
+{
+	string filename = Config::Instance().WakeupScript;
+
+	if (filename == "" || !Glib::file_test(filename, Glib::FILE_TEST_IS_EXECUTABLE))
+	{
+		return;
+	}
+
+	vector<string> argv;
+	argv.push_back(filename);
+
+	Glib::spawn_async(Glib::get_current_dir(), argv, Glib::SPAWN_STDOUT_TO_DEV_NULL);
 }

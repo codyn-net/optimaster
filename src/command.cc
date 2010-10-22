@@ -162,6 +162,16 @@ Command::Data::HandleSetPriority(Client                            &client,
 }
 
 void
+Command::Data::HandleIdle(jessevdk::network::Client  &client,
+                          command::IdleCommand const &command)
+{
+	command::Response response = CreateResponse(command::Idle, true);
+	command::IdleResponse &idle = *response.mutable_idle();
+
+	idle.set_seconds(application.Idle());
+
+	Respond(client, response);
+}
 Command::Data::GenerateChallenge(Client                             &client,
                                  command::AuthenticateCommand const &command)
 {
@@ -323,6 +333,16 @@ Command::Data::OnClientData(FileDescriptor::DataArgs &args, Client client)
 				if (c.has_authenticate())
 				{
 					HandleAuthenticate(client, c.authenticate());
+				}
+				else
+				{
+					invalid = true;
+				}
+			break;
+			case command::Idle:
+				if (c.has_idle())
+				{
+					HandleIdle(client, c.idle());
 				}
 				else
 				{
