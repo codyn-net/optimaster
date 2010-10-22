@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with optimaster; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
@@ -37,24 +37,24 @@ namespace optimaster
 			/* Constructor/destructor */
 			JobManager();
 			~JobManager();
-		
+
 			/* Public functions */
 			void Set(std::string const &host, std::string const &port);
-			
+
 			bool Listen();
 			operator bool() const;
-			
+
 			bool Find(size_t id, Job &job);
 
 			std::vector<Job> Jobs() const;
-			
+
 			/**
 			* @brief OnAdded signal
 			 *
 			 * Signal emitted when job is added to the manager
 			 */
 			jessevdk::base::signals::Signal<Job> OnAdded;
-			
+
 			/**
 			* @brief OnRemoved signal
 			 *

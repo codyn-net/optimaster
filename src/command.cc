@@ -162,6 +162,47 @@ Command::Data::HandleSetPriority(Client                            &client,
 }
 
 void
+Command::Data::HandleIdle(jessevdk::network::Client  &client,
+                          command::IdleCommand const &command)
+{
+	command::Response response = CreateResponse(command::Idle, true);
+	command::IdleResponse &idle = *response.mutable_idle();
+
+	idle.set_seconds(application.Idle());
+
+	Respond(client, response);
+}
+
+void
+Command::Data::HandleProgress(Client                         &client,
+                              command::ProgressCommand const &command)
+{
+	Job job;
+
+	if (!application.Manager().Find(command.id(), job))
+	{
+		command::Response response = CreateResponse(command::Progress,
+		                                            false,
+		                                            "Job not found");
+		Respond(client, response);
+		return;
+	}
+
+	command::Response response = CreateResponse(command::Progress, true);
+	command::ProgressResponse &progress = *response.mutable_progress();
+
+	list<task::Progress> const &items = job.ProgressItems();
+
+	for (list<task::Progress>::const_iterator iter = items.begin(); iter != items.end(); ++iter)
+	{
+		task::Progress *pgs = progress.add_items();
+		*pgs = *iter;
+	}
+
+	Respond(client, response);
+}
+
+void
 Command::Data::GenerateChallenge(Client                             &client,
                                  command::AuthenticateCommand const &command)
 {
@@ -323,6 +364,26 @@ Command::Data::OnClientData(FileDescriptor::DataArgs &args, Client client)
 				if (c.has_authenticate())
 				{
 					HandleAuthenticate(client, c.authenticate());
+				}
+				else
+				{
+					invalid = true;
+				}
+			break;
+			case command::Progress:
+				if (c.has_progress())
+				{
+					HandleProgress(client, c.progress());
+				}
+				else
+				{
+					invalid = true;
+				}
+			break;
+			case command::Idle:
+				if (c.has_idle())
+				{
+					HandleIdle(client, c.idle());
 				}
 				else
 				{

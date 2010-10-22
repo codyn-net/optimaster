@@ -79,6 +79,7 @@ Config::Config()
 	Register("log storage", LogStorage);
 	Register("log interval", LogInterval);
 	Register("command address", CommandAddress);
+	Register("wakeup script", WakeupScript);
 }
 
 /**

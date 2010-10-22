@@ -61,6 +61,9 @@ namespace optimaster
 
 			/** Address on which to listen for commands. */
 			Glib::ustring CommandAddress;
+
+			/** Wakeup script */
+			Glib::ustring WakeupScript;
 			
 			/* Constructor/destructor */
 			static Config &Initialize(std::string const &filename);

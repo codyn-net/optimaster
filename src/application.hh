@@ -58,8 +58,9 @@ namespace optimaster
 		size_t d_tasksSuccess;
 
 		std::map<std::string, double> d_activeUsers;
-
 		jessevdk::db::sqlite::SQLite d_logStorage;
+
+		Glib::Timer *d_idleTimer;
 
 		public:
 			struct LogType
@@ -88,6 +89,8 @@ namespace optimaster
 
 			void Log(LogType::Values type, std::string const &format, ...);
 			void Log(LogType::Values type, std::string const &user, std::string const &format, ...);
+
+			double Idle() const;
 		private:
 			/* Private functions */
 			void ParseArguments(int &argc, char **&argv);
@@ -118,6 +121,8 @@ namespace optimaster
 			                    optimization::messages::task::Communication const &communication);
 			void HandleJobToken(Job                                               &job,
 			                    optimization::messages::task::Communication const &communication);
+			void HandleJobProgress(Job                                               &job,
+			                       optimization::messages::task::Communication const &communication);
 
 			void OnNotifyAvailable();
 			std::string FailureToString(optimization::messages::task::Response::Failure const &failure) const;
@@ -129,6 +134,8 @@ namespace optimaster
 
 			void LogStorage(LogType::Values type, std::string const &user, std::string const &message);
 			void AddIdleTime(std::string const &user, double idleTime);
+
+			void TryWakeup();
 	};
 }
 

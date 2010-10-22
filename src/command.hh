@@ -59,6 +59,12 @@ namespace optimaster
 				void HandleAuthenticate(jessevdk::network::Client                                  &client,
 				                        optimization::messages::command::AuthenticateCommand const &command);
 
+				void HandleProgress(jessevdk::network::Client                              &client,
+				                    optimization::messages::command::ProgressCommand const &command);
+
+				void HandleIdle(jessevdk::network::Client                          &client,
+				                optimization::messages::command::IdleCommand const &command);
+
 				optimization::messages::command::Response CreateResponse(optimization::messages::command::CommandType  type,
 				                                                         bool                                          status,
 				                                                         std::string const                            &message = "") const;
