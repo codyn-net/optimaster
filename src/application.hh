@@ -88,7 +88,7 @@ namespace optimaster
 			JobManager &Manager();
 
 			void Log(LogType::Values type, std::string const &format, ...);
-			void Log(LogType::Values type, std::string const &user, std::string const &format, ...);
+			void LogUser(LogType::Values type, std::string const &user, std::string const &format, ...);
 
 			double Idle() const;
 		private:
@@ -135,7 +135,7 @@ namespace optimaster
 			void LogStorage(LogType::Values type, std::string const &user, std::string const &message);
 			void AddIdleTime(std::string const &user, double idleTime);
 
-			void TryWakeup();
+			bool TryWakeup();
 	};
 }
 
