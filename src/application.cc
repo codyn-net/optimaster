@@ -425,17 +425,18 @@ Application::OnJobAdded(Job &job)
 	if (d_workerManager.Size() == 0)
 	{
 		// Notify job
-		task::Communication comm;
+		if (TryWakeup())
+		{
+			task::Communication comm;
 
-		comm.set_type(task::Communication::CommunicationNotification);
-		task::Notification &notification = *comm.mutable_notification();
+			comm.set_type(task::Communication::CommunicationNotification);
+			task::Notification &notification = *comm.mutable_notification();
 
-		notification.set_type(task::Notification::Warning);
-		notification.set_message("There are currently no workers connected... optimaster will try to wakeup available worker nodes. This might take some minutes...");
+			notification.set_type(task::Notification::Warning);
+			notification.set_message("There are currently no workers connected... optimaster will try to wakeup available worker nodes. It might take some minutes for all workers to come online...");
 
-		job.Send(comm);
-
-		TryWakeup();
+			job.Send(comm);
+		}
 	}
 }
 
@@ -1063,7 +1064,7 @@ Application::OnPeriodicLogStatus()
 
 	for (iter = d_activeUsers.begin(); iter != d_activeUsers.end(); ++iter)
 	{
-		Log(LogType::Information, iter->first.c_str(), "user-status: %f", iter->second);
+		LogUser(LogType::Information, iter->first.c_str(), "user-status: %f", iter->second);
 	}
 
 	map<size_t, Worker> &workers = d_workerManager.Workers();
@@ -1161,7 +1162,7 @@ Application::Log(LogType::Values type, string const &format, ...)
 }
 
 void
-Application::Log(LogType::Values type, string const &user, string const &format, ...)
+Application::LogUser(LogType::Values type, string const &user, string const &format, ...)
 {
 	char buffer[4096];
 
@@ -1176,18 +1177,35 @@ Application::Log(LogType::Values type, string const &user, string const &format,
 	LogStorage(type, user, buffer);
 }
 
-void
+bool
 Application::TryWakeup()
 {
 	string filename = Config::Instance().WakeupScript;
 
-	if (filename == "" || !Glib::file_test(filename, Glib::FILE_TEST_IS_EXECUTABLE))
+	if (filename == "")
 	{
-		return;
+		Log(LogType::Information, "Wakeup script is not configured");
+		return false;
+	}
+	else if (!Glib::file_test(filename, Glib::FILE_TEST_IS_EXECUTABLE))
+	{
+		Log(LogType::Information, "Wake up script is not executable: %s", filename.c_str());
+		return false;
 	}
 
 	vector<string> argv;
 	argv.push_back(filename);
 
-	Glib::spawn_async(Glib::get_current_dir(), argv, Glib::SPAWN_STDOUT_TO_DEV_NULL);
+	try
+	{
+		Log(LogType::Information, "Spawning wakeup script: %s", filename.c_str());
+		Glib::spawn_async(Glib::get_current_dir(), argv, Glib::SPAWN_STDOUT_TO_DEV_NULL);
+	}
+	catch (Glib::Error &e)
+	{
+		Log(LogType::Error, "Failed to launch wakeup script: %s", e.what().c_str());
+		return false;
+	}
+
+	return true;
 }
