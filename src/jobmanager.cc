@@ -126,8 +126,8 @@ JobManager::OnJobClosed(Communicator &communicator)
 
 	if (Find(communicator.Id(), job))
 	{
-		OnRemoved(job);
 		d_jobs.erase(job.Id());
+		OnRemoved(job);
 	}
 }
 
