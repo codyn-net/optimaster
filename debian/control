@@ -10,7 +10,7 @@ Build-Depends: debhelper (>= 7),
 			   libgcrypt11-dev
 Standards-Version: 3.8.0
 Section: libs
-Homepage: http://birg.epfl.ch
+Homepage: http://biorob.epfl.ch
 
 Package: optimaster
 Section: science

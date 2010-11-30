@@ -1,3 +1,10 @@
+optimaster (2.5-1) UNRELEASED; urgency=low
+
+  * New upstream release
+  * Fixed issue with fitness headers not being reported in progress command
+
+ -- Jesse van den Kieboom <jvanden@grijpc10.epfl.ch>  Tue, 30 Nov 2010 19:42:08 +0100
+
 optimaster (2.4-1) UNRELEASED; urgency=low
 
   * New upstream release
