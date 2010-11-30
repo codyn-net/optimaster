@@ -199,6 +199,14 @@ Command::Data::HandleProgress(Client                         &client,
 		*pgs = *iter;
 	}
 
+	vector<task::Identify::Fitness> const &fitness = job.Fitness();
+
+	for (vector<task::Identify::Fitness>::const_iterator iter = fitness.begin(); iter != fitness.end(); ++iter)
+	{
+		task::Identify::Fitness *fit = progress.add_fitnesses();
+		*fit = *iter;
+	}
+
 	Respond(client, response);
 }
 
