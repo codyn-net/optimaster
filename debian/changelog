@@ -1,4 +1,4 @@
-optimaster (2.5-1precise1) precise; urgency=low
+optimaster (2.5-1) UNRELEASED; urgency=low
 
   * precise release
   * Updated rules and dependency to use autogen.sh
