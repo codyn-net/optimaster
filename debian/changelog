@@ -1,3 +1,10 @@
+optimaster (2.6-1) UNRELEASED; urgency=low
+
+  * New upstream release
+  * Link against latest libjessevdk
+
+ -- Jesse van den Kieboom <jesse.vandenkieboom@epfl.ch>  Mon, 18 Mar 2013 09:28:15 +0100
+
 optimaster (2.5-1) UNRELEASED; urgency=low
 
   * precise release
